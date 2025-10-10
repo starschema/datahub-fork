@@ -16,7 +16,7 @@ This guide provides step-by-step instructions to get DataHub up and running on y
 
 ```bash
 # Clone the DataHub repository
-git clone https://github.com/datahub-project/datahub.git
+git clone https://github.com/starschema/Custom-Datahub.git
 
 # Navigate to the project directory
 cd datahub
