@@ -1,197 +1,244 @@
-<!--HOSTED_DOCS_ONLY
-import useBaseUrl from '@docusaurus/useBaseUrl';
+# Custom DataHub - RAG Metadata Store for Data Estate
 
-export const Logo = (props) => {
-  return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "20px", height: "190px" }}>
-      <img
-        alt="DataHub Logo"
-        src="https://raw.githubusercontent.com/datahub-project/static-assets/main/imgs/datahub-logo-color-mark.svg"
-        {...props}
-      />
-    </div>
-  );
-};
+## Project Overview
 
-<Logo />
+This is a customized DataHub implementation designed to serve as a **metadata-powered knowledge base for RAG (Retrieval-Augmented Generation)** systems.
 
-<!--
-HOSTED_DOCS_ONLY-->
-<p align="center">
-<a href="https://datahub.com">
-<img alt="DataHub" src="https://raw.githubusercontent.com/datahub-project/static-assets/main/imgs/datahub-logo-color-mark.svg" height="150" />
-</a>
-</p>
-<!-- -->
+**Our Goal:** Build an intelligent metadata catalog that:
+- Ingests metadata from diverse data sources across the data estate (Snowflake, MySQL, PostgreSQL, S3, etc.)
+- Provides a unified view of datasets, schemas, lineage, and quality metrics
+- Serves as a structured knowledge store for AI/LLM queries about data assets
+- Enables intelligent data discovery through metadata enrichment
 
-# DataHub: The Data Discovery Platform for the Modern Data Stack
-
-### Built with ❤️ by <img src="https://raw.githubusercontent.com/datahub-project/static-assets/main/imgs/datahub-logo-color-mark.svg" width="20"/> [DataHub](https://datahub.com) and <img src="https://docs.datahub.com/img/LI-In-Bug.png" width="20"/> [LinkedIn](https://engineering.linkedin.com)
-
-<div>
-  <a target="_blank" href="https://github.com/datahub-project/datahub/blob/master/LICENSE">
-    <img alt="Apache 2.0 License" src="https://img.shields.io/badge/License-Apache_2.0-blue.svg?label=license&labelColor=133554&color=1890ff" /></a>
-  <a target="_blank" href="https://pypi.org/project/acryl-datahub/">
-    <img alt="PyPI" src="https://img.shields.io/pypi/dm/acryl-datahub?label=downloads&labelColor=133554&color=1890ff" /></a>
-  <a target="_blank" href="https://github.com/datahub-project/datahub/pulse">
-    <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/datahub-project/datahub?label=commits&labelColor=133554&color=1890ff" /></a>
-  <br />
-  <a target="_blank" href="https://datahub.com/slack?utm_source=github&utm_medium=readme&utm_campaign=github_readme">
-    <img alt="Slack" src="https://img.shields.io/badge/slack-join_community-red.svg?logo=slack&labelColor=133554&color=1890ff" /></a>
-  <a href="https://www.youtube.com/channel/UC3qFQC5IiwR5fvWEqi_tJ5w">
-    <img alt="YouTube" src="https://img.shields.io/youtube/channel/subscribers/UC3qFQC5IiwR5fvWEqi_tJ5w?style=flat&logo=youtube&label=subscribers&labelColor=133554&color=1890ff"/></a>
-  <a href="https://medium.com/datahub-project/">
-    <img alt="Medium" src="https://img.shields.io/badge/blog-DataHub-red.svg?style=flat&logo=medium&logoColor=white&labelColor=133554&color=1890ff" /></a>
-  <a href="https://x.com/datahubproject">
-    <img alt="X (formerly Twitter) Follow" src="https://img.shields.io/badge/follow-datahubproject-red.svg?style=flat&logo=x&labelColor=133554&color=1890ff" /></a>
-</div>
+**Use Case:** Instead of traditional data catalogs, we're leveraging DataHub's metadata graph to power:
+- Conversational data discovery ("What tables contain customer PII?")
+- Automated data documentation generation
+- Intelligent schema suggestions and recommendations
+- Data quality monitoring with automated assertions
 
 ---
 
-### 🏠 Docs: [docs.datahub.com](https://docs.datahub.com/)
+## Quick Start
 
-[Quickstart](https://docs.datahub.com/docs/quickstart) |
-[Features](https://docs.datahub.com/docs/features) |
-[Roadmap](https://feature-requests.datahubproject.io/roadmap) |
-[Adoption](#adoption) |
-[Demo](https://demo.datahub.com/) |
-[Town Hall](https://docs.datahub.com/docs/townhalls)
+### Prerequisites
+
+- **Docker** (version 20.10+) and **Docker Compose** (v2.0+)
+- **Git**
+- **Minimum 8GB RAM** (16GB recommended)
+- **10GB free disk space**
+
+### Start DataHub in 3 Steps
+
+**1. Clone the Repository**
+```bash
+git clone https://github.com/starschema/Custom-Datahub.git
+cd datahub
+```
+
+**2. Start All Services**
+```bash
+cd docker/quickstart
+docker-compose -f docker-compose.quickstart.yml up -d
+```
+
+**3. Access the UI**
+
+Open your browser and navigate to: **http://localhost:9002**
+
+**Default credentials:**
+- Username: `datahub`
+- Password: `datahub`
+
+> **Note:** First startup takes 5-10 minutes to download images and initialize services.
 
 ---
 
-> 📣 DataHub Town Hall is the 4th Thursday at 9am US PT of every month - [add it to your calendar!](https://lu.ma/datahubevents/)
->
-> - Town-hall Zoom link: [zoom.datahubproject.io](https://zoom.datahubproject.io)
-> - [Meeting details](docs/townhalls.md) & [past recordings](docs/townhall-history.md)
+## Core Services & Endpoints
 
-> ✨ DataHub Community Highlights:
->
-> - Read our Monthly Project Updates [here](https://medium.com/datahub-project/tagged/project-updates).
-> - Bringing The Power Of The DataHub Real-Time Metadata Graph To Everyone At DataHub: [Data Engineering Podcast](https://www.dataengineeringpodcast.com/acryl-data-datahub-metadata-graph-episode-230/)
-> - Check out our most-read blog post, [DataHub: Popular Metadata Architectures Explained](https://engineering.linkedin.com/blog/2020/datahub-popular-metadata-architectures-explained) @ LinkedIn Engineering Blog.
-> - Join us on [Slack](docs/slack.md)! Ask questions and keep up with the latest announcements.
+| Service | URL | Purpose |
+|---------|-----|---------|
+| **DataHub UI** | http://localhost:9002 | Main web interface for metadata browsing |
+| **GMS API** | http://localhost:8888 | Backend GraphQL & REST APIs |
+| **MySQL** | localhost:3306 | Metadata persistence (`datahub`/`datahub`) |
+| **Elasticsearch** | http://localhost:9200 | Search and indexing |
+| **Kafka** | localhost:9092 | Event streaming |
+| **Neo4j** (optional) | http://localhost:7474 | Graph database (`neo4j`/`P@ssword1`) |
 
-## Introduction
+**For complete service details and credentials, see [QUICKSTART.md](./QUICKSTART.md)**
 
-DataHub is an open-source data catalog for the modern data stack. Read about the architectures of different metadata systems and why DataHub excels [here](https://engineering.linkedin.com/blog/2020/datahub-popular-metadata-architectures-explained). Also read our
-[LinkedIn Engineering blog post](https://engineering.linkedin.com/blog/2019/data-hub), check out our [Strata presentation](https://speakerdeck.com/shirshanka/the-evolution-of-metadata-linkedins-journey-strata-nyc-2019) and watch our [Crunch Conference Talk](https://www.youtube.com/watch?v=OB-O0Y6OYDE). You should also visit [DataHub Architecture](docs/architecture/architecture.md) to get a better understanding of how DataHub is implemented.
+---
 
-## Features & Roadmap
+## Architecture for RAG Use Case
 
-Check out DataHub's [Features](docs/features.md) & [Roadmap](https://feature-requests.datahubproject.io/roadmap).
+```
+┌─────────────────────────────────────────────────┐
+│         Data Sources (Data Estate)              │
+│  Snowflake • MySQL • PostgreSQL • S3 • APIs     │
+└────────────────┬────────────────────────────────┘
+                 │ Ingestion
+                 ↓
+┌─────────────────────────────────────────────────┐
+│              DataHub Core                       │
+│  ┌─────────────┐  ┌──────────────┐             │
+│  │  Metadata   │  │    Search    │             │
+│  │   Storage   │  │  (Elastic)   │             │
+│  │  (MySQL)    │  └──────────────┘             │
+│  └─────────────┘  ┌──────────────┐             │
+│  ┌─────────────┐  │   Lineage    │             │
+│  │   Events    │  │   (Neo4j)    │             │
+│  │  (Kafka)    │  └──────────────┘             │
+│  └─────────────┘                                │
+└────────────────┬────────────────────────────────┘
+                 │ GraphQL/REST APIs
+                 ↓
+┌─────────────────────────────────────────────────┐
+│           RAG Application Layer                 │
+│  • Metadata Retrieval • Context Enrichment      │
+│  • LLM Queries • Semantic Search                │
+└─────────────────────────────────────────────────┘
+```
 
-## Demo and Screenshots
+**Key Components:**
+- **Frontend (React):** User interface for browsing metadata
+- **GMS (Backend):** GraphQL/REST API server for programmatic access
+- **Elasticsearch:** Powers semantic search across metadata
+- **MySQL:** Persistent storage for all metadata entities
+- **Kafka:** Real-time event streaming for metadata changes
+- **Actions Framework:** Custom automation (data quality checks, webhooks)
 
-There's a [hosted demo environment](https://demo.datahub.com/) courtesy of DataHub where you can explore DataHub without installing it locally.
+---
 
-## Quickstart
+## Getting Started with Metadata Ingestion
 
-Please follow the [DataHub Quickstart Guide](https://docs.datahub.com/docs/quickstart) to run DataHub locally using [Docker](https://docker.com).
+### Option 1: Using the UI (Recommended)
+
+1. Navigate to **Ingestion** → **Create new source**
+2. Select your data source (Snowflake, MySQL, etc.)
+3. Configure connection details
+4. Click **Execute** to start ingestion
+
+### Option 2: Using the CLI
+
+```bash
+# Install DataHub CLI
+pip install 'acryl-datahub'
+
+# Create a recipe file (e.g., snowflake-recipe.yml)
+# See examples in ./examples/recipes/
+
+# Run ingestion
+datahub ingest -c snowflake-recipe.yml
+```
+
+**Example Snowflake Recipe:**
+```yaml
+source:
+  type: snowflake
+  config:
+    account_id: YOUR_ACCOUNT
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
+    warehouse: YOUR_WAREHOUSE
+    role: YOUR_ROLE
+
+sink:
+  type: datahub-rest
+  config:
+    server: 'http://localhost:8080'
+```
+
+---
+
+## Key Features for RAG Use Case
+
+✅ **Metadata Discovery**
+- Automatically extract schemas, column types, descriptions
+- Map relationships and data lineage
+- Track data quality metrics
+
+✅ **Semantic Search**
+- Full-text search across dataset names, descriptions, columns
+- Tag-based filtering and domain organization
+- Glossary terms for business context
+
+✅ **API Access for RAG**
+- GraphQL API for structured metadata queries
+- REST API for bulk retrieval
+- Real-time updates via Kafka events
+
+✅ **Custom Automation**
+- Data Quality Actions for automated testing
+- Custom transformers for metadata enrichment
+- Webhooks for external integrations
+
+---
+
+## Customizations in This Fork
+
+- ✨ **Data Quality Action Plugin** - Automated data quality testing framework
+- 🔧 **Custom Connectors** - Extended support for proprietary data sources
+- 📊 **RAG-Optimized Metadata** - Enhanced metadata schemas for LLM consumption
+- 🤖 **AI-Powered Documentation** - Automated metadata enrichment
+
+---
+
+## Stopping & Managing Services
+
+**Stop services (keeps data):**
+```bash
+docker-compose -f docker-compose.quickstart.yml down
+```
+
+**Stop and remove all data:**
+```bash
+docker-compose -f docker-compose.quickstart.yml down -v
+```
+
+**View logs:**
+```bash
+docker-compose -f docker-compose.quickstart.yml logs -f
+```
+
+---
+
+## Troubleshooting
+
+**Services won't start?**
+- Check Docker has at least 8GB RAM allocated
+- Verify no port conflicts (9002, 8888, 3306, 9200, 9092)
+- View logs: `docker logs datahub-gms`
+
+**Can't access UI?**
+- Wait 5-10 minutes for all services to initialize
+- Check container health: `docker ps`
+- Try: http://127.0.0.1:9002
+
+**For detailed troubleshooting, see [QUICKSTART.md](./QUICKSTART.md#troubleshooting)**
+
+---
+
+## Additional Resources
+
+- 📖 **Detailed Setup Guide:** [QUICKSTART.md](./QUICKSTART.md)
+- 📘 **Official DataHub Docs:** [docs.datahub.com](https://docs.datahub.com/)
+- 🏗️ **Architecture Overview:** [docs/architecture/architecture.md](./docs/architecture/architecture.md)
+- 🔌 **Ingestion Sources:** [Supported Connectors](https://docs.datahub.com/docs/metadata-ingestion/)
+- 🤝 **Community:** [DataHub Slack](https://datahub.com/slack)
+
+---
 
 ## Development
 
-If you're looking to build & modify datahub please take a look at our [Development Guide](https://docs.datahub.com/docs/developers).
+To build and modify DataHub components, see:
+- [Development Guide](https://docs.datahub.com/docs/developers)
+- [CLAUDE.md](./CLAUDE.md) - AI-assisted development guidelines
 
-<p align="center">
-<a href="https://demo.datahub.com/">
-  <img width="70%"  src="https://raw.githubusercontent.com/datahub-project/static-assets/main/imgs/entity.png"/>
-</a>
-</p>
-
-## Source Code and Repositories
-
-- [datahub-project/datahub](https://github.com/datahub-project/datahub): This repository contains the complete source code for DataHub's metadata model, metadata services, integration connectors and the web application.
-- [acryldata/datahub-actions](https://github.com/acryldata/datahub-actions): DataHub Actions is a framework for responding to changes to your DataHub Metadata Graph in real time.
-- [acryldata/datahub-helm](https://github.com/acryldata/datahub-helm): Helm charts for deploying DataHub on a Kubernetes cluster
-- [acryldata/meta-world](https://github.com/acryldata/meta-world): A repository to store recipes, custom sources, transformations and other things to make your DataHub experience magical.
-- [dbt-impact-action](https://github.com/acryldata/dbt-impact-action): A github action for commenting on your PRs with a summary of the impact of changes within a dbt project.
-- [datahub-tools](https://github.com/makenotion/datahub-tools): Additional python tools to interact with the DataHub GraphQL endpoints, built by Notion.
-- [business-glossary-sync-action](https://github.com/acryldata/business-glossary-sync-action): A github action that opens PRs to update your business glossary yaml file.
-- [mcp-server-datahub](https://github.com/acryldata/mcp-server-datahub): A [Model Context Protocol](https://modelcontextprotocol.io/) server implementation for DataHub.
-
-## Releases
-
-See [Releases](https://github.com/datahub-project/datahub/releases) page for more details. We follow the [SemVer Specification](https://semver.org) when versioning the releases and adopt the [Keep a Changelog convention](https://keepachangelog.com/) for the changelog format.
-
-## Contributing
-
-We welcome contributions from the community. Please refer to our [Contributing Guidelines](docs/CONTRIBUTING.md) for more details. We also have a [contrib](contrib) directory for incubating experimental features.
-
-## Community
-
-Join our [Slack workspace](https://datahub.com/slack?utm_source=github&utm_medium=readme&utm_campaign=github_readme) for discussions and important announcements. You can also find out more about our upcoming [town hall meetings](docs/townhalls.md) and view past recordings.
-
-## Security
-
-See [Security Stance](docs/SECURITY_STANCE.md) for information on DataHub's Security.
-
-## Adoption
-
-Here are the companies that have officially adopted DataHub. Please feel free to add yours to the list if we missed it.
-
-- [ABLY](https://ably.team/)
-- [Adevinta](https://www.adevinta.com/)
-- [Banksalad](https://www.banksalad.com)
-- [Cabify](https://cabify.tech/)
-- [ClassDojo](https://www.classdojo.com/)
-- [Coursera](https://www.coursera.org/)
-- [CVS Health](https://www.cvshealth.com/)
-- [DefinedCrowd](http://www.definedcrowd.com)
-- [DFDS](https://www.dfds.com/)
-- [Digital Turbine](https://www.digitalturbine.com/)
-- [Expedia Group](http://expedia.com)
-- [Experius](https://www.experius.nl)
-- [Geotab](https://www.geotab.com)
-- [Grofers](https://grofers.com)
-- [Haibo Technology](https://www.botech.com.cn)
-- [hipages](https://hipages.com.au/)
-- [inovex](https://www.inovex.de/)
-- [Inter&Co](https://inter.co/)
-- [IOMED](https://iomed.health)
-- [Klarna](https://www.klarna.com)
-- [LinkedIn](http://linkedin.com)
-- [Moloco](https://www.moloco.com/en)
-- [N26](https://n26brasil.com/)
-- [Optum](https://www.optum.com/)
-- [Peloton](https://www.onepeloton.com)
-- [PITS Global Data Recovery Services](https://www.pitsdatarecovery.net/)
-- [Razer](https://www.razer.com)
-- [Rippling](https://www.rippling.com/)
-- [Showroomprive](https://www.showroomprive.com/)
-- [SpotHero](https://spothero.com)
-- [Stash](https://www.stash.com)
-- [Shanghai HuaRui Bank](https://www.shrbank.com)
-- [s7 Airlines](https://www.s7.ru/)
-- [ThoughtWorks](https://www.thoughtworks.com)
-- [TypeForm](http://typeform.com)
-- [Udemy](https://www.udemy.com/)
-- [Uphold](https://uphold.com)
-- [Viasat](https://viasat.com)
-- [Wealthsimple](https://www.wealthsimple.com)
-- [Wikimedia](https://www.wikimedia.org)
-- [Wolt](https://wolt.com)
-- [Zynga](https://www.zynga.com)
-
-## Select Articles & Talks
-
-- [DataHub Blog](https://medium.com/datahub-project/)
-- [DataHub YouTube Channel](https://www.youtube.com/channel/UC3qFQC5IiwR5fvWEqi_tJ5w)
-- [Optum: Data Mesh via DataHub](https://opensource.optum.com/blog/2022/03/23/data-mesh-via-datahub)
-- [Saxo Bank: Enabling Data Discovery in Data Mesh](https://medium.com/datahub-project/enabling-data-discovery-in-a-data-mesh-the-saxo-journey-451b06969c8f)
-- [Bringing The Power Of The DataHub Real-Time Metadata Graph To Everyone At DataHub](https://www.dataengineeringpodcast.com/acryl-data-datahub-metadata-graph-episode-230/)
-- [DataHub: Popular Metadata Architectures Explained](https://engineering.linkedin.com/blog/2020/datahub-popular-metadata-architectures-explained)
-- [Driving DataOps Culture with LinkedIn DataHub](https://www.youtube.com/watch?v=ccsIKK9nVxk) @ [DataOps Unleashed 2021](https://dataopsunleashed.com/#shirshanka-session)
-- [The evolution of metadata: LinkedIn’s story](https://speakerdeck.com/shirshanka/the-evolution-of-metadata-linkedins-journey-strata-nyc-2019) @ [Strata Data Conference 2019](https://conferences.oreilly.com/strata/strata-ny-2019.html)
-- [Journey of metadata at LinkedIn](https://www.youtube.com/watch?v=OB-O0Y6OYDE) @ [Crunch Data Conference 2019](https://crunchconf.com/2019)
-- [DataHub Journey with Expedia Group](https://www.youtube.com/watch?v=ajcRdB22s5o)
-- [Data Discoverability at SpotHero](https://www.slideshare.net/MaggieHays/data-discoverability-at-spothero)
-- [Data Catalogue — Knowing your data](https://medium.com/albert-franzi/data-catalogue-knowing-your-data-15f7d0724900)
-- [DataHub: A Generalized Metadata Search & Discovery Tool](https://engineering.linkedin.com/blog/2019/data-hub)
-- [Open sourcing DataHub: LinkedIn’s metadata search and discovery platform](https://engineering.linkedin.com/blog/2020/open-sourcing-datahub--linkedins-metadata-search-and-discovery-p)
-- [Emerging Architectures for Modern Data Infrastructure](https://future.com/emerging-architectures-for-modern-data-infrastructure-2020/)
-
-See the full list [here](docs/links.md).
+---
 
 ## License
 
-[Apache License 2.0](./LICENSE).
+[Apache License 2.0](./LICENSE)
+
+---
+
+**Built with ❤️ using DataHub** - An open-source data catalog for the modern data stack.
