@@ -96,6 +96,9 @@ plugins: Dict[str, Set[str]] = {
         "opentelemetry-api>=1.20.0",
         "opentelemetry-sdk>=1.20.0",
     },
+    "data_quality": {
+        "sqlalchemy>=2.0.0",
+    },
     # Transformer Plugins (None yet)
 }
 
