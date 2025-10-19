@@ -1,0 +1,519 @@
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.demographics,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.demographics,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.goog_global_mobility_report,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.goog_global_mobility_report,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hdx_acaps,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hdx_acaps,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hs_bulk_data,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hs_bulk_data,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_airline,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_airline,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_country,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_country,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_hcp_capacity,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_hcp_capacity,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_icu_beds,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_icu_beds,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.metadata,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.metadata,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_covid19,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_covid19,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19_details,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19_details,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.rki_ger_covid19_dashboard,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.rki_ger_covid19_dashboard,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_hospitalisations,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_hospitalisations,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_mortality,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_mortality,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_province_case_counts,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_province_case_counts,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_tests,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_tests,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.vh_can_detailed,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.vh_can_detailed,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.who_situation_reports,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.who_situation_reports,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b00,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b00,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b01,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b01,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b02,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b02,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b03,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b03,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b07,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b07,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b08,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b08,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b09,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b09,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b11,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b11,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b12,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b12,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b14,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b14,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b15,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b15,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b19,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b19,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b20,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b20,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b21,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b21,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b22,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b22,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b23,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b23,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b25,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b25,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b27,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b27,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b99,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b99,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c16,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c16,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c17,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c17,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c24,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c24,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_patterns,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_patterns,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_field_descriptions,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_field_descriptions,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_fips_codes,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_fips_codes,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_geographic_data,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_geographic_data,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_all,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_all,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_covid_19,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_covid_19,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_icu_all,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_icu_all,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_testing,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_testing,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.community_transmission,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.community_transmission,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.databank_demographics,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.databank_demographics,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global_weekly,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global_weekly,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19_timeseries,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19_timeseries,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_dashboard_covid_19_global,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_dashboard_covid_19_global,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_vaccines,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_vaccines,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_policy_actions,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_policy_actions,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_state_mitigations,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_state_mitigations,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_reopen_status,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_reopen_status,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.owid_vaccinations,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.owid_vaccinations,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.det_hotels_swshare,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.det_hotels_swshare,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_carrental_agg_swshare,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_carrental_agg_swshare,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_cruises_agg_swshare,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_cruises_agg_swshare,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.intervals,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.intervals,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.nurses,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.nurses,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.products,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.products,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.sales,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.sales,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.lineitem,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.lineitem,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.nation,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.nation,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.orders,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.orders,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.part,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.part,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.partsupp,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.partsupp,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.region,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.region,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.supplier,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.supplier,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory_metro,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory_metro,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.home_values,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.home_values,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.rent_percentage_household_income,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.rent_percentage_household_income,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.total_rental_geo,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.total_rental_geo,PROD)
+Failed to retrieve profile for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex_geo,PROD): Cannot get a timeseries aspect using "get_aspect". Use "get_latest_timeseries_value" instead.
+No profile data found for urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex_geo,PROD)
+Loading data quality configuration...
+[OK] Loaded 14 quality tests
+
+Connecting to DataHub...
+[OK] Connected to DataHub
+
+Searching for Snowflake datasets...
+[OK] Found 83 Snowflake datasets
+
+Processing 83 datasets...
+
+[1/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.demographics,PROD)
+  [OK] Tests completed
+
+[2/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.goog_global_mobility_report,PROD)
+  [OK] Tests completed
+
+[3/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hdx_acaps,PROD)
+  [OK] Tests completed
+
+[4/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hs_bulk_data,PROD)
+  [OK] Tests completed
+
+[5/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_airline,PROD)
+  [OK] Tests completed
+
+[6/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.hum_restrictions_country,PROD)
+  [OK] Tests completed
+
+[7/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19,PROD)
+  [OK] Tests completed
+
+[8/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_hcp_capacity,PROD)
+  [OK] Tests completed
+
+[9/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_icu_beds,PROD)
+  [OK] Tests completed
+
+[10/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.metadata,PROD)
+  [OK] Tests completed
+
+[11/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_covid19,PROD)
+  [OK] Tests completed
+
+[12/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19,PROD)
+  [OK] Tests completed
+
+[13/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.pcm_dps_covid19_details,PROD)
+  [OK] Tests completed
+
+[14/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.rki_ger_covid19_dashboard,PROD)
+  [OK] Tests completed
+
+[15/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_hospitalisations,PROD)
+  [OK] Tests completed
+
+[16/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_mortality,PROD)
+  [OK] Tests completed
+
+[17/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_province_case_counts,PROD)
+  [OK] Tests completed
+
+[18/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.scs_be_detailed_tests,PROD)
+  [OK] Tests completed
+
+[19/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.vh_can_detailed,PROD)
+  [OK] Tests completed
+
+[20/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.who_situation_reports,PROD)
+  [OK] Tests completed
+
+[21/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b00,PROD)
+  [OK] Tests completed
+
+[22/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b01,PROD)
+  [OK] Tests completed
+
+[23/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b02,PROD)
+  [OK] Tests completed
+
+[24/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b03,PROD)
+  [OK] Tests completed
+
+[25/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b07,PROD)
+  [OK] Tests completed
+
+[26/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b08,PROD)
+  [OK] Tests completed
+
+[27/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b09,PROD)
+  [OK] Tests completed
+
+[28/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b11,PROD)
+  [OK] Tests completed
+
+[29/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b12,PROD)
+  [OK] Tests completed
+
+[30/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b14,PROD)
+  [OK] Tests completed
+
+[31/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b15,PROD)
+  [OK] Tests completed
+
+[32/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b19,PROD)
+  [OK] Tests completed
+
+[33/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b20,PROD)
+  [OK] Tests completed
+
+[34/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b21,PROD)
+  [OK] Tests completed
+
+[35/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b22,PROD)
+  [OK] Tests completed
+
+[36/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b23,PROD)
+  [OK] Tests completed
+
+[37/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b25,PROD)
+  [OK] Tests completed
+
+[38/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b27,PROD)
+  [OK] Tests completed
+
+[39/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_b99,PROD)
+  [OK] Tests completed
+
+[40/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c16,PROD)
+  [OK] Tests completed
+
+[41/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c17,PROD)
+  [OK] Tests completed
+
+[42/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_c24,PROD)
+  [OK] Tests completed
+
+[43/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.data_cbg_patterns,PROD)
+  [OK] Tests completed
+
+[44/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_field_descriptions,PROD)
+  [OK] Tests completed
+
+[45/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_fips_codes,PROD)
+  [OK] Tests completed
+
+[46/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.metadata_cbg_geographic_data,PROD)
+  [OK] Tests completed
+
+[47/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_all,PROD)
+  [OK] Tests completed
+
+[48/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_covid_19,PROD)
+  [OK] Tests completed
+
+[49/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_inpatient_beds_icu_all,PROD)
+  [OK] Tests completed
+
+[50/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.cdc_testing,PROD)
+  [OK] Tests completed
+
+[51/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.community_transmission,PROD)
+  [OK] Tests completed
+
+[52/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.databank_demographics,PROD)
+  [OK] Tests completed
+
+[53/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global,PROD)
+  [OK] Tests completed
+
+[54/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.ecdc_global_weekly,PROD)
+  [OK] Tests completed
+
+[55/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_covid_19_timeseries,PROD)
+  [OK] Tests completed
+
+[56/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_dashboard_covid_19_global,PROD)
+  [OK] Tests completed
+
+[57/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.jhu_vaccines,PROD)
+  [OK] Tests completed
+
+[58/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_policy_actions,PROD)
+  [OK] Tests completed
+
+[59/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.kff_us_state_mitigations,PROD)
+  [OK] Tests completed
+
+[60/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.nyt_us_reopen_status,PROD)
+  [OK] Tests completed
+
+[61/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,covid19.public.owid_vaccinations,PROD)
+  [OK] Tests completed
+
+[62/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.det_hotels_swshare,PROD)
+  [OK] Tests completed
+
+[63/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_carrental_agg_swshare,PROD)
+  [OK] Tests completed
+
+[64/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,ql2_freemium.public.weekly_cruises_agg_swshare,PROD)
+  [OK] Tests completed
+
+[65/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex,PROD)
+  [OK] Tests completed
+
+[66/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.intervals,PROD)
+  [OK] Tests completed
+
+[67/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.nurses,PROD)
+  [OK] Tests completed
+
+[68/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.products,PROD)
+  [OK] Tests completed
+
+[69/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.public.sales,PROD)
+  [OK] Tests completed
+
+[70/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)
+  [OK] Tests completed
+
+[71/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.lineitem,PROD)
+  [OK] Tests completed
+
+[72/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.nation,PROD)
+  [OK] Tests completed
+
+[73/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.orders,PROD)
+  [OK] Tests completed
+
+[74/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.part,PROD)
+  [OK] Tests completed
+
+[75/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.partsupp,PROD)
+  [OK] Tests completed
+
+[76/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.region,PROD)
+  [OK] Tests completed
+
+[77/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.supplier,PROD)
+  [OK] Tests completed
+
+[78/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory,PROD)
+  [OK] Tests completed
+
+[79/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.for_sale_inventory_metro,PROD)
+  [OK] Tests completed
+
+[80/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.home_values,PROD)
+  [OK] Tests completed
+
+[81/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.rent_percentage_household_income,PROD)
+  [OK] Tests completed
+
+[82/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.total_rental_geo,PROD)
+  [OK] Tests completed
+
+[83/83] Processing: PROD
+  URN: urn:li:dataset:(urn:li:dataPlatform:snowflake,safegraph_uscensus_and_neighborhood.public.us_population_by_sex_geo,PROD)
+  [OK] Tests completed
+
+============================================================
+SUMMARY
+============================================================
+Total datasets processed: 83
+Successful: 83
+Errors: 0
+
+Check DataHub UI at http://localhost:9002
+Navigate to any dataset and check the 'Validations' tab
+============================================================

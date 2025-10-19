@@ -147,6 +147,9 @@ query listIngestionSources($input: ListIngestionSourcesInput!, $execution_start:
       urn
       type
       name
+      config {
+        recipe
+      }
       executions(start: $execution_start, count: $execution_count) {
         start
         count

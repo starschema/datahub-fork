@@ -91,7 +91,7 @@ class TestExecutor:
 
     def __init__(
         self,
-        graph: DataHubGraph,
+        graph,  # AcrylDataHubGraph wrapper, use graph.graph to access DataHubGraph
         test_configs: List[TestConfig],
         connector_registry: Optional["ConnectorRegistry"] = None,
     ):
@@ -159,7 +159,8 @@ class TestExecutor:
     def _get_dataset_profile(self, dataset_urn: str) -> DatasetProfileClass | None:
         """Retrieve dataset profile from DataHub."""
         try:
-            profile = self.graph.get_aspect(
+            # Access underlying DataHubGraph from AcrylDataHubGraph wrapper
+            profile = self.graph.graph.get_aspect(
                 entity_urn=dataset_urn,
                 aspect_type=DatasetProfileClass,
                 version=0,

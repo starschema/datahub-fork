@@ -92,6 +92,9 @@ plugins: Dict[str, Set[str]] = {
         f"acryl-datahub[snowflake-slim]{_self_pin}",
     },
     "doc_propagation": set(),
+    "data_quality": {
+        "sqlalchemy>=2.0.0",
+    },
     # Transformer Plugins (None yet)
 }
 
