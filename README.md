@@ -35,11 +35,12 @@ git clone https://github.com/starschema/Custom-Datahub.git
 cd datahub
 ```
 
-**2. Start All Services**
+**2. Start All Services (with Data Quality)**
 ```bash
-cd docker/quickstart
-docker-compose -f docker-compose.quickstart.yml up -d
+docker-compose -f datahub-with-data-quality.yml up -d
 ```
+
+> **Note:** This boots DataHub with automatic data quality testing enabled. Tests run automatically when you ingest data.
 
 **3. Access the UI**
 
@@ -59,6 +60,7 @@ Open your browser and navigate to: **http://localhost:9002**
 |---------|-----|---------|
 | **DataHub UI** | http://localhost:9002 | Main web interface for metadata browsing |
 | **GMS API** | http://localhost:8888 | Backend GraphQL & REST APIs |
+| **DataHub Actions** | (background) | Automatic data quality testing & automation |
 | **MySQL** | localhost:3306 | Metadata persistence (`datahub`/`datahub`) |
 | **Elasticsearch** | http://localhost:9200 | Search and indexing |
 | **Kafka** | localhost:9092 | Event streaming |
@@ -149,7 +151,7 @@ sink:
 
 ---
 
-## Key Features for RAG Use Case
+## Key Features
 
 ✅ **Metadata Discovery**
 - Automatically extract schemas, column types, descriptions
@@ -166,8 +168,15 @@ sink:
 - REST API for bulk retrieval
 - Real-time updates via Kafka events
 
+✅ **Automatic Data Quality Testing** (NEW!)
+- **20 built-in test types** (13 profile-based + 7 query-based)
+- **Zero-duplication credentials** - Tests reuse ingestion source configs
+- **Real-time monitoring** - Tests auto-run on every ingestion
+- **Stateful optimization** - Only tests changed datasets
+- See [DATA_QUALITY_FLOW.md](./DATA_QUALITY_FLOW.md) for details
+
 ✅ **Custom Automation**
-- Data Quality Actions for automated testing
+- DataHub Actions framework for event-driven workflows
 - Custom transformers for metadata enrichment
 - Webhooks for external integrations
 
@@ -175,10 +184,10 @@ sink:
 
 ## Customizations in This Fork
 
-- ✨ **Data Quality Action Plugin** - Automated data quality testing framework
-- 🔧 **Custom Connectors** - Extended support for proprietary data sources
+- ✨ **Automatic Data Quality Testing** - 20 test types, zero-duplication credentials, event-driven execution
+- 🔧 **Enhanced DataHub Actions** - Extended automation framework with custom plugins
 - 📊 **RAG-Optimized Metadata** - Enhanced metadata schemas for LLM consumption
-- 🤖 **AI-Powered Documentation** - Automated metadata enrichment
+- 🔄 **Stateful Ingestion** - Smart incremental updates for efficient re-ingestion
 
 ---
 
@@ -186,17 +195,22 @@ sink:
 
 **Stop services (keeps data):**
 ```bash
-docker-compose -f docker-compose.quickstart.yml down
+docker-compose -f datahub-with-data-quality.yml down
 ```
 
 **Stop and remove all data:**
 ```bash
-docker-compose -f docker-compose.quickstart.yml down -v
+docker-compose -f datahub-with-data-quality.yml down -v
 ```
 
 **View logs:**
 ```bash
-docker-compose -f docker-compose.quickstart.yml logs -f
+# All services
+docker-compose -f datahub-with-data-quality.yml logs -f
+
+# Specific services
+docker logs datahub-gms -f           # Backend API logs
+docker logs datahub-datahub-actions-1 -f  # Data quality action logs
 ```
 
 ---
@@ -220,6 +234,8 @@ docker-compose -f docker-compose.quickstart.yml logs -f
 ## Additional Resources
 
 - 📖 **Detailed Setup Guide:** [QUICKSTART.md](./QUICKSTART.md)
+- 🔬 **Data Quality Flow:** [DATA_QUALITY_FLOW.md](./DATA_QUALITY_FLOW.md)
+- 📋 **Query-Based Tests:** [QUERY_BASED_QUALITY_TESTS.md](./QUERY_BASED_QUALITY_TESTS.md)
 - 📘 **Official DataHub Docs:** [docs.datahub.com](https://docs.datahub.com/)
 - 🏗️ **Architecture Overview:** [docs/architecture/architecture.md](./docs/architecture/architecture.md)
 - 🔌 **Ingestion Sources:** [Supported Connectors](https://docs.datahub.com/docs/metadata-ingestion/)

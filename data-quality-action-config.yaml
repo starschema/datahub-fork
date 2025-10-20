@@ -81,7 +81,7 @@ action:
       # Test distinct counts
       - name: "reasonable_distinct_values"
         type: "column_distinct_count_between"
-        dataset_pattern: "urn:li:dataset:*snowflake*"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
         column: "county"
         params:
           min_value: "1"
@@ -90,7 +90,7 @@ action:
       # Test for null values in critical columns
       - name: "date_columns_not_null"
         type: "column_values_not_null"
-        dataset_pattern: "urn:li:dataset:*snowflake*"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
         column: "date"
         params:
           max_null_proportion: "0.05"
@@ -189,20 +189,22 @@ action:
           max_value: "2025-12-31"
 
       # Custom SQL - referential integrity
-      - name: "covid_fips_exist_in_demographics"
-        type: "table_custom_sql"
-        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
-        params:
-          sql: "SELECT COUNT(*) FROM covid19_data c LEFT JOIN demographics d ON c.fips = d.fips WHERE c.fips IS NOT NULL AND d.fips IS NULL"
-          expected_result: "0"
+      # DISABLED: Requires actual table names from Snowflake schema
+      # - name: "covid_fips_exist_in_demographics"
+      #   type: "table_custom_sql"
+      #   dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+      #   params:
+      #     sql: "SELECT COUNT(*) FROM covid19_data c LEFT JOIN demographics d ON c.fips = d.fips WHERE c.fips IS NOT NULL AND d.fips IS NULL"
+      #     expected_result: "0"
 
       # Custom SQL - data quality check
-      - name: "no_negative_covid_cases"
-        type: "table_custom_sql"
-        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
-        params:
-          sql: "SELECT COUNT(*) FROM covid19_data WHERE cases < 0 OR deaths < 0"
-          expected_result: "0"
+      # DISABLED: Requires actual table names from Snowflake schema
+      # - name: "no_negative_covid_cases"
+      #   type: "table_custom_sql"
+      #   dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+      #   params:
+      #     sql: "SELECT COUNT(*) FROM covid19_data WHERE cases < 0 OR deaths < 0"
+      #     expected_result: "0"
 
 datahub:
   server: "http://datahub-gms:8080"

@@ -169,7 +169,18 @@ query listIngestionSources($input: ListIngestionSourcesInput!, $execution_start:
                     },
                 }
             )
-            listIngestionSources = resp.get("listIngestionSources", {})
+
+            logger.debug(f"GraphQL response for query_ingestion_sources: {resp}")
+
+            if not resp:
+                logger.warning("Empty GraphQL response when querying ingestion sources")
+                break
+
+            listIngestionSources = resp.get("listIngestionSources")
+            if listIngestionSources is None:
+                logger.warning(f"listIngestionSources field not found in response: {resp}")
+                break
+
             sources.extend(listIngestionSources.get("ingestionSources", []))
 
             cur_total = listIngestionSources.get("total", 0)

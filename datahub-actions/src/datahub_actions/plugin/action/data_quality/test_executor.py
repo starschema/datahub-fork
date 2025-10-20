@@ -160,10 +160,11 @@ class TestExecutor:
         """Retrieve dataset profile from DataHub."""
         try:
             # Access underlying DataHubGraph from AcrylDataHubGraph wrapper
-            profile = self.graph.graph.get_aspect(
+            # DatasetProfile is a timeseries aspect, must use get_latest_timeseries_value
+            profile = self.graph.graph.get_latest_timeseries_value(
                 entity_urn=dataset_urn,
                 aspect_type=DatasetProfileClass,
-                version=0,
+                filter_criteria_map={},
             )
             return profile
         except Exception as e:

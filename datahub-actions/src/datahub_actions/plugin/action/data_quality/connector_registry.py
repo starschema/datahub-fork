@@ -115,6 +115,11 @@ class ConnectorRegistry:
 
             logger.info("Querying DataHub for ingestion source configurations...")
             sources = self.graph.query_ingestion_sources()
+
+            if sources is None:
+                logger.warning("GraphQL query returned None - ingestion sources may not be configured")
+                return {}
+
             source_map = {}
 
             for source in sources:
