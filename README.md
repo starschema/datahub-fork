@@ -1,17 +1,34 @@
-# DataHub with GraphRAG
+# DataHub Modifications
+
+This repository contains two major enhancements to DataHub:
+
+## 1. GraphRAG Integration
 
 AI-powered semantic search and natural language Q&A for DataHub using GraphQL.
 
-## What's New
-
-This repository extends DataHub with **GraphRAG** (Graph-based Retrieval Augmented Generation) capabilities:
-
+**Features:**
 - 🔍 **Semantic Search** - Search datasets using natural language, not just keywords
 - 💬 **AI Q&A** - Ask questions about your data catalog and get intelligent answers
 - 🎯 **GraphQL API** - Clean, modern API interface
 - 🤖 **OpenAI Integration** - Powered by GPT-4 and embeddings
 
-## Quick Start
+**Implementation:** Complete working code in `graphrag-demo/` directory
+
+## 2. Keycloak SSO Integration
+
+Enterprise-grade Single Sign-On authentication for DataHub using Keycloak and OIDC.
+
+**Features:**
+- 🔐 **Centralized Authentication** - One login for all applications
+- 👥 **User Management** - Manage users in Keycloak, not DataHub
+- 🛡️ **Security** - Industry-standard OIDC protocol, 2FA capability
+- ⚡ **JIT Provisioning** - Auto-create users on first login
+
+**Implementation:** Complete setup guide in `COMPLETE_SSO_JOURNEY.md`
+
+---
+
+## GraphRAG Quick Start
 
 ### Prerequisites
 
@@ -182,20 +199,69 @@ For production, consider:
 - Multiple entity types (dashboards, charts, etc.)
 - Caching and optimization
 
-## Documentation
+## GraphRAG Documentation
 
 - `graphrag-demo/README.md` - Detailed setup and usage
 - `graphrag-demo/QUICKSTART.md` - 5-minute quick start
 - `graphrag-demo/DEMO_SCRIPT.md` - Presentation guide
 - `GRAPHRAG_DEMO_SUMMARY.md` - Implementation overview
 
+---
+
+## Keycloak SSO Setup
+
+For complete instructions on setting up Single Sign-On with Keycloak, see:
+
+**📖 [COMPLETE_SSO_JOURNEY.md](COMPLETE_SSO_JOURNEY.md)**
+
+This comprehensive guide covers:
+- Step-by-step Keycloak installation and configuration
+- DataHub OIDC integration setup
+- Troubleshooting common issues
+- Understanding SSO concepts (OAuth, OIDC, realms, clients)
+- Docker networking and environment variables
+- Security best practices
+
+### Quick Overview
+
+**What was implemented:**
+1. Keycloak running on port 8180 with PostgreSQL backend
+2. DataHub configured with OIDC authentication
+3. JIT (Just-In-Time) user provisioning enabled
+4. Traditional username/password login disabled
+
+**Key Configuration:**
+- **Realm:** DataHub
+- **Client:** datahub-client (OpenID Connect, Confidential)
+- **Redirect URI:** http://localhost:9002/*
+- **Discovery URI:** http://host.docker.internal:8180/realms/DataHub/.well-known/openid-configuration
+
+**Result:** Users login through Keycloak instead of typing datahub/datahub
+
+### Screenshots
+
+See `errors_solved/` directory for configuration screenshots:
+- `keycloak redirect.png` - Valid redirect URIs configuration
+- `datahub_realm.png` - DataHub realm setup
+
+---
+
 ## Technology Stack
 
-- **DataHub** - Metadata platform (original)
+### GraphRAG
 - **Apollo Server** - GraphQL server
 - **OpenAI API** - Embeddings (text-embedding-3-small) + LLM (GPT-4)
 - **Node.js** - Runtime environment
 - **Cosine Similarity** - Vector search algorithm
+
+### Keycloak SSO
+- **Keycloak 23.0** - Identity and access management
+- **PostgreSQL** - Keycloak database backend
+- **OIDC** - OpenID Connect protocol
+- **Docker** - Containerization
+
+### Base Platform
+- **DataHub** - Metadata platform
 
 ## Development
 
