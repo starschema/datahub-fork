@@ -1,0 +1,48 @@
+"""
+Simplified GraphRAG Schema for Demo
+"""
+
+type Query {
+  """
+  Search DataHub entities using natural language
+  """
+  semanticSearch(query: String!, limit: Int): SemanticSearchResults!
+
+  """
+  Ask a question about your data catalog
+  """
+  askDataHub(question: String!): AskDataHubResponse!
+
+  """
+  Health check
+  """
+  health: String!
+}
+
+type SemanticSearchResults {
+  query: String!
+  results: [SearchResult!]!
+  total: Int!
+}
+
+type SearchResult {
+  urn: String!
+  name: String!
+  type: String!
+  platform: String
+  description: String
+  score: Float!
+}
+
+type AskDataHubResponse {
+  question: String!
+  answer: String!
+  sources: [Source!]!
+  confidence: Float
+}
+
+type Source {
+  urn: String!
+  name: String!
+  relevance: Float!
+}
