@@ -3,7 +3,6 @@ import { Button, Layout } from 'antd';
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 
-import { REDESIGN_COLORS } from '@app/entityV2/shared/constants';
 import { useNavBarContext } from '@app/homeV2/layout/navBarRedesign/NavBarContext';
 import NavBarToggler from '@app/homeV2/layout/navBarRedesign/NavBarToggler';
 import { useShowHomePageRedesign } from '@app/homeV3/context/hooks/useShowHomePageRedesign';
@@ -50,15 +49,17 @@ const Wrapper = styled.div<{ $isShowNavBarRedesign?: boolean }>`
 `;
 
 const Header = styled(Layout)<{ $isNavBarCollapsed?: boolean; $isShowNavBarRedesign?: boolean }>`
-    background-color: transparent;
-    height: ${(props) => (props.$isShowNavBarRedesign ? '56px' : '72px')};
+    background: linear-gradient(90deg, #6B4EFF 0%, #4B6FFF 100%);
+    height: ${(props) => (props.$isShowNavBarRedesign ? '80px' : '72px')};
     display: flex;
     ${(props) =>
         props.$isShowNavBarRedesign &&
         `
-        margin-top: 8px;
+        margin-top: 0px;
+        margin-bottom: 0px;
         gap: 16px;
         flex-direction: row;
+        padding: 0;
 
         // preventing of NavBar's overlapping
         position: relative;
@@ -78,9 +79,9 @@ const Header = styled(Layout)<{ $isNavBarCollapsed?: boolean; $isShowNavBarRedes
 `;
 
 const HeaderBackground = styled.div<{ $isShowNavBarRedesign?: boolean }>`
-    ${(props) => !props.$isShowNavBarRedesign && 'background-color: #171723;'}
+    background: linear-gradient(90deg, #6B4EFF 0%, #4B6FFF 100%);
     position: fixed;
-    height: 100px;
+    height: ${(props) => (props.$isShowNavBarRedesign ? '80px' : '100px')};
     width: 100%;
     z-index: -1;
 `;
@@ -99,7 +100,7 @@ const SearchBarContainer = styled.div<{ $isShowNavBarRedesign?: boolean }>`
 `;
 
 const StyledButton = styled(Button)`
-    color: ${REDESIGN_COLORS.BODY_TEXT_GREY};
+    color: white !important;
     text-align: center;
 
     font-family: Mulish;
@@ -115,7 +116,7 @@ const StyledButton = styled(Button)`
     &:hover,
     :active,
     :focus {
-        color: ${REDESIGN_COLORS.GREY_300};
+        color: rgba(255, 255, 255, 0.85) !important;
     }
 `;
 

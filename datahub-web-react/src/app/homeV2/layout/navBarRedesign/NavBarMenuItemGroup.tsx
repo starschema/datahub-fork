@@ -5,7 +5,7 @@ const NavBarMenuItemGroup = styled(Menu.ItemGroup)`
     .ant-menu-item-group-title {
         margin-top: 8px;
         padding: 8px 0;
-        color: #8088a3;
+        color: #065fdd;
         font-family: Mulish;
         font-size: 14px;
         font-style: normal;

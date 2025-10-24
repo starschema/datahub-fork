@@ -1,4 +1,5 @@
 import { PageTitle } from '@components';
+import { Rocket } from '@phosphor-icons/react';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -28,13 +29,12 @@ export default function GreetingText() {
     } = useAppConfig();
 
     const finalText = useMemo(() => {
-        if (!user) return `${greetingText}!`;
-        return `${greetingText}, ${entityRegistry.getDisplayName(EntityType.CorpUser, user)}!`;
-    }, [greetingText, user, entityRegistry]);
+        return `${greetingText}`;
+    }, [greetingText]);
 
     return (
         <Container>
-            <PageTitle title={finalText} subTitle={showHomepageUserRole ? maybeRole : null} />
+            <PageTitle title={finalText} subTitle={showHomepageUserRole ? maybeRole : null} icon={<Rocket size={24} color="#6B4EFF" weight="regular" />} />
         </Container>
     );
 }

@@ -104,12 +104,10 @@ const UnborderedTabs = styled(Tabs)<{ $isClosed: boolean }>`
                 ? 'transparent !important'
                 : `linear-gradient(
             180deg,
-            rgba(83, 63, 209, 0.04) -3.99%,
-            rgba(112, 94, 228, 0.04) 53.04%,
-            rgba(112, 94, 228, 0.04) 100%
+            #6b5dd6 0%,
+            #5340cc 100%
         ) !important`};
-        box-shadow: ${(props) =>
-            props.$isClosed ? 'none !important' : '0px 0px 0px 1px rgba(108, 71, 255, 0.08) !important'};
+        box-shadow: ${(props) => (props.$isClosed ? 'none !important' : 'none !important')};
         .ant-tabs-tab-btn {
             color: inherit !important;
         }
@@ -124,11 +122,10 @@ const UnborderedTabs = styled(Tabs)<{ $isClosed: boolean }>`
             )`
                     : `linear-gradient(
                 180deg,
-                rgba(83, 63, 209, 0.04) -3.99%,
-                rgba(112, 94, 228, 0.04) 53.04%,
-                rgba(112, 94, 228, 0.04) 100%
+                #6b5dd6 0%,
+                #5340cc 100%
             )`} !important;
-            box-shadow: 0px 0px 0px 1px rgba(139, 135, 157, 0.08);
+            box-shadow: none;
         }
     }
     &&& .ant-tabs-content-holder {
@@ -173,15 +170,7 @@ const TabText = styled.span<{ $isSelected?: boolean }>`
     text-overflow: ellipsis;
     white-space: nowrap;
     /* Override any Ant Design styling that could cause blue text */
-    color: ${(props) => (props.$isSelected ? 'transparent !important' : '#8088a3 !important')};
-    ${(props) =>
-        props.$isSelected &&
-        `
-        background: linear-gradient(#7565d6 20%, #5340cc 80%) !important;
-        background-clip: text !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        `}
+    color: ${(props) => (props.$isSelected ? '#ffffff !important' : '#8088a3 !important')};
 `;
 
 const TabTextWithTooltip = ({ text, isSelected }: { text: string; isSelected?: boolean }) => {
@@ -217,7 +206,7 @@ const IconWrapper = styled.div<{ $isSelected?: boolean }>`
 
     /* For Phosphor icons */
     && svg {
-        ${(props) => (props.$isSelected ? 'fill: url(#menu-item-selected-gradient) #533fd1;' : 'color: #8088a3;')}
+        ${(props) => (props.$isSelected ? 'color: #ffffff; fill: #ffffff;' : 'color: #8088a3;')}
         width: 20px !important;
         height: 20px !important;
         min-width: 20px !important;
@@ -234,7 +223,7 @@ const IconWrapper = styled.div<{ $isSelected?: boolean }>`
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        ${(props) => (props.$isSelected ? 'color: url(#menu-item-selected-gradient) #533fd1;' : 'color: #8088a3;')}
+        ${(props) => (props.$isSelected ? 'color: #ffffff;' : 'color: #8088a3;')}
         width: 20px !important;
         height: 20px !important;
 
@@ -250,7 +239,7 @@ const IconWrapper = styled.div<{ $isSelected?: boolean }>`
 
     /* Ensure Phosphor icon weights are correctly applied */
     & .ph-fill {
-        fill: ${(props) => (props.$isSelected ? 'url(#menu-item-selected-gradient) #533fd1' : '#8088a3')};
+        fill: ${(props) => (props.$isSelected ? '#ffffff' : '#8088a3')};
     }
 `;
 
