@@ -54,6 +54,9 @@ export class DataHubClient {
           start: $start
           count: $count
         }) {
+          start
+          count
+          total
           searchResults {
             entity {
               urn
@@ -83,6 +86,7 @@ export class DataHubClient {
     `;
 
     const data = await this.query(gqlQuery, { query, start, count });
+    console.log(`DataHub reports ${data.search.total} total datasets, returning ${data.search.searchResults.length} results`);
     return data.search.searchResults.map(r => this.normalizeEntity(r.entity));
   }
 

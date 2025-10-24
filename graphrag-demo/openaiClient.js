@@ -8,7 +8,7 @@ export class OpenAIClient {
   constructor(apiKey) {
     this.client = new OpenAI({ apiKey });
     this.embeddingModel = 'text-embedding-3-small';
-    this.chatModel = 'gpt-3.5';
+    this.chatModel = 'gpt-3.5-turbo';
   }
 
   /**

@@ -79,11 +79,17 @@ const resolvers = {
       console.log(`[AskDataHub] Question: "${question}"`);
 
       try {
-        // Step 1: Generate question embedding
+        // Step 1: Detect if this is a generic "list all" type query
+        const isGenericQuery = /(what|which|how many) (datasets|tables|data|entities)|list (all )?(datasets|tables|data)|show (me )?(all )?(datasets|tables)/i.test(question);
+
+        // Step 2: Generate question embedding
         const questionEmbedding = await openaiClient.generateEmbedding(question);
 
-        // Step 2: Retrieve relevant entities
-        const relevantEntities = vectorStore.search(questionEmbedding, 5, 0.4);
+        // Step 3: Retrieve relevant entities
+        // For generic queries, get more results with lower threshold
+        const limit = isGenericQuery ? 100 : 10;
+        const threshold = isGenericQuery ? 0.05 : 0.2;
+        const relevantEntities = vectorStore.search(questionEmbedding, limit, threshold);
 
         if (relevantEntities.length === 0) {
           return {
@@ -94,32 +100,42 @@ const resolvers = {
           };
         }
 
-        console.log(`[AskDataHub] Retrieved ${relevantEntities.length} relevant entities`);
+        console.log(`[AskDataHub] Retrieved ${relevantEntities.length} relevant entities (generic: ${isGenericQuery})`);
 
-        // Step 3: Fetch full metadata for context
-        const contextEntities = await Promise.all(
-          relevantEntities.slice(0, 3).map(async (entity) => {
-            try {
-              const fullEntity = await datahubClient.getEntity(entity.urn);
-              return fullEntity;
-            } catch (error) {
-              console.warn(`Failed to fetch entity ${entity.urn}:`, error.message);
-              return entity;
-            }
-          })
-        );
+        // Step 4: Build context based on query type
+        let context;
 
-        // Step 4: Build context string
-        const context = contextEntities.map((entity, idx) => {
-          return `
+        if (isGenericQuery) {
+          // For generic queries, provide a comprehensive list without fetching full metadata
+          context = `Total datasets available: ${relevantEntities.length}\n\nDataset List:\n` +
+            relevantEntities.map((entity, idx) =>
+              `${idx + 1}. ${entity.name} (${entity.platform}) - ${entity.description || 'No description'}`
+            ).join('\n');
+        } else {
+          // For specific queries, fetch full metadata for top results
+          const contextEntities = await Promise.all(
+            relevantEntities.slice(0, 5).map(async (entity) => {
+              try {
+                const fullEntity = await datahubClient.getEntity(entity.urn);
+                return fullEntity;
+              } catch (error) {
+                console.warn(`Failed to fetch entity ${entity.urn}:`, error.message);
+                return entity;
+              }
+            })
+          );
+
+          context = contextEntities.map((entity, idx) => {
+            return `
 [${idx + 1}] ${entity.name}
    URN: ${entity.urn}
    Platform: ${entity.platform}
    Description: ${entity.description || 'No description'}
    ${entity.owners ? `Owners: ${entity.owners.map(o => o.username).join(', ')}` : ''}
    ${entity.tags ? `Tags: ${entity.tags.join(', ')}` : ''}
-          `.trim();
-        }).join('\n\n');
+            `.trim();
+          }).join('\n\n');
+        }
 
         // Step 5: Generate answer using LLM
         const answer = await openaiClient.generateAnswer(question, context);
@@ -127,10 +143,11 @@ const resolvers = {
         console.log(`[AskDataHub] Generated answer`);
 
         // Step 6: Return response with sources
+        const sourceCount = isGenericQuery ? Math.min(10, relevantEntities.length) : 5;
         return {
           question,
           answer,
-          sources: relevantEntities.slice(0, 3).map(e => ({
+          sources: relevantEntities.slice(0, sourceCount).map(e => ({
             urn: e.urn,
             name: e.name,
             relevance: e.score
