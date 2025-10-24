@@ -5,6 +5,7 @@ export interface PageTitleProps {
     subTitle?: string | React.ReactNode;
     pillLabel?: string;
     variant?: 'pageHeader' | 'sectionHeader';
+    icon?: React.ReactNode;
     actionButton?: {
         label: string;
         icon?: React.ReactNode;

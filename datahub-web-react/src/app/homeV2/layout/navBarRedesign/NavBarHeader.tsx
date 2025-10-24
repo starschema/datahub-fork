@@ -8,8 +8,6 @@ import { useShowHomePageRedesign } from '@app/homeV3/context/hooks/useShowHomePa
 import { useIsHomePage } from '@app/shared/useIsHomePage';
 import analytics, { EventType } from '@src/app/analytics';
 
-import DatahubCoreLogo from '@images/datahub_core.svg?react';
-
 const Container = styled.div`
     display: flex;
     width: 100%;
@@ -22,15 +20,18 @@ const Container = styled.div`
 `;
 
 const Logotype = styled.div`
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     min-height: 24px;
     max-height: 24px;
     max-width: 42px;
+    min-width: 42px;
     border-radius: 4px;
     position: relative;
     object-fit: contain;
+    visibility: visible !important;
+    opacity: 1 !important;
 
     & svg,
     img {
@@ -38,7 +39,16 @@ const Logotype = styled.div`
         max-width: 42px;
         min-width: 42px;
         object-fit: contain;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
+`;
+
+const LogoText = styled.span`
+    font-size: 16px;
+    font-weight: 600;
+    color: ${(props) => props.theme.styles['primary-color']};
+    white-space: nowrap;
 `;
 
 const StyledLink = styled(Link)`
@@ -70,7 +80,7 @@ export default function NavBarHeader({ logotype }: Props) {
         <Container>
             <StyledLink to="/" onClick={handleLogoClick} data-testid="nav-bar-home-logo">
                 <Logotype>{logotype}</Logotype>
-                {!isCollapsed && <DatahubCoreLogo />}
+                {!isCollapsed && <LogoText>DataHub Core</LogoText>}
             </StyledLink>
             {!isCollapsed && <NavBarToggler />}
         </Container>

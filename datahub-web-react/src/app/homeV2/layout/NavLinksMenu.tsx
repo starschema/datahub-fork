@@ -1,6 +1,6 @@
 import { Tooltip } from '@components';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components/macro';
 
 import { useUserContext } from '@app/context/useUserContext';
@@ -82,9 +82,15 @@ const SubMenuTitle = styled.div`
     margin-bottom: 4px;
 `;
 
-const SubMenuLink = styled.div`
+const SubMenuLink = styled.div<{ $isSelected?: boolean }>`
     border-radius: 12px;
     padding: 4px 12px 12px 12px;
+
+    ${(props) =>
+        props.$isSelected &&
+        `
+        background-color: #7C4DFF !important;
+    `}
 
     &:hover {
         background-color: #4b39bc;
@@ -101,6 +107,7 @@ export function NavLinksMenu(props: Props) {
     const { config } = useAppConfig();
     const themeConfig = useTheme();
     const version = config?.appVersion;
+    const location = useLocation();
 
     // Submenu states
     const [showGovernMenu, setShowGovernMenu] = useState(false);
@@ -265,8 +272,11 @@ export function NavLinksMenu(props: Props) {
                                 <SubMenuTitle>{menuItem.title}</SubMenuTitle>
                                 {menuItem.subMenu?.items?.map((subMenuItem) => {
                                     if (subMenuItem.isHidden) return null;
+                                    const isSelected = !!(
+                                        subMenuItem.link && location.pathname.startsWith(subMenuItem.link)
+                                    );
                                     return (
-                                        <SubMenuLink>
+                                        <SubMenuLink $isSelected={isSelected} key={subMenuItem.title.toLowerCase()}>
                                             <CustomNavLink
                                                 menuItem={subMenuItem}
                                                 key={subMenuItem.title.toLowerCase()}

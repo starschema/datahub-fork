@@ -14,12 +14,18 @@ const Wrapper = styled.div`
     justify-content: space-between;
 `;
 
+const IconWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+`;
+
 export const PageTitle = ({
     title,
     subTitle,
     pillLabel,
     variant = 'pageHeader',
-    actionButton,
+    icon, actionButton,
     titlePill,
 }: PageTitleProps) => {
     return (
@@ -33,6 +39,7 @@ export const PageTitle = ({
 
                 {subTitle ? <SubTitle variant={variant}>{subTitle}</SubTitle> : null}
             </Container>
+            {icon && !actionButton ? <IconWrapper>{icon}</IconWrapper> : null}
             {actionButton ? (
                 <Button onClick={actionButton.onClick} size="md">
                     {actionButton.icon && actionButton.icon}

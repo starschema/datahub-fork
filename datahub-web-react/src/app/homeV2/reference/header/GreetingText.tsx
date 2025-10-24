@@ -1,3 +1,4 @@
+import { Rocket } from '@phosphor-icons/react';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -46,24 +47,15 @@ export const GreetingText = ({ role }: { role?: string | null }) => {
     if (showNavBarRedesign) {
         return (
             <TitleWrapper>
-                {!!user && (
-                    <PageTitle
-                        title={`${greetingText}, ${entityRegistry.getDisplayName(EntityType.CorpUser, user)}`}
-                        subTitle={role}
-                    />
-                )}
+                <PageTitle title={greetingText} subTitle={role} icon={<Rocket size={24} color="#6B4EFF" weight="regular" />} />
             </TitleWrapper>
         );
     }
 
     return (
         <Text>
-            {!!user && (
-                <>
-                    {greetingText},<Name>{entityRegistry.getDisplayName(EntityType.CorpUser, user)}!</Name>
-                    {(role && <Role>{role}</Role>) || null}
-                </>
-            )}{' '}
+            {greetingText}
+            {(role && <Role>{role}</Role>) || null}
         </Text>
     );
 };
