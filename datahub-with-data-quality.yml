@@ -9,6 +9,15 @@
 #   docker compose -f datahub-with-data-quality.yml up -d
 #
 # Prerequisites:
+#   Option A - Pull pre-built images from GHCR (RECOMMENDED):
+#     ./docker/pull-images.sh
+#
+#   Option B - Build images locally:
+#     ./docker/build-push-images.sh --no-push
+#
+#   Ensure config files exist:
+#     - executor-action-config.yaml
+#     - data-quality-action-config.yaml
 #   1. Ensure config files exist in same directory:
 #      - executor-action-config.yaml
 #      - data-quality-action-config.yaml
@@ -25,7 +34,9 @@ services:
 
   datahub-frontend-react:
     hostname: datahub-frontend-react
-    image: ${DATAHUB_FRONTEND_IMAGE:-custom-datahub-frontend-react:hcltech}
+    # Use GHCR image by default, fallback to local if not available
+    # To use local image: export DATAHUB_FRONTEND_IMAGE=custom-datahub-frontend-react:hcltech
+    image: ${DATAHUB_FRONTEND_IMAGE:-ghcr.io/rykalc/custom-datahub-frontend-react:latest}
     ports:
       - ${DATAHUB_MAPPED_FRONTEND_PORT:-9002}:9002
     environment:
@@ -109,9 +120,12 @@ services:
     build:
       context: ./datahub-actions
       dockerfile: Dockerfile
-    image: my-datahub-actions:latest
+    # Use GHCR image by default, fallback to local if not available
+    # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/rykalc/datahub-actions:latest}
     ports:
       - "8082:8082"
+    restart: unless-stopped
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
