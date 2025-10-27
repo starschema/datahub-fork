@@ -12,15 +12,20 @@ This guide provides step-by-step instructions to get DataHub up and running on y
 
 ---
 
-## Step 1: Clone the Repository
+## Step 1: Clone the Repository and Pull Images
 
 ```bash
 # Clone the DataHub repository
 git clone https://github.com/starschema/Custom-Datahub.git
 
 # Navigate to the project directory
-cd datahub
+cd Custom-Datahub
+
+# Pull pre-built custom images (saves over 1 hour of build time!)
+./docker/pull-images.sh
 ```
+
+**Note:** If you encounter authentication issues, see [GHCR-IMAGES-README.md](./GHCR-IMAGES-README.md) for authentication instructions.
 
 ---
 
