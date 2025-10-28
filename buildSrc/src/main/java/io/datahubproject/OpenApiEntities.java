@@ -53,9 +53,15 @@ class Entity {
 
 class Entities {
     private List<Entity> entities;
+    private Object events;
+    private Object plugins;
 
     public List<Entity> getEntities() { return entities; }
     public void setEntities(List<Entity> entities) { this.entities = entities; }
+    public Object getEvents() { return events; }
+    public void setEvents(Object events) { this.events = events; }
+    public Object getPlugins() { return plugins; }
+    public void setPlugins(Object plugins) { this.plugins = plugins; }
 }
 
 public class OpenApiEntities {

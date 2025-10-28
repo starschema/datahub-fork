@@ -20,7 +20,14 @@ const IconWrapper = styled.div`
     margin-left: auto;
 `;
 
-export const PageTitle = ({ title, subTitle, pillLabel, variant = 'pageHeader', icon, actionButton }: PageTitleProps) => {
+export const PageTitle = ({
+    title,
+    subTitle,
+    pillLabel,
+    variant = 'pageHeader',
+    icon,
+    actionButton,
+}: PageTitleProps) => {
     return (
         <Wrapper style={actionButton ? { width: '100%' } : {}}>
             <Container>

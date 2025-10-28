@@ -93,11 +93,7 @@ export async function generateSQL(datasetUrn: string, nlRule: string): Promise<G
     return response.json();
 }
 
-export async function executeSQL(
-    datasetUrn: string,
-    sql: string,
-    config: AssertionConfig,
-): Promise<ExecuteResponse> {
+export async function executeSQL(datasetUrn: string, sql: string, config: AssertionConfig): Promise<ExecuteResponse> {
     const response = await fetch(`${AI_ASSISTANT_BASE_URL}/execute`, {
         method: 'POST',
         headers: {

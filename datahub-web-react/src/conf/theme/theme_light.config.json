@@ -1,8 +1,8 @@
 {
     "styles": {
-        "primary-color": "#1890ff",
-        "primary-color-light": "#F0F5FF",
-        "primary-color-dark": "#002766",
+        "primary-color": "#6B4EFF",
+        "primary-color-light": "#EDE9FF",
+        "primary-color-dark": "#5940CC",
         "layout-header-background": "white",
         "layout-header-color": "#434343",
         "layout-body-background": "white",
@@ -23,8 +23,8 @@
         "box-shadow-hover": "0px 1px 0px 0.5px rgb(239 239 239)",
         "box-shadow-navbar-redesign": "0 0 6px 0px rgba(93, 102, 139, 0.20)",
         "border-radius-navbar-redesign": "12px",
-        "highlight-color": "#E6F4FF",
-        "highlight-border-color": "#BAE0FF"
+        "highlight-color": "#EDE9FF",
+        "highlight-border-color": "#C9BFFF"
     },
     "assets": {
         "logoUrl": "/assets/logo.png"

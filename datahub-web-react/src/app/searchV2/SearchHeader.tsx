@@ -49,7 +49,7 @@ const Wrapper = styled.div<{ $isShowNavBarRedesign?: boolean }>`
 `;
 
 const Header = styled(Layout)<{ $isNavBarCollapsed?: boolean; $isShowNavBarRedesign?: boolean }>`
-    background: linear-gradient(90deg, #6B4EFF 0%, #4B6FFF 100%);
+    background: linear-gradient(90deg, #6b4eff 0%, #4b6fff 100%);
     height: ${(props) => (props.$isShowNavBarRedesign ? '80px' : '72px')};
     display: flex;
     ${(props) =>
@@ -79,7 +79,7 @@ const Header = styled(Layout)<{ $isNavBarCollapsed?: boolean; $isShowNavBarRedes
 `;
 
 const HeaderBackground = styled.div<{ $isShowNavBarRedesign?: boolean }>`
-    background: linear-gradient(90deg, #6B4EFF 0%, #4B6FFF 100%);
+    background: linear-gradient(90deg, #6b4eff 0%, #4b6fff 100%);
     position: fixed;
     height: ${(props) => (props.$isShowNavBarRedesign ? '80px' : '100px')};
     width: 100%;
