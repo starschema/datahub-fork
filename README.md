@@ -1,339 +1,260 @@
-# DataHub Modifications
+# Custom DataHub - RAG Metadata Store for Data Estate
 
-This repository contains two major enhancements to DataHub:
+## Project Overview
 
-## 1. GraphRAG Integration
+This is a customized DataHub implementation designed to serve as a **metadata-powered knowledge base for RAG (Retrieval-Augmented Generation)** systems.
 
-AI-powered semantic search and natural language Q&A for DataHub using GraphQL.
+**Our Goal:** Build an intelligent metadata catalog that:
+- Ingests metadata from diverse data sources across the data estate (Snowflake, MySQL, PostgreSQL, S3, etc.)
+- Provides a unified view of datasets, schemas, lineage, and quality metrics
+- Serves as a structured knowledge store for AI/LLM queries about data assets
+- Enables intelligent data discovery through metadata enrichment
 
-**Features:**
-- 🔍 **Semantic Search** - Search datasets using natural language, not just keywords
-- 💬 **AI Q&A** - Ask questions about your data catalog and get intelligent answers
-- 🎯 **GraphQL API** - Clean, modern API interface
-- 🤖 **OpenAI Integration** - Powered by GPT-4 and embeddings
-
-**Implementation:** Complete working code in `graphrag-demo/` directory
-
-## 2. Keycloak SSO Integration
-
-Enterprise-grade Single Sign-On authentication for DataHub using Keycloak and OIDC.
-
-**Features:**
-- 🔐 **Centralized Authentication** - One login for all applications
-- 👥 **User Management** - Manage users in Keycloak, not DataHub
-- 🛡️ **Security** - Industry-standard OIDC protocol, 2FA capability
-- ⚡ **JIT Provisioning** - Auto-create users on first login
-
-**Implementation:** Complete setup guide in `COMPLETE_SSO_JOURNEY.md`
+**Use Case:** Instead of traditional data catalogs, we're leveraging DataHub's metadata graph to power:
+- Conversational data discovery ("What tables contain customer PII?")
+- Automated data documentation generation
+- Intelligent schema suggestions and recommendations
+- Data quality monitoring with automated assertions
 
 ---
 
-## GraphRAG Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- DataHub running at `http://localhost:8080`
-- OpenAI API key
+- **Docker** (version 20.10+) and **Docker Compose** (v2.0+)
+- **Git**
+- **Minimum 8GB RAM** (16GB recommended)
+- **10GB free disk space**
 
-### Setup (5 minutes)
+### Start DataHub in 3 Steps
 
+**1. Clone the Repository**
 ```bash
-# 1. Navigate to demo directory
-cd graphrag-demo
-
-# 2. Install dependencies
-npm install
-
-# 3. Configure environment
-cp .env.example .env
-# Edit .env and add your OpenAI API key
-
-# 4. Index your DataHub entities
-npm run index
-
-# 5. Start the GraphQL server
-npm start
+git clone https://github.com/starschema/Custom-Datahub.git
+cd datahub
 ```
 
-Open `http://localhost:4000` in your browser to access the GraphQL Playground.
-
-## Example Queries
-
-### Semantic Search
-
-Find datasets using natural language:
-
-```graphql
-query {
-  semanticSearch(query: "customer revenue data", limit: 5) {
-    results {
-      name
-      platform
-      score
-    }
-  }
-}
+**2. Start All Services (with Data Quality)**
+```bash
+docker-compose -f datahub-with-data-quality.yml up -d
 ```
 
-### Ask Questions
+> **Note:** This boots DataHub with automatic data quality testing enabled. Tests run automatically when you ingest data.
 
-Get natural language answers about your data:
+**3. Access the UI**
 
-```graphql
-query {
-  askDataHub(question: "What datasets do we have and what do they contain?") {
-    answer
-    sources {
-      name
-    }
-  }
-}
-```
+Open your browser and navigate to: **http://localhost:9002**
 
-## Architecture
+**Default credentials:**
+- Username: `datahub`
+- Password: `datahub`
 
-```
-┌─────────────────┐
-│   DataHub       │  Your existing DataHub instance
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  GraphRAG Demo  │  New GraphQL server (Node.js)
-│  Apollo Server  │  Port 4000
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌─────────┐ ┌──────────┐
-│ OpenAI  │ │ Vector   │
-│ API     │ │ Store    │
-└─────────┘ └──────────┘
-```
-
-## What's Different from Standard DataHub
-
-### New: GraphRAG Demo (`graphrag-demo/`)
-
-A standalone GraphQL server that adds AI-powered features:
-
-**Files:**
-- `index.js` - GraphQL server with semantic search and Q&A resolvers
-- `schema.graphql` - GraphQL schema defining new queries
-- `vectorStore.js` - In-memory vector search using cosine similarity
-- `datahubClient.js` - Client to fetch metadata from DataHub
-- `openaiClient.js` - OpenAI integration for embeddings and GPT-4
-- `indexer.js` - Script to generate embeddings for DataHub entities
-
-**Key Features:**
-- Semantic search over DataHub metadata
-- RAG-powered question answering
-- Vector embeddings for similarity search
-- Natural language interface
-
-### Configuration
-
-**Model Configuration** (`openaiClient.js`):
-```javascript
-this.embeddingModel = 'text-embedding-3-small';  // For semantic search
-this.chatModel = 'gpt-4-turbo-preview';          // For answers
-```
-
-Change these to use different models (e.g., `gpt-3.5-turbo` for lower cost).
-
-**Similarity Threshold** (`index.js`):
-```javascript
-vectorStore.search(queryEmbedding, limit, 0.4);  // 0.4 = 40% similarity
-```
-
-Adjust for stricter/looser matching.
-
-## How It Works
-
-### 1. Indexing
-
-```
-DataHub Entities → Extract Metadata → Generate Embeddings → Store Vectors
-                                        (OpenAI API)         (JSON file)
-```
-
-### 2. Semantic Search
-
-```
-User Query → Generate Embedding → Vector Similarity Search → Return Results
-              (OpenAI API)         (Cosine Similarity)
-```
-
-### 3. RAG Question Answering
-
-```
-Question → Find Similar Entities → Fetch Full Metadata → Build Context → GPT-4 Answer
-```
-
-## Cost
-
-For ~100 entities with moderate usage:
-
-- **Initial indexing**: ~$0.002
-- **Per query**: ~$0.01-0.03 (depending on model)
-- **Monthly (100 queries)**: ~$1-3
-
-Use `gpt-3.5-turbo` instead of `gpt-4` for 10-20x cost reduction.
-
-## Limitations
-
-This is a demonstration implementation:
-
-- ❌ **No persistence** - Vectors stored in JSON (not production-ready)
-- ❌ **No authentication** - Open GraphQL endpoint
-- ❌ **Limited context** - Doesn't fetch lineage relationships
-- ❌ **Single entity type** - Only indexes datasets
-- ❌ **In-memory only** - Not distributed
-
-For production, consider:
-- Persistent vector database (Pinecone, Weaviate, Milvus, pgvector)
-- Authentication and authorization
-- Full context aggregation (lineage, ownership, quality)
-- Multiple entity types (dashboards, charts, etc.)
-- Caching and optimization
-
-## GraphRAG Documentation
-
-- `graphrag-demo/README.md` - Detailed setup and usage
-- `graphrag-demo/QUICKSTART.md` - 5-minute quick start
-- `graphrag-demo/DEMO_SCRIPT.md` - Presentation guide
-- `GRAPHRAG_DEMO_SUMMARY.md` - Implementation overview
+> **Note:** First startup takes 5-10 minutes to download images and initialize services.
 
 ---
 
-## Keycloak SSO Setup
+## Core Services & Endpoints
 
-For complete instructions on setting up Single Sign-On with Keycloak, see:
+| Service | URL | Purpose |
+|---------|-----|---------|
+| **DataHub UI** | http://localhost:9002 | Main web interface for metadata browsing |
+| **GMS API** | http://localhost:8888 | Backend GraphQL & REST APIs |
+| **DataHub Actions** | (background) | Automatic data quality testing & automation |
+| **MySQL** | localhost:3306 | Metadata persistence (`datahub`/`datahub`) |
+| **Elasticsearch** | http://localhost:9200 | Search and indexing |
+| **Kafka** | localhost:9092 | Event streaming |
+| **Neo4j** (optional) | http://localhost:7474 | Graph database (`neo4j`/`P@ssword1`) |
 
-**📖 [COMPLETE_SSO_JOURNEY.md](COMPLETE_SSO_JOURNEY.md)**
-
-This comprehensive guide covers:
-- Step-by-step Keycloak installation and configuration
-- DataHub OIDC integration setup
-- Troubleshooting common issues
-- Understanding SSO concepts (OAuth, OIDC, realms, clients)
-- Docker networking and environment variables
-- Security best practices
-
-### Quick Overview
-
-**What was implemented:**
-1. Keycloak running on port 8180 with PostgreSQL backend
-2. DataHub configured with OIDC authentication
-3. JIT (Just-In-Time) user provisioning enabled
-4. Traditional username/password login disabled
-
-**Key Configuration:**
-- **Realm:** DataHub
-- **Client:** datahub-client (OpenID Connect, Confidential)
-- **Redirect URI:** http://localhost:9002/*
-- **Discovery URI:** http://host.docker.internal:8180/realms/DataHub/.well-known/openid-configuration
-
-**Result:** Users login through Keycloak instead of typing datahub/datahub
-
-### Screenshots
-
-See `errors_solved/` directory for configuration screenshots:
-- `keycloak redirect.png` - Valid redirect URIs configuration
-- `datahub_realm.png` - DataHub realm setup
+**For complete service details and credentials, see [QUICKSTART.md](./QUICKSTART.md)**
 
 ---
 
-## Technology Stack
+## Architecture for RAG Use Case
 
-### GraphRAG
-- **Apollo Server** - GraphQL server
-- **OpenAI API** - Embeddings (text-embedding-3-small) + LLM (GPT-4)
-- **Node.js** - Runtime environment
-- **Cosine Similarity** - Vector search algorithm
-
-### Keycloak SSO
-- **Keycloak 23.0** - Identity and access management
-- **PostgreSQL** - Keycloak database backend
-- **OIDC** - OpenID Connect protocol
-- **Docker** - Containerization
-
-### Base Platform
-- **DataHub** - Metadata platform
-
-## Development
-
-### Modify Models
-
-Edit `graphrag-demo/openaiClient.js`:
-```javascript
-this.embeddingModel = 'text-embedding-3-small';
-this.chatModel = 'gpt-3.5-turbo';  // Change to cheaper model
+```
+┌─────────────────────────────────────────────────┐
+│         Data Sources (Data Estate)              │
+│  Snowflake • MySQL • PostgreSQL • S3 • APIs     │
+└────────────────┬────────────────────────────────┘
+                 │ Ingestion
+                 ↓
+┌─────────────────────────────────────────────────┐
+│              DataHub Core                       │
+│  ┌─────────────┐  ┌──────────────┐             │
+│  │  Metadata   │  │    Search    │             │
+│  │   Storage   │  │  (Elastic)   │             │
+│  │  (MySQL)    │  └──────────────┘             │
+│  └─────────────┘  ┌──────────────┐             │
+│  ┌─────────────┐  │   Lineage    │             │
+│  │   Events    │  │   (Neo4j)    │             │
+│  │  (Kafka)    │  └──────────────┘             │
+│  └─────────────┘                                │
+└────────────────┬────────────────────────────────┘
+                 │ GraphQL/REST APIs
+                 ↓
+┌─────────────────────────────────────────────────┐
+│           RAG Application Layer                 │
+│  • Metadata Retrieval • Context Enrichment      │
+│  • LLM Queries • Semantic Search                │
+└─────────────────────────────────────────────────┘
 ```
 
-### Adjust Search Threshold
+**Key Components:**
+- **Frontend (React):** User interface for browsing metadata
+- **GMS (Backend):** GraphQL/REST API server for programmatic access
+- **Elasticsearch:** Powers semantic search across metadata
+- **MySQL:** Persistent storage for all metadata entities
+- **Kafka:** Real-time event streaming for metadata changes
+- **Actions Framework:** Custom automation (data quality checks, webhooks)
 
-Edit `graphrag-demo/index.js`:
-```javascript
-vectorStore.search(queryEmbedding, limit, 0.5);  // Increase for stricter matching
-```
+---
 
-### Re-index Entities
+## Getting Started with Metadata Ingestion
 
-If DataHub data changes:
+### Option 1: Using the UI (Recommended)
+
+1. Navigate to **Ingestion** → **Create new source**
+2. Select your data source (Snowflake, MySQL, etc.)
+3. Configure connection details
+4. Click **Execute** to start ingestion
+
+### Option 2: Using the CLI
+
 ```bash
-cd graphrag-demo
-npm run index  # Regenerate embeddings
+# Install DataHub CLI
+pip install 'acryl-datahub'
+
+# Create a recipe file (e.g., snowflake-recipe.yml)
+# See examples in ./examples/recipes/
+
+# Run ingestion
+datahub ingest -c snowflake-recipe.yml
 ```
+
+**Example Snowflake Recipe:**
+```yaml
+source:
+  type: snowflake
+  config:
+    account_id: YOUR_ACCOUNT
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
+    warehouse: YOUR_WAREHOUSE
+    role: YOUR_ROLE
+
+sink:
+  type: datahub-rest
+  config:
+    server: 'http://localhost:8080'
+```
+
+---
+
+## Key Features
+
+✅ **Metadata Discovery**
+- Automatically extract schemas, column types, descriptions
+- Map relationships and data lineage
+- Track data quality metrics
+
+✅ **Semantic Search**
+- Full-text search across dataset names, descriptions, columns
+- Tag-based filtering and domain organization
+- Glossary terms for business context
+
+✅ **API Access for RAG**
+- GraphQL API for structured metadata queries
+- REST API for bulk retrieval
+- Real-time updates via Kafka events
+
+✅ **Automatic Data Quality Testing** (NEW!)
+- **20 built-in test types** (13 profile-based + 7 query-based)
+- **Zero-duplication credentials** - Tests reuse ingestion source configs
+- **Real-time monitoring** - Tests auto-run on every ingestion
+- **Stateful optimization** - Only tests changed datasets
+- See [DATA_QUALITY_FLOW.md](./DATA_QUALITY_FLOW.md) for details
+
+✅ **Custom Automation**
+- DataHub Actions framework for event-driven workflows
+- Custom transformers for metadata enrichment
+- Webhooks for external integrations
+
+---
+
+## Customizations in This Fork
+
+- ✨ **Automatic Data Quality Testing** - 20 test types, zero-duplication credentials, event-driven execution
+- 🔧 **Enhanced DataHub Actions** - Extended automation framework with custom plugins
+- 📊 **RAG-Optimized Metadata** - Enhanced metadata schemas for LLM consumption
+- 🔄 **Stateful Ingestion** - Smart incremental updates for efficient re-ingestion
+
+---
+
+## Stopping & Managing Services
+
+**Stop services (keeps data):**
+```bash
+docker-compose -f datahub-with-data-quality.yml down
+```
+
+**Stop and remove all data:**
+```bash
+docker-compose -f datahub-with-data-quality.yml down -v
+```
+
+**View logs:**
+```bash
+# All services
+docker-compose -f datahub-with-data-quality.yml logs -f
+
+# Specific services
+docker logs datahub-gms -f           # Backend API logs
+docker logs datahub-datahub-actions-1 -f  # Data quality action logs
+```
+
+---
 
 ## Troubleshooting
 
-**Server won't start:**
-```bash
-# Check if port 4000 is in use
-netstat -ano | findstr :4000
+**Services won't start?**
+- Check Docker has at least 8GB RAM allocated
+- Verify no port conflicts (9002, 8888, 3306, 9200, 9092)
+- View logs: `docker logs datahub-gms`
 
-# Kill process
-taskkill //PID <pid> //F
-```
+**Can't access UI?**
+- Wait 5-10 minutes for all services to initialize
+- Check container health: `docker ps`
+- Try: http://127.0.0.1:9002
 
-**No results from semantic search:**
-- Lower similarity threshold in `index.js`
-- Verify vectors.json exists
-- Re-run indexer
-
-**OpenAI errors:**
-- Check API key in `.env`
-- Verify billing enabled
-- Check usage limits
-
-## Contributing
-
-This is a demonstration implementation. For production use:
-
-1. Integrate directly into DataHub codebase
-2. Add persistent vector storage
-3. Implement proper authentication
-4. Add lineage and relationship traversal
-5. Support multiple entity types
-
-## License
-
-Apache License 2.0 (same as DataHub)
-
-## Acknowledgments
-
-Built on top of:
-- [DataHub](https://datahubproject.io) - Open-source metadata platform
-- [Apollo Server](https://www.apollographql.com) - GraphQL server
-- [OpenAI](https://openai.com) - Embeddings and LLM
-
-Inspired by Microsoft's [GraphRAG](https://arxiv.org/abs/2404.16130) paper.
+**For detailed troubleshooting, see [QUICKSTART.md](./QUICKSTART.md#troubleshooting)**
 
 ---
 
-**Questions?** See documentation in `graphrag-demo/` directory or open an issue.
+## Additional Resources
 
-**Ready to try it?** → `cd graphrag-demo && npm install && npm start`
+- 📖 **Detailed Setup Guide:** [QUICKSTART.md](./QUICKSTART.md)
+- 🔬 **Data Quality Flow:** [DATA_QUALITY_FLOW.md](./DATA_QUALITY_FLOW.md)
+- 📋 **Query-Based Tests:** [QUERY_BASED_QUALITY_TESTS.md](./QUERY_BASED_QUALITY_TESTS.md)
+- 📘 **Official DataHub Docs:** [docs.datahub.com](https://docs.datahub.com/)
+- 🏗️ **Architecture Overview:** [docs/architecture/architecture.md](./docs/architecture/architecture.md)
+- 🔌 **Ingestion Sources:** [Supported Connectors](https://docs.datahub.com/docs/metadata-ingestion/)
+- 🤝 **Community:** [DataHub Slack](https://datahub.com/slack)
+
+---
+
+## Development
+
+To build and modify DataHub components, see:
+- [Development Guide](https://docs.datahub.com/docs/developers)
+- [CLAUDE.md](./CLAUDE.md) - AI-assisted development guidelines
+
+---
+
+## License
+
+[Apache License 2.0](./LICENSE)
+
+---
+
+**Built with ❤️ using DataHub** - An open-source data catalog for the modern data stack.

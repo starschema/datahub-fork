@@ -1,0 +1,5 @@
+**/*.graphql
+dist/
+build/
+node_modules/
+**/*.generated.ts

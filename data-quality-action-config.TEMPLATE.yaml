@@ -1,0 +1,141 @@
+# DataHub Actions Configuration Template - Data Quality Testing
+#
+# SETUP INSTRUCTIONS:
+# 1. Copy this file to: data-quality-action-config.yaml
+# 2. Replace placeholder credentials with your actual values
+# 3. Add data-quality-action-config.yaml to .gitignore (IMPORTANT!)
+# 4. Mount this config in Docker compose
+
+name: data_quality_monitoring
+
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+      schema_registry_url: "http://schema-registry:8081"
+    topic_routes:
+      mcl: "MetadataChangeLog_Timeseries_v1"
+      pe: "PlatformEvent_v1"
+
+# Filter for MetadataChangeLog events with datasetProfile aspect
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataset"
+    aspectName: "datasetProfile"
+
+action:
+  type: "data_quality"
+  config:
+    enabled: true
+
+    # ============================================================================
+    # DATABASE CONNECTORS - Configure for Query-Based Tests
+    # ============================================================================
+    # Query-based tests execute fresh SQL queries to validate data quality.
+    # Credentials configured here are used ONLY by the quality tests.
+    #
+    # SECURITY NOTES:
+    # - Keep this file secure and never commit to git!
+    # - Use read-only database credentials when possible
+    # - Credentials are never logged (checked and sanitized)
+    # ============================================================================
+
+    connectors:
+      # Snowflake configuration
+      snowflake:
+        # Connection string format:
+        # snowflake://USERNAME:PASSWORD@ACCOUNT_ID/DATABASE?warehouse=WAREHOUSE&role=ROLE
+        #
+        # Example: snowflake://datahub_ro:SecurePass123@xy12345.us-east-1/PROD_DB?warehouse=COMPUTE_WH&role=ANALYST
+        connection_string: "snowflake://USERNAME:PASSWORD@ACCOUNT_ID/?warehouse=WAREHOUSE&role=ROLE"
+
+      # PostgreSQL configuration (uncomment if needed)
+      # postgres:
+      #   connection_string: "postgresql://USERNAME:PASSWORD@HOST:PORT/DATABASE"
+
+      # MySQL configuration (uncomment if needed)
+      # mysql:
+      #   connection_string: "mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE"
+
+      # BigQuery configuration (uncomment if needed)
+      # bigquery:
+      #   connection_string: "bigquery://PROJECT_ID/DATASET"
+
+      # Redshift configuration (uncomment if needed)
+      # redshift:
+      #   connection_string: "redshift+psycopg2://USERNAME:PASSWORD@HOST:PORT/DATABASE"
+
+    # ============================================================================
+    # DATA QUALITY TESTS
+    # ============================================================================
+    # Tests are automatically triggered when datasets are profiled during ingestion.
+    #
+    # TEST TYPES:
+    # - Profile-based (13 types): Use cached statistics, no DB connection needed
+    # - Query-based (7 types): Execute SQL queries, require connector config above
+    # ============================================================================
+
+    tests:
+      # === TABLE-LEVEL TESTS ===
+
+      - name: "table_has_data"
+        type: "table_row_count"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        params:
+          min_rows: "1"
+          max_rows: "100000000"
+
+      - name: "reasonable_column_count"
+        type: "table_column_count_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        params:
+          min_value: "1"
+          max_value: "500"
+
+      # === COLUMN-LEVEL PROFILE-BASED TESTS ===
+
+      - name: "critical_columns_not_null"
+        type: "column_values_not_null"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        column: "id"
+        params:
+          max_null_proportion: "0.01"  # Allow max 1% nulls
+
+      - name: "id_columns_unique"
+        type: "column_values_unique"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        column: "id"
+        params:
+          min_unique_proportion: "0.95"  # 95% unique
+
+      # === QUERY-BASED TESTS (require database connection) ===
+
+      # String length validation
+      - name: "code_length_check"
+        type: "column_length_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*your_table*"
+        column: "code_column"
+        params:
+          min_length: "5"
+          max_length: "10"
+
+      # Set membership validation
+      - name: "valid_status_values"
+        type: "column_values_in_set"
+        dataset_pattern: "urn:li:dataset:*snowflake*your_table*"
+        column: "status"
+        params:
+          value_set: "ACTIVE,INACTIVE,PENDING"
+
+      # Custom SQL validation
+      - name: "referential_integrity_check"
+        type: "table_custom_sql"
+        dataset_pattern: "urn:li:dataset:*snowflake*your_table*"
+        params:
+          sql: "SELECT COUNT(*) FROM your_table WHERE invalid_condition = TRUE"
+          expected_result: "0"
+
+datahub:
+  server: "http://datahub-gms:8080"

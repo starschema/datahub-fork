@@ -1,0 +1,212 @@
+name: Build and Push Custom Images to GHCR
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      # Trigger on frontend changes
+      - 'datahub-web-react/**'
+      - 'datahub-frontend/**'
+      - 'docker/datahub-frontend/**'
+      # Trigger on actions changes
+      - 'datahub-actions/**'
+      - 'metadata-ingestion/**'
+      - 'docker/datahub-actions/**'
+      # Trigger on workflow changes
+      - '.github/workflows/build-push-custom-images.yml'
+
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      build_frontend:
+        description: 'Build frontend image'
+        required: true
+        default: 'true'
+        type: boolean
+      build_actions:
+        description: 'Build actions image'
+        required: true
+        default: 'true'
+        type: boolean
+
+  # Trigger on new tags/releases
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  GITHUB_USER: rykalc
+  FRONTEND_IMAGE_NAME: custom-datahub-frontend-react
+  ACTIONS_IMAGE_NAME: datahub-actions
+
+jobs:
+  detect-changes:
+    name: Detect Which Images Need Building
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+      actions: ${{ steps.changes.outputs.actions }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          # For manual trigger or release, use input or build both
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "frontend=${{ inputs.build_frontend || 'true' }}" >> $GITHUB_OUTPUT
+            echo "actions=${{ inputs.build_actions || 'true' }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "release" ]; then
+            echo "frontend=true" >> $GITHUB_OUTPUT
+            echo "actions=true" >> $GITHUB_OUTPUT
+          else
+            # Check if frontend files changed
+            if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-web-react|datahub-frontend|docker/datahub-frontend)/'; then
+              echo "frontend=true" >> $GITHUB_OUTPUT
+            else
+              echo "frontend=false" >> $GITHUB_OUTPUT
+            fi
+
+            # Check if actions files changed
+            if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-actions|metadata-ingestion|docker/datahub-actions)/'; then
+              echo "actions=true" >> $GITHUB_OUTPUT
+            else
+              echo "actions=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  build-frontend:
+    name: Build and Push Frontend Image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.GITHUB_USER }}/${{ env.FRONTEND_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=hcltech
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/datahub-frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_ENV=prod
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-actions:
+    name: Build and Push Actions Image
+    needs: detect-changes
+    if: needs.detect-changes.outputs.actions == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get git SHA
+        id: git_sha
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.GITHUB_USER }}/${{ env.ACTIONS_IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=ref,event=tag
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push actions image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/datahub-actions/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_ENV=full
+            RELEASE_VERSION=${{ steps.git_sha.outputs.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  notify-completion:
+    name: Notify Build Completion
+    needs: [detect-changes, build-frontend, build-actions]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build status
+        run: |
+          echo "Frontend build: ${{ needs.build-frontend.result || 'skipped' }}"
+          echo "Actions build: ${{ needs.build-actions.result || 'skipped' }}"
+
+          if [ "${{ needs.build-frontend.result }}" == "failure" ] || [ "${{ needs.build-actions.result }}" == "failure" ]; then
+            echo "❌ One or more builds failed"
+            exit 1
+          else
+            echo "✅ All builds completed successfully"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Custom Image Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: ${{ needs.build-frontend.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Actions: ${{ needs.build-actions.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Images are available at:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`ghcr.io/${{ env.GITHUB_USER }}/${{ env.FRONTEND_IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`ghcr.io/${{ env.GITHUB_USER }}/${{ env.ACTIONS_IMAGE_NAME }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Team members should run: \`./docker/pull-images.sh\`" >> $GITHUB_STEP_SUMMARY

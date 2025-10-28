@@ -1,0 +1,37 @@
+# Executor Action Configuration for UI-based Ingestion
+# This action listens for ingestion execution requests from the DataHub UI
+# and spawns ingestion processes to execute them
+
+name: "ingestion_executor"
+
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+      schema_registry_url: "http://schema-registry:8081"
+    topic_routes:
+      mcl: "MetadataChangeLog_Versioned_v1"
+      pe: "PlatformEvent_v1"
+
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataHubExecutionRequest"
+    changeType: "UPSERT"
+    aspectName:
+      - "dataHubExecutionRequestInput"
+      - "dataHubExecutionRequestSignal"
+    aspect:
+      value:
+        executorId: "default"
+
+action:
+  type: "executor"
+  config:
+    executor_id: "default"
+
+datahub:
+  server: "http://datahub-gms:8080"
+  extra_headers:
+    Authorization: "Basic __datahub_system:JohnSnowKnowsNothing"

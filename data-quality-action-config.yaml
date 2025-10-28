@@ -1,0 +1,215 @@
+# DataHub Actions Configuration - Automatic Data Quality Testing
+# This configuration runs quality tests automatically when datasets are profiled during ingestion
+#
+# ZERO DUPLICATION: Connection credentials are automatically retrieved from DataHub's
+# ingestion source registry. No need to duplicate credentials here!
+
+name: data_quality_monitoring
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+      schema_registry_url: "http://schema-registry:8081"
+    topic_routes:
+      mcl: "MetadataChangeLog_Timeseries_v1"
+      pe: "PlatformEvent_v1"
+
+# Filter for MetadataChangeLog events with datasetProfile aspect
+# This fires when profiling data is written during ingestion
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataset"
+    aspectName: "datasetProfile"
+
+action:
+  type: "data_quality"
+  config:
+    enabled: true
+
+    # Connector configs - configure database connections for query-based tests
+    # IMPORTANT: Keep this file secure! Add to .gitignore to prevent credential leaks
+    # connectors:
+    #   snowflake:
+    #     # TODO: Replace with your actual Snowflake credentials
+    #     # Format: snowflake://USER:PASSWORD@ACCOUNT/DATABASE?warehouse=WAREHOUSE&role=ROLE
+    #     connection_string: "snowflake://DATAHUB_USER:YOUR_PASSWORD@xy12345.us-east-1/?warehouse=COMPUTE_WH&role=DATAHUB_ROLE"
+
+      # Add more platforms as needed
+      # postgres:
+      #   connection_string: "postgresql://user:password@localhost:5432/mydb"
+      # mysql:
+      #   connection_string: "mysql://user:password@localhost:3306/mydb"
+
+    tests:
+      # === TABLE-LEVEL TESTS (Apply to all Snowflake tables) ===
+
+      - name: "table_has_data"
+        type: "table_row_count"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        params:
+          min_rows: "1"
+          max_rows: "100000000"
+
+      - name: "reasonable_column_count"
+        type: "table_column_count_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*"
+        params:
+          min_value: "1"
+          max_value: "500"
+
+      # === COLUMN-LEVEL TESTS ===
+
+      # Test all numeric columns for reasonable min values
+      - name: "covid_cases_min_reasonable"
+        type: "column_min_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+        column: "cases"
+        params:
+          min_value: "0"
+          max_value: "100000000"
+
+      - name: "covid_deaths_min_reasonable"
+        type: "column_min_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+        column: "deaths"
+        params:
+          min_value: "0"
+          max_value: "100000000"
+
+      # Test distinct counts
+      - name: "reasonable_distinct_values"
+        type: "column_distinct_count_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+        column: "county"
+        params:
+          min_value: "1"
+          max_value: "10000"
+
+      # Test for null values in critical columns
+      - name: "date_columns_not_null"
+        type: "column_values_not_null"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+        column: "date"
+        params:
+          max_null_proportion: "0.05"
+
+      - name: "fips_not_null"
+        type: "column_values_not_null"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "fips"
+        params:
+          max_null_proportion: "0.01"
+
+      - name: "iso_codes_not_null"
+        type: "column_values_not_null"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "iso3166_2"
+        params:
+          max_null_proportion: "0.0"
+
+      # Test uniqueness for ID/key columns
+      - name: "fips_mostly_unique"
+        type: "column_values_unique"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "fips"
+        params:
+          min_unique_proportion: "0.95"
+
+      # Test numeric ranges for specific columns
+      - name: "population_reasonable_range"
+        type: "column_min_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "total_population"
+        params:
+          min_value: "0"
+          max_value: "1000000000"
+
+      - name: "population_max_reasonable"
+        type: "column_max_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "total_population"
+        params:
+          min_value: "0"
+          max_value: "1000000000"
+
+      # Test statistical measures
+      - name: "population_mean_reasonable"
+        type: "column_mean_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "total_population"
+        params:
+          min_value: "0"
+          max_value: "10000000"
+
+      - name: "population_median_reasonable"
+        type: "column_median_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "total_population"
+        params:
+          min_value: "0"
+          max_value: "1000000"
+
+      - name: "population_stddev_reasonable"
+        type: "column_stddev_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "total_population"
+        params:
+          min_value: "0"
+          max_value: "5000000"
+
+      # === NEW: QUERY-BASED TESTS (execute fresh SQL queries) ===
+      # These require database connection - will auto-use ingestion source credentials!
+
+      # String length validation
+      - name: "fips_code_length_check"
+        type: "column_length_between"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "fips"
+        params:
+          min_length: "5"
+          max_length: "5"
+
+      # Set membership validation
+      - name: "valid_state_abbreviations"
+        type: "column_values_in_set"
+        dataset_pattern: "urn:li:dataset:*snowflake*demographics*"
+        column: "state"
+        params:
+          value_set: "AL,AK,AZ,AR,CA,CO,CT,DE,FL,GA,HI,ID,IL,IN,IA,KS,KY,LA,ME,MD,MA,MI,MN,MS,MO,MT,NE,NV,NH,NJ,NM,NY,NC,ND,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VT,VA,WA,WV,WI,WY,DC"
+
+      # Date range validation (no future dates)
+      - name: "no_future_covid_dates"
+        type: "column_value_range"
+        dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+        column: "date"
+        params:
+          min_value: "2019-01-01"
+          max_value: "2025-12-31"
+
+      # Custom SQL - referential integrity
+      # DISABLED: Requires actual table names from Snowflake schema
+      # - name: "covid_fips_exist_in_demographics"
+      #   type: "table_custom_sql"
+      #   dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+      #   params:
+      #     sql: "SELECT COUNT(*) FROM covid19_data c LEFT JOIN demographics d ON c.fips = d.fips WHERE c.fips IS NOT NULL AND d.fips IS NULL"
+      #     expected_result: "0"
+
+      # Custom SQL - data quality check
+      # DISABLED: Requires actual table names from Snowflake schema
+      # - name: "no_negative_covid_cases"
+      #   type: "table_custom_sql"
+      #   dataset_pattern: "urn:li:dataset:*snowflake*covid19*"
+      #   params:
+      #     sql: "SELECT COUNT(*) FROM covid19_data WHERE cases < 0 OR deaths < 0"
+      #     expected_result: "0"
+
+datahub:
+  server: "http://datahub-gms:8080"
+
+# Optional: Configure specific behavior
+# pipeline:
+#   max_workers: 10
+#   batch_size: 100

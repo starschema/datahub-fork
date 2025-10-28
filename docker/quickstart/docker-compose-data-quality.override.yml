@@ -1,0 +1,15 @@
+# Docker Compose override to enable automatic data quality testing and UI-based ingestion
+# This file uses the custom datahub-actions image with both data_quality and executor actions
+#
+# To pull the pre-built image: cd ../.. && ./docker/pull-images.sh
+# Or build locally: cd ../.. && ./docker/build-push-images.sh --actions-only --no-push
+
+services:
+  datahub-actions:
+    # Use GHCR image by default, fallback to local if not available
+    # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/rykalc/datahub-actions:latest}
+    volumes:
+      # Mount both executor and data quality configuration files
+      - ../../executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro
+      - ../../data-quality-action-config.yaml:/etc/datahub/actions/conf/data-quality-action.yaml:ro
