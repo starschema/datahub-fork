@@ -3,15 +3,16 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { useEntityData } from '@app/entity/shared/EntityContext';
+
 import {
     AssertionConfig,
-    executeSQL,
     ExecuteResponse,
-    generateSQL,
     GenerateResponse,
+    ValidateResponse,
+    executeSQL,
+    generateSQL,
     persistAssertion,
     validateRule,
-    ValidateResponse,
 } from './aiAssistantApi';
 
 const { TextArea } = Input;
@@ -27,7 +28,8 @@ const StyledCard = styled(Card)`
 `;
 
 const SqlPreview = styled.pre`
-    background: #f5f5f5;
+    background: ${(props) => props.theme.styles['primary-color-light']};
+    border: 1px solid ${(props) => props.theme.styles['highlight-border-color']};
     padding: 16px;
     border-radius: 4px;
     overflow-x: auto;
@@ -36,7 +38,17 @@ const SqlPreview = styled.pre`
 `;
 
 const MetricsCard = styled(Card)`
-    background: #f9f9f9;
+    background: ${(props) => props.theme.styles['highlight-color']};
+`;
+
+const StyledTextArea = styled(TextArea)`
+    background: #f8f7fb !important;
+
+    &:hover,
+    &:focus {
+        background: #f8f7fb !important;
+        border-color: ${(props) => props.theme.styles['primary-color']} !important;
+    }
 `;
 
 type Phase = 'idle' | 'validating' | 'generating' | 'executing' | 'ready_to_persist' | 'persisted';
@@ -134,16 +146,10 @@ export function AIAssistantTab() {
         setPhase('persisted');
 
         try {
-            const response = await persistAssertion(
-                datasetUrn,
-                generateResponse.sql,
-                generateResponse.config,
-                nlRule,
-                {
-                    title: `AI: ${nlRule.substring(0, 50)}`,
-                    description: `AI-generated assertion: ${nlRule}`,
-                },
-            );
+            const response = await persistAssertion(datasetUrn, generateResponse.sql, generateResponse.config, nlRule, {
+                title: `AI: ${nlRule.substring(0, 50)}`,
+                description: `AI-generated assertion: ${nlRule}`,
+            });
             setAssertionUrn(response.assertion_urn);
         } catch (err: any) {
             setError(err.message || 'Persistence failed');
@@ -178,17 +184,13 @@ export function AIAssistantTab() {
         <Container>
             <Title level={3}>AI Quality Assistant</Title>
             <Paragraph>
-                Describe a data quality rule in natural language, and I'll generate a SQL assertion that automatically runs on every ingestion.
+                Describe a data quality rule in natural language, and I'll generate a SQL assertion that automatically
+                runs on every ingestion.
             </Paragraph>
 
             <Steps
                 current={currentStep}
-                items={[
-                    { title: 'Validate' },
-                    { title: 'Generate' },
-                    { title: 'Execute' },
-                    { title: 'Persist' },
-                ]}
+                items={[{ title: 'Validate' }, { title: 'Generate' }, { title: 'Execute' }, { title: 'Persist' }]}
                 style={{ marginBottom: 24 }}
             />
 
@@ -204,7 +206,7 @@ export function AIAssistantTab() {
             )}
 
             <StyledCard title="1. Describe Your Quality Rule">
-                <TextArea
+                <StyledTextArea
                     placeholder="Example: Ensure revenue column has no negative values"
                     value={nlRule}
                     onChange={(e) => setNlRule(e.target.value)}
@@ -236,7 +238,9 @@ export function AIAssistantTab() {
                     <Alert
                         message={validateResponse.feasible ? 'Rule is feasible' : 'Rule is not feasible'}
                         description={
-                            validateResponse.reasons.length > 0 ? validateResponse.reasons.join(', ') : 'Ready to generate SQL'
+                            validateResponse.reasons.length > 0
+                                ? validateResponse.reasons.join(', ')
+                                : 'Ready to generate SQL'
                         }
                         type={validateResponse.feasible ? 'success' : 'warning'}
                         style={{ marginTop: 16 }}

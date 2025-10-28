@@ -34,7 +34,11 @@ export default function GreetingText() {
 
     return (
         <Container>
-            <PageTitle title={finalText} subTitle={showHomepageUserRole ? maybeRole : null} icon={<Rocket size={24} color="#6B4EFF" weight="regular" />} />
+            <PageTitle
+                title={finalText}
+                subTitle={showHomepageUserRole ? maybeRole : null}
+                icon={<Rocket size={24} color="#6B4EFF" weight="regular" />}
+            />
         </Container>
     );
 }

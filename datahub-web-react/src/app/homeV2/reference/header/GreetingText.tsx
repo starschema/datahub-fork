@@ -47,7 +47,11 @@ export const GreetingText = ({ role }: { role?: string | null }) => {
     if (showNavBarRedesign) {
         return (
             <TitleWrapper>
-                <PageTitle title={greetingText} subTitle={role} icon={<Rocket size={24} color="#6B4EFF" weight="regular" />} />
+                <PageTitle
+                    title={greetingText}
+                    subTitle={role}
+                    icon={<Rocket size={24} color="#6B4EFF" weight="regular" />}
+                />
             </TitleWrapper>
         );
     }
