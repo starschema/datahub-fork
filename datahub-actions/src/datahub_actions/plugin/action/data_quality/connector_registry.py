@@ -25,7 +25,7 @@ This eliminates credential duplication and ensures security.
 
 import logging
 import os
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional, List, Tuple
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -75,7 +75,10 @@ class ConnectorRegistry:
         self.connector_configs = connector_configs or {}
         self.graph = graph
         self._engines: Dict[str, Engine] = {}
-        self._ingestion_source_cache: Optional[Dict[str, Any]] = None
+        # Cached map of platform -> list of ingestion sources (each source is a dict)
+        self._ingestion_source_cache: Optional[Dict[str, List[Dict[str, Any]]]] = None
+        # Cache for native Snowflake connections keyed by platform name
+        self._sf_connections: Dict[str, Any] = {}
 
     def register_connector(self, platform: str, connection_string: str) -> None:
         """
@@ -90,7 +93,7 @@ class ConnectorRegistry:
         if platform in self._engines:
             del self._engines[platform]
 
-    def _load_ingestion_sources(self) -> Dict[str, Any]:
+    def _load_ingestion_sources(self) -> Dict[str, List[Dict[str, Any]]]:
         """
         Query DataHub for all configured ingestion sources.
 
@@ -120,7 +123,8 @@ class ConnectorRegistry:
                 logger.warning("GraphQL query returned None - ingestion sources may not be configured")
                 return {}
 
-            source_map = {}
+            # Build map: platform -> list of source dicts
+            source_map: Dict[str, List[Dict[str, Any]]] = {}
 
             for source in sources:
                 source_type = source.get("type", "").lower()
@@ -144,7 +148,13 @@ class ConnectorRegistry:
                     source_config = recipe.get("source", {}).get("config", {})
 
                     if source_config:
-                        source_map[source_type] = source_config
+                        entry = {
+                            "name": source_name,
+                            "type": source_type,
+                            "config": source_config,
+                            "urn": source.get("urn"),
+                        }
+                        source_map.setdefault(source_type, []).append(entry)
                         logger.debug(
                             f"Loaded config for platform '{source_type}' from source '{source_name}'"
                         )
@@ -346,12 +356,13 @@ class ConnectorRegistry:
 
         # Priority 2: DataHub ingestion sources (RECOMMENDED)
         ingestion_sources = self._load_ingestion_sources()
-        if platform in ingestion_sources:
+        if platform in ingestion_sources and ingestion_sources[platform]:
+            # Fallback to the first source for connection string (legacy behavior)
             logger.debug(
-                f"Using DataHub ingestion source config for platform: {platform}"
+                f"Using DataHub ingestion source config for platform: {platform} (first source)"
             )
             return self._build_connection_string_from_ingestion_config(
-                platform, ingestion_sources[platform]
+                platform, ingestion_sources[platform][0]["config"]
             )
 
         # Priority 3: Environment variable fallback
@@ -436,6 +447,16 @@ class ConnectorRegistry:
                 logger.warning(f"Error closing engine for {platform}: {e}")
         self._engines.clear()
 
+        # Close any native Snowflake connections
+        for platform, conn in list(self._sf_connections.items()):
+            try:
+                # conn is a SnowflakeConnection wrapper from metadata-ingestion
+                conn.close()
+                logger.debug(f"Closed Snowflake native connection for platform: {platform}")
+            except Exception as e:
+                logger.warning(f"Error closing Snowflake connection for {platform}: {e}")
+        self._sf_connections.clear()
+
     @staticmethod
     def _extract_platform_from_urn(dataset_urn: str) -> Optional[str]:
         """
@@ -465,3 +486,131 @@ class ConnectorRegistry:
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Close all connections on exit."""
         self.close_all()
+
+    # --- Generic native connection resolution (scalable, no hardcoding) ---
+
+    def _parse_dataset_key(self, dataset_urn: str) -> Tuple[Optional[str], Optional[str]]:
+        """
+        Returns (platform, dataset_key_str) where dataset_key_str is the dataset name portion
+        like "db.schema.table". If extra segments exist, falls back to the last three tokens.
+        """
+        try:
+            if "urn:li:dataPlatform:" not in dataset_urn:
+                return None, None
+            start = dataset_urn.index("urn:li:dataPlatform:") + len("urn:li:dataPlatform:")
+            platform = dataset_urn[start: dataset_urn.index(",", start)].lower()
+            key = dataset_urn.split(",")[1]
+            parts = key.split(".")
+            if len(parts) >= 3:
+                key = ".".join(parts[-3:])
+            return platform, key
+        except Exception:
+            return None, None
+
+    def _snowflake_source_matches_dataset(self, dataset_key: str, source_config: Dict[str, Any]) -> bool:
+        """Check if a Snowflake ingestion source config should own this dataset (db.schema.table)."""
+        try:
+            from datahub.ingestion.source.snowflake.snowflake_config import SnowflakeV2Config
+
+            resolved = self._resolve_secrets(source_config)
+            cfg = SnowflakeV2Config.parse_obj(resolved)
+            parts = dataset_key.split(".")
+            if len(parts) != 3:
+                return False
+            db, schema, table = parts
+
+            # Database allowed
+            if not cfg.database_pattern.allowed(db):
+                return False
+
+            # Schema allowed
+            if cfg.match_fully_qualified_names:
+                schema_target = f"{db}.{schema}"
+            else:
+                schema_target = schema
+            if not cfg.schema_pattern.allowed(schema_target):
+                return False
+
+            # Table pattern checks fully qualified
+            fq_table = f"{db}.{schema}.{table}"
+            if not cfg.table_pattern.allowed(fq_table):
+                return False
+
+            return True
+        except Exception as e:
+            logger.debug(f"Snowflake matching failed: {e}")
+            return False
+
+    def _select_best_source(self, platform: str, dataset_key: str, sources: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        """Select the best matching ingestion source for a dataset among candidates of the same platform."""
+        best = None
+        best_score = -1
+
+        for src in sources:
+            cfg = src.get("config", {})
+
+            match = False
+            score = 0
+
+            if platform == "snowflake":
+                if not self._snowflake_source_matches_dataset(dataset_key, cfg):
+                    continue
+                match = True
+                # Increase score by presence of account_id and platform_instance for stability
+                if cfg.get("account_id"):
+                    score += 2
+                if cfg.get("platform_instance"):
+                    score += 1
+                # More constrained patterns get a small boost
+                for pat in ("database_pattern", "schema_pattern", "table_pattern"):
+                    if pat in cfg:
+                        score += 1
+
+            # Future: add other platforms here
+
+            if match and score > best_score:
+                best = src
+                best_score = score
+
+        return best
+
+    def get_native_connection(self, dataset_urn: str) -> Optional[Any]:
+        """
+        Return a native DB connection for the specific ingestion source that ingested this dataset.
+
+        This mirrors profiling: select the ingestion source whose config and patterns
+        include the dataset, then build a native connection using that source's config.
+        """
+        platform, key = self._parse_dataset_key(dataset_urn)
+        if not platform or not key:
+            return None
+
+        ing = self._load_ingestion_sources()
+        candidates = ing.get(platform, [])
+        if not candidates:
+            return None
+
+        selected = self._select_best_source(platform, key, candidates)
+        if not selected:
+            return None
+
+        cfg = selected.get("config", {})
+
+        try:
+            if platform == "snowflake":
+                from datahub.ingestion.source.snowflake.snowflake_config import SnowflakeV2Config
+
+                resolved = self._resolve_secrets(cfg)
+                sf_config = SnowflakeV2Config.parse_obj(resolved)
+                return sf_config.get_connection()  # returns wrapper around native connection
+
+            # TODO: Implement native connections for other platforms as needed
+            return None
+        except Exception as e:
+            logger.error(f"Failed to create native connection for {platform}: {e}")
+            return None
+
+    # Backwards-compatibility shim: some callers expect get_connector()
+    def get_connector(self, dataset_urn: str) -> Optional[Any]:
+        """Compatibility alias to return a native connection for a dataset."""
+        return self.get_native_connection(dataset_urn)

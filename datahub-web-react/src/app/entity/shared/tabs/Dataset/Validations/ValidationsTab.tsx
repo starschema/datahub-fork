@@ -1,4 +1,4 @@
-import { AuditOutlined, FileProtectOutlined } from '@ant-design/icons';
+import { AuditOutlined, FileProtectOutlined, RobotOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React, { useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router';
@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { useEntityData } from '@app/entity/shared/EntityContext';
 import TabToolbar from '@app/entity/shared/components/styled/TabToolbar';
 import { ANTD_GRAY } from '@app/entity/shared/constants';
+import { AIAssistantTab } from '@app/entity/shared/tabs/Dataset/Validations/AIAssistant/AIAssistantTab';
 import { Assertions } from '@app/entity/shared/tabs/Dataset/Validations/Assertions';
 import { DataContractTab } from '@app/entity/shared/tabs/Dataset/Validations/contract/DataContractTab';
 import { useGetValidationsTab } from '@app/entity/shared/tabs/Dataset/Validations/useGetValidationsTab';
@@ -24,6 +25,7 @@ const TabButton = styled(Button)<{ selected: boolean }>`
 enum TabPaths {
     ASSERTIONS = 'List',
     DATA_CONTRACT = 'Data Contract',
+    AI_ASSISTANT = 'AI Assistant',
 }
 
 const DEFAULT_TAB = TabPaths.ASSERTIONS;
@@ -66,13 +68,25 @@ export const ValidationsTab = () => {
         },
     ];
 
+    // AI Assistant tab - always enabled
+    tabs.push({
+        title: (
+            <>
+                <RobotOutlined />
+                <TabTitle>AI Assistant</TabTitle>
+            </>
+        ),
+        path: TabPaths.AI_ASSISTANT,
+        content: <AIAssistantTab />,
+        disabled: false,
+    });
+
     if (appConfig.config.featureFlags?.dataContractsEnabled) {
         // If contracts feature is enabled, add to list.
         tabs.push({
             title: (
                 <>
                     <AuditOutlined />
-
                     <TabTitle>Data Contract</TabTitle>
                 </>
             ),

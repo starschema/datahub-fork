@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { useEntityData } from '@app/entity/shared/EntityContext';
 import { QUALITY_TAB_NAME } from '@app/entityV2/dataset/constants';
+import { AIAssistantTab } from '@app/entityV2/shared/tabs/Dataset/Validations/AIAssistant/AIAssistantTab';
 import { AcrylAssertionList } from '@app/entityV2/shared/tabs/Dataset/Validations/AssertionList/AcrylAssertionList';
 import { AcrylAssertionSummaryTab } from '@app/entityV2/shared/tabs/Dataset/Validations/AssertionList/Summary/AcrylAssertionSummaryTab';
 import { DataContractTab } from '@app/entityV2/shared/tabs/Dataset/Validations/contract/DataContractTab';
@@ -42,6 +43,7 @@ enum TabPaths {
     ASSERTIONS = 'List',
     DATA_CONTRACT = 'Data Contract',
     SUMMARY = 'Summary',
+    AI_ASSISTANT = 'AI Assistant',
 }
 
 const DEFAULT_TAB = TabPaths.SUMMARY;
@@ -92,6 +94,17 @@ export const AcrylValidationsTab = () => {
             disabled: false, // Always keep the assertions tab clickable in saas.
             content: <AcrylAssertionList />,
             id: 'assertions',
+        },
+        {
+            title: (
+                <>
+                    <TabTitle>AI Assistant</TabTitle>
+                </>
+            ),
+            path: TabPaths.AI_ASSISTANT,
+            disabled: false,
+            content: <AIAssistantTab />,
+            id: 'ai-assistant',
         },
     ];
 

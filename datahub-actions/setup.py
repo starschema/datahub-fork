@@ -99,6 +99,13 @@ plugins: Dict[str, Set[str]] = {
     "data_quality": {
         "sqlalchemy>=2.0.0",
     },
+    "ai_assistant": {
+        "fastapi>=0.115.0",
+        "uvicorn[standard]>=0.34.0",
+        "google-generativeai>=0.8.0",
+        # Use the same Snowflake connector stack as ingestion (no SQLAlchemy needed)
+        f"acryl-datahub[snowflake-slim]{_self_pin}",
+    },
     # Transformer Plugins (None yet)
 }
 

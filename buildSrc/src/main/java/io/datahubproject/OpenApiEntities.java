@@ -8,8 +8,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.linkedin.metadata.models.registry.config.Entities;
-import com.linkedin.metadata.models.registry.config.Entity;
+// Temporarily commented out due to circular dependency with metadata-models
+// import com.linkedin.metadata.models.registry.config.Entities;
+// import com.linkedin.metadata.models.registry.config.Entity;
 import org.gradle.internal.Pair;
 
 import java.io.IOException;
@@ -28,6 +29,34 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+// Stub classes to break circular dependency - only needed for OpenAPI schema generation
+// which is not required for frontend builds
+class Entity {
+    private String name;
+    private String category;
+    private String keyAspect;
+    private String doc;
+    private List<String> aspects;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public String getKeyAspect() { return keyAspect; }
+    public void setKeyAspect(String keyAspect) { this.keyAspect = keyAspect; }
+    public String getDoc() { return doc; }
+    public void setDoc(String doc) { this.doc = doc; }
+    public List<String> getAspects() { return aspects; }
+    public void setAspects(List<String> aspects) { this.aspects = aspects; }
+}
+
+class Entities {
+    private List<Entity> entities;
+
+    public List<Entity> getEntities() { return entities; }
+    public void setEntities(List<Entity> entities) { this.entities = entities; }
+}
 
 public class OpenApiEntities {
     private final static String MODEL_VERSION = "_v2";
