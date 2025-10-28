@@ -1,0 +1,300 @@
+                                     'urn:li:dataset:(urn:li:dataPlatform:snowflake,zillow_zillow_share.public.home_values,PROD)']}},
+ 'event_not_produced_warn': True,
+ 'events_produced': 598,
+ 'events_produced_per_sec': 5,
+ 'access_history_range_query_secs': -1,
+ 'access_history_query_secs': -1,
+ 'rows_processed': 0,
+ 'rows_missing_query_text': 0,
+ 'rows_zero_base_objects_accessed': 0,
+ 'rows_zero_direct_objects_accessed': 0,
+ 'rows_missing_email': 0,
+ 'rows_parsing_error': 0,
+ 'usage_start_time': '2025-10-25 00:00:00+00:00 (1 day, 10 hours and 44 minutes ago)',
+ 'usage_end_time': '2025-10-26 10:43:08.215349+00:00 (1 minute and 43.54 seconds ago)',
+ 'stateful_usage_ingestion_enabled': True,
+ 'usage_aggregation': {'query_secs': -1,
+                       'query_row_count': -1,
+                       'result_fetch_timer': None,
+                       'result_skip_timer': None,
+                       'result_map_timer': None,
+                       'users_map_timer': None,
+                       'queries_map_timer': None,
+                       'fields_map_timer': None},
+ 'soft_deleted_stale_entities': [],
+ 'last_state_non_deletable_entities': [],
+ 'tables_scanned': 80,
+ 'views_scanned': 3,
+ 'entities_profiled': 37,
+ 'filtered': ['SNOWFLAKE_SAMPLE_DATA.*', 'UTIL_DB.*'],
+ 'query_combiner': {'total_queries': 1, 'uncombined_queries_issued': 1, 'combined_queries_issued': 0, 'queries_combined': 0, 'query_exceptions': 0},
+ 'num_view_definitions_parsed': 0,
+ 'num_view_definitions_view_urn_mismatch': 0,
+ 'num_view_definitions_failed_parsing': 0,
+ 'num_view_definitions_failed_column_parsing': 0,
+ 'view_definitions_parsing_failures': [],
+ 'sql_aggregator': {'num_observed_queries': 0,
+                    'num_observed_queries_failed': 0,
+                    'num_observed_queries_column_timeout': 0,
+                    'num_observed_queries_column_failed': 0,
+                    'observed_query_parse_failures': [],
+                    'num_view_definitions': 0,
+                    'num_views_failed': 0,
+                    'num_views_column_timeout': 0,
+                    'num_views_column_failed': 0,
+                    'views_parse_failures': {},
+                    'num_sql_parsed': 0,
+                    'sql_parsing_timer': None,
+                    'sql_fingerprinting_timer': None,
+                    'sql_formatting_timer': None,
+                    'sql_parsing_cache_stats': {'hits': 0, 'misses': 0, 'maxsize': 1000, 'currsize': 0},
+                    'parse_statement_cache_stats': {'hits': 1, 'misses': 7, 'maxsize': 1000, 'currsize': 7},
+                    'format_query_cache_stats': {'hits': 0, 'misses': 0, 'maxsize': 1000, 'currsize': 0},
+                    'num_known_query_lineage': 0,
+                    'num_preparsed_queries': 0,
+                    'num_known_mapping_lineage': 0,
+                    'num_table_renames': 0,
+                    'num_table_swaps': 0,
+                    'num_temp_sessions': 0,
+                    'num_inferred_temp_schemas': 0,
+                    'num_queries_with_temp_tables_in_session': 0,
+                    'queries_with_temp_upstreams': {},
+                    'queries_with_non_authoritative_session': [],
+                    'make_schema_resolver_timer': None,
+                    'schema_resolver_count': 83,
+                    'num_unique_query_fingerprints': 0,
+                    'num_urns_with_lineage': 0,
+                    'num_lineage_skipped_due_to_filters': 0,
+                    'num_table_lineage_trimmed_due_to_large_size': 0,
+                    'num_column_lineage_trimmed_due_to_large_size': 0,
+                    'num_queries_entities_generated': 0,
+                    'num_queries_used_in_lineage': 0,
+                    'num_queries_skipped_due_to_filters': 0,
+                    'usage_skipped_missing_timestamp': 0,
+                    'num_query_usage_stats_generated': 0,
+                    'num_query_usage_stats_outside_window': 0,
+                    'num_operations_generated': 0,
+                    'num_operations_skipped_due_to_filters': 0,
+                    'tool_meta_report': {'num_queries_meta_extracted': {}, 'failures': [], 'looker_user_mapping_missing': True}},
+ 'num_table_to_table_edges_scanned': 0,
+ 'num_table_to_view_edges_scanned': 0,
+ 'num_view_to_table_edges_scanned': 0,
+ 'num_external_table_edges_scanned': 0,
+ 'ignore_start_time_lineage': False,
+ 'upstream_lineage_in_report': False,
+ 'upstream_lineage': {},
+ 'lineage_start_time': '2025-10-25 00:00:00+00:00 (1 day, 10 hours and 44 minutes ago)',
+ 'lineage_end_time': '2025-10-26 10:43:08.215349+00:00 (1 minute and 43.54 seconds ago)',
+ 'stateful_lineage_ingestion_enabled': True,
+ 'cleaned_account_id': 'STARSCHEMA-STARSCHEMA',
+ 'run_ingestion': False,
+ 'saas_version': '9.33.1',
+ 'default_warehouse': 'DATAHUB_WH',
+ 'role': 'DATAHUB_ROLE',
+ 'profile_candidates': {},
+ 'account_locator': 'STARSCHEMA',
+ 'region': 'PUBLIC.AWS_US_WEST_2',
+ 'schemas_scanned': 9,
+ 'databases_scanned': 9,
+ 'tags_scanned': 0,
+ 'streams_scanned': 0,
+ 'procedures_scanned': 0,
+ 'include_usage_stats': True,
+ 'include_operational_stats': True,
+ 'include_technical_schema': True,
+ 'include_column_lineage': True,
+ 'table_lineage_query_secs': -1,
+ 'external_lineage_queries_secs': -1,
+ 'num_tables_with_known_upstreams': 0,
+ 'num_streams_with_known_upstreams': 0,
+ 'num_upstream_lineage_edge_parsing_failed': 0,
+ 'num_secure_views_missing_definition': 3,
+ 'num_structured_property_templates_created': 0,
+ 'data_dictionary_cache': {'get_tables_for_database': {'hits': 2, 'misses': 7, 'maxsize': 1, 'currsize': 1},
+                           'get_views_for_database': {'hits': 2, 'misses': 7, 'maxsize': 1, 'currsize': 1},
+                           'get_columns_for_schema': {'hits': 77, 'misses': 6, 'maxsize': 20, 'currsize': 6},
+                           'get_streams_for_database': {'hits': 2, 'misses': 7, 'maxsize': 1, 'currsize': 1},
+                           'get_pk_constraints_for_schema': {'hits': 74, 'misses': 6, 'maxsize': 20, 'currsize': 6},
+                           'get_fk_constraints_for_schema': {'hits': 74, 'misses': 6, 'maxsize': 20, 'currsize': 6}},
+ 'queries_extractor': {'copy_history_fetch_timer': '6.604 seconds',
+                       'query_log_fetch_timer': '16.166 seconds',
+                       'users_fetch_timer': '3.586 seconds',
+                       'audit_log_load_timer': '5.000 seconds',
+                       'aggregator_generate_timer': '0.009 seconds',
+                       'sql_aggregator': {'num_observed_queries': 8,
+                                          'num_observed_queries_failed': 0,
+                                          'num_observed_queries_column_timeout': 0,
+                                          'num_observed_queries_column_failed': 0,
+                                          'observed_query_parse_failures': [],
+                                          'num_view_definitions': 0,
+                                          'num_views_failed': 0,
+                                          'num_views_column_timeout': 0,
+                                          'num_views_column_failed': 0,
+                                          'views_parse_failures': {},
+                                          'num_sql_parsed': 8,
+                                          'sql_parsing_timer': '2.599 seconds',
+                                          'sql_fingerprinting_timer': None,
+                                          'sql_formatting_timer': None,
+                                          'sql_parsing_cache_stats': {'hits': 0, 'misses': 0, 'maxsize': 1000, 'currsize': 0},
+                                          'parse_statement_cache_stats': {'hits': 1, 'misses': 7, 'maxsize': 1000, 'currsize': 7},
+                                          'format_query_cache_stats': {'hits': 0, 'misses': 0, 'maxsize': 1000, 'currsize': 0},
+                                          'num_known_query_lineage': 0,
+                                          'num_preparsed_queries': 10922,
+                                          'num_known_mapping_lineage': 0,
+                                          'num_table_renames': 0,
+                                          'num_table_swaps': 0,
+                                          'num_temp_sessions': 11,
+                                          'num_inferred_temp_schemas': 4,
+                                          'num_queries_with_temp_tables_in_session': 8,
+                                          'queries_with_temp_upstreams': {},
+                                          'queries_with_non_authoritative_session': [],
+                                          'make_schema_resolver_timer': '0.001 seconds',
+                                          'schema_resolver_count': 83,
+                                          'num_unique_query_fingerprints': 129,
+                                          'num_urns_with_lineage': 0,
+                                          'num_lineage_skipped_due_to_filters': 0,
+                                          'num_table_lineage_trimmed_due_to_large_size': 0,
+                                          'num_column_lineage_trimmed_due_to_large_size': 0,
+                                          'num_queries_entities_generated': 0,
+                                          'num_queries_used_in_lineage': 0,
+                                          'num_queries_skipped_due_to_filters': 129,
+                                          'usage_skipped_missing_timestamp': 0,
+                                          'num_query_usage_stats_generated': 0,
+                                          'num_query_usage_stats_outside_window': 0,
+                                          'num_operations_generated': 0,
+                                          'num_operations_skipped_due_to_filters': 0,
+                                          'tool_meta_report': {'num_queries_meta_extracted': {},
+                                                               'failures': [],
+                                                               'looker_user_mapping_missing': True}},
+                       'stored_proc_lineage': {'num_stored_proc_calls': 1,
+                                               'num_related_queries': 2,
+                                               'num_related_queries_without_proc_call': 0,
+                                               'num_stored_proc_lineage_entries': 2,
+                                               'num_stored_proc_calls_with_no_inputs': 0,
+                                               'num_stored_proc_calls_with_no_outputs': 0},
+                       'num_ddl_queries_dropped': 13378,
+                       'num_stream_queries_observed': 0,
+                       'num_create_temp_view_queries_observed': 8,
+                       'num_users': 121},
+ 'num_get_tables_for_schema_queries': 0,
+ 'num_get_tags_for_object_queries': 0,
+ 'num_get_tags_on_columns_for_table_queries': 0,
+ 'num_get_streams_for_schema_queries': 9,
+ 'rows_zero_objects_modified': 0,
+ 'edition': 'ENTERPRISE',
+ 'start_time': '2025-10-26 10:43:08.255904 (1 minute and 43.5 seconds ago)',
+ 'running_time': '1 minute and 43.49 seconds',
+ 'failures': [],
+ 'warnings': [{'title': 'Failed to extract statistics for some assets',
+               'message': 'Caught unexpected exception while attempting to extract profiling statistics for some assets.',
+               'context': ["Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b09 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_73cc6572 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B09" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b12 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_4cf526a5 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B12" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b20 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_c7ceef31 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B20" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b01 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_ecb5c833 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B01" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_patterns <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_19bbe67c AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_PATTERNS" TABLESAMPLE BERNOULLI (4.53031916)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b27 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_e11c71cd AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B27" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b19 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_cfd7f2ac AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B19" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b11 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_b0f33f65 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B11" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.data_cbg_b14 <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_4ed76c78 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."DATA_CBG_B14" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           "Asset: safegraph_uscensus_and_neighborhood.public.us_population_by_sex <class 'sqlalchemy.exc.ProgrammingError'>: "
+                           '(snowflake.connector.errors.ProgrammingError) 003001 (42501): SQL access control error:\n'
+                           "Insufficient privileges to operate on schema 'PUBLIC'.\n"
+                           '[SQL: CREATE OR REPLACE TEMPORARY TABLE ge_temp_acd16ea6 AS select * from '
+                           '"SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD"."PUBLIC"."US_POPULATION_BY_SEX" TABLESAMPLE BERNOULLI (4.53858478)]\n'
+                           '(Background on this error at: https://sqlalche.me/e/14/f405)',
+                           '... sampled of 26 total elements']}],
+ 'infos': [{'title': 'No tables/views/streams found in schema',
+            'message': 'If objects exist, please grant REFERENCES or SELECT permissions on them.',
+            'context': ['HDX.POPULATION', 'HDX.PUBLIC', 'SNOWFLAKE$GDS.PUBLIC']},
+           {'title': 'Secure view definition not found',
+            'message': 'Lineage will be missing for the view.',
+            'context': ['SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD.PUBLIC.RENT_PERCENTAGE_HOUSEHOLD_INCOME',
+                        'SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD.PUBLIC.TOTAL_RENTAL_GEO',
+                        'SAFEGRAPH_USCENSUS_AND_NEIGHBORHOOD.PUBLIC.US_POPULATION_BY_SEX_GEO']}]}
+
+Aspects by Subtypes:
++----------------------+------------------------+----------------------+-------------------+------------------+
+| Aspect               |   container (Database) |   container (Schema) |   dataset (Table) |   dataset (View) |
++======================+========================+======================+===================+==================+
+| browsePathsV2        |                      7 |                    9 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| container            |                      0 |                    9 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| containerProperties  |                      7 |                    9 |                 0 |                0 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| dataPlatformInstance |                      7 |                    9 |                 0 |                0 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| datasetProfile       |                      0 |                    0 |                11 |                0 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| datasetProperties    |                      0 |                    0 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| schemaMetadata       |                      0 |                    0 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| status               |                      7 |                    9 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+| subTypes             |                      7 |                    9 |                80 |                3 |
++----------------------+------------------------+----------------------+-------------------+------------------+
+Sink (datahub-rest) report:
+{'total_records_written': 598,
+ 'records_written_per_second': 4,
+ 'warnings': [],
+ 'failures': [],
+ 'start_time': '2025-10-26 10:42:48.935702 (2 minutes and 2.84 seconds ago)',
+ 'current_time': '2025-10-26 10:44:51.770700 (now)',
+ 'total_duration_in_seconds': 122.83,
+ 'mode': 'ASYNC_BATCH',
+ 'endpoint': 'RESTLI',
+ 'max_threads': 15,
+ 'gms_version': 'v1.0.0rc3',
+ 'pending_requests': 0,
+ 'async_batches_prepared': 7,
+ 'async_batches_split': 0,
+ 'main_thread_blocking_timer': '0.049 seconds'}
+
+Pipeline finished with at least 1 warnings; produced 598 events in 1 minute and 43.49 seconds.
+

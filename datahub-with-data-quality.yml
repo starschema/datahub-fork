@@ -1,19 +1,18 @@
-# DataHub with Data Quality & UI Ingestion Support
+# DataHub with Data Quality & AI Assistant Support
 #
 # This unified Docker Compose file includes:
 # - All standard DataHub services (GMS, Frontend, Elasticsearch, MySQL, Kafka, etc.)
-# - Custom datahub-actions container with executor + data_quality actions
+# - Custom datahub-actions container with executor + data_quality + AI assistant
 # - Optional Neo4j container (commented out - uncomment if not using external Neo4j)
 #
 # Usage:
-#   docker-compose -f datahub-with-data-quality.yml up -d
+#   docker compose -f datahub-with-data-quality.yml up -d
 #
 # Prerequisites:
-#   1. Build custom datahub-actions image:
-#      cd datahub-actions && docker build -t my-datahub-actions:latest .
-#   2. Ensure config files exist:
+#   1. Ensure config files exist in same directory:
 #      - executor-action-config.yaml
 #      - data-quality-action-config.yaml
+#   2. The datahub-actions image will be built automatically from ./datahub-actions/Dockerfile
 
 version: '3.9'
 
@@ -107,11 +106,17 @@ services:
 
   datahub-actions:
     hostname: actions
+    build:
+      context: ./datahub-actions
+      dockerfile: Dockerfile
     image: my-datahub-actions:latest
+    ports:
+      - "8082:8082"
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
       - DATAHUB_GMS_PROTOCOL=http
+      - DATAHUB_GMS_URL=http://datahub-gms:8080
       - DATAHUB_SYSTEM_CLIENT_ID=__datahub_system
       - DATAHUB_SYSTEM_CLIENT_SECRET=JohnSnowKnowsNothing
       - KAFKA_BOOTSTRAP_SERVER=broker:29092
@@ -119,6 +124,10 @@ services:
       - METADATA_AUDIT_EVENT_NAME=MetadataAuditEvent_v4
       - METADATA_CHANGE_LOG_VERSIONED_TOPIC_NAME=MetadataChangeLog_Versioned_v1
       - SCHEMA_REGISTRY_URL=http://schema-registry:8081
+      # AI Assistant configuration
+      - LLM_PROVIDER=gemini
+      - GEMINI_API_KEY=AIzaSyA26MaS06JMDpOliZO334jirYd13QKNV0w
+      - GEMINI_MODEL=gemini-2.0-flash-exp
     depends_on:
       datahub-gms:
         condition: service_healthy

@@ -70,7 +70,7 @@ class AcrylDataHubGraph:
         url = f"{self.graph._gms_server}{url_frag}"
 
         headers = {
-            "X-DataHub-Actor": "urn:li:corpuser:admin",
+            "X-DataHub-Actor": "urn:li:corpuser:datahub",
             "Content-Type": "application/json",
         }
         try:

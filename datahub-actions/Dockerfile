@@ -26,10 +26,12 @@ RUN pip install --upgrade pip setuptools wheel build
 # Set working directory
 WORKDIR /app
 
-# Copy startup script first (before copying all source code)
+# Copy startup scripts first (before copying all source code)
 COPY start_actions.sh /usr/local/bin/start_actions.sh
+COPY start_ai_assistant.sh /usr/local/bin/start_ai_assistant.sh
 # Convert Windows line endings to Unix and make executable
 RUN sed -i 's/\r$//' /usr/local/bin/start_actions.sh && chmod +x /usr/local/bin/start_actions.sh
+RUN sed -i 's/\r$//' /usr/local/bin/start_ai_assistant.sh && chmod +x /usr/local/bin/start_ai_assistant.sh
 
 # Copy the entire datahub-actions source code
 COPY . .
@@ -37,10 +39,11 @@ COPY . .
 # Build the package as a wheel
 RUN python -m build --wheel
 
-# Force install the wheel with data_quality and executor extras
+# Force install the wheel with data_quality, executor, and ai_assistant extras
 # The [data_quality] extra includes SQLAlchemy for data quality plugin
 # The [executor] extra includes acryl-executor for UI-based ingestion
-RUN WHEEL=$(ls dist/*.whl) && pip install --force-reinstall "${WHEEL}[data_quality,executor]"
+# The [ai_assistant] extra includes FastAPI, uvicorn, and google-generativeai
+RUN WHEEL=$(ls dist/*.whl) && pip install --force-reinstall "${WHEEL}[data_quality,executor,ai_assistant]"
 
 # Build-time assertion: Verify both data_quality and executor entry points are registered
 RUN python -c "from importlib.metadata import entry_points; \
@@ -57,6 +60,6 @@ RUN useradd -m -u 1000 datahub && \
 # Switch to datahub user
 USER datahub
 
-# Default command to run DataHub Actions server with multiple pipelines
+# Default command to run both DataHub Actions server AND AI Assistant API
 # Note: Configuration files are expected to be mounted in /etc/datahub/actions/conf/
-CMD ["/usr/local/bin/start_actions.sh"]
+CMD ["/bin/bash", "-c", "/usr/local/bin/start_ai_assistant.sh & /usr/local/bin/start_actions.sh"]
