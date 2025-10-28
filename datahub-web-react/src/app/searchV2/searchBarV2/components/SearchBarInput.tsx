@@ -16,6 +16,22 @@ const StyledSearchBar = styled(SearchBar)<{ $isShowNavBarRedesign?: boolean }>`
     border-width: 2px !important;
     border-color: ${colors.gray[100]};
 
+    .ant-input {
+        color: #734dda !important;
+
+        &::placeholder {
+            color: rgba(115, 77, 218, 0.7) !important;
+        }
+    }
+
+    .ant-input-prefix {
+        color: #734dda !important;
+    }
+
+    .ant-input-clear-icon {
+        color: #734dda !important;
+    }
+
     ${(props) =>
         !props.$isShowNavBarRedesign &&
         `
@@ -29,7 +45,6 @@ const StyledSearchBar = styled(SearchBar)<{ $isShowNavBarRedesign?: boolean }>`
         }
 
         .ant-input, .ant-input-clear-icon {
-            color: ${colors.white};
             background: ${PRE_NAV_BAR_REDESIGN_SEARCHBAR_BACKGROUND};
         }
     `}

@@ -3,8 +3,6 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { getColor } from '@components/theme/utils';
-
 import { NavBarMenuBaseItem } from '@app/homeV2/layout/navBarRedesign/types';
 import { Badge, Text, colors } from '@src/alchemy-components';
 import analytics, { EventType } from '@src/app/analytics';
@@ -63,13 +61,16 @@ const StyledMenuItem = styled(Menu.Item)<{ isCollapsed?: boolean }>`
     }
 
     &&.ant-menu-item-selected {
-        background: linear-gradient(
-            180deg,
-            rgba(83, 63, 209, 0.04) -3.99%,
-            rgba(112, 94, 228, 0.04) 53.04%,
-            rgba(112, 94, 228, 0.04) 100%
-        );
+        background: #7c4dff;
         box-shadow: 0px 0px 0px 1px rgba(108, 71, 255, 0.08);
+
+        && svg {
+            color: white !important;
+        }
+
+        && .ant-menu-title-content {
+            color: white !important;
+        }
     }
 `;
 
@@ -78,10 +79,7 @@ const Icon = styled.div<{ $isSelected?: boolean; $size?: number }>`
     height: ${(props) => props.$size ?? 20}px;
 
     && svg {
-        ${(props) =>
-            props.$isSelected
-                ? `fill: url(#menu-item-selected-gradient) ${props.theme.styles['primary-color']};`
-                : 'color: #8088a3;'}
+        ${(props) => (props.$isSelected ? 'color: white !important;' : 'color: #8088a3;')}
         width: ${(props) => props.$size ?? 20}px;
         height: ${(props) => props.$size ?? 20}px;
     }
@@ -91,13 +89,11 @@ const StyledText = styled(Text)<{ $isSelected?: boolean }>`
     ${(props) =>
         props.$isSelected &&
         `
-        background: linear-gradient(${getColor('primary', 300, props.theme)} 1%, ${getColor(
-            'primary',
-            500,
-            props.theme,
-        )} 99%);
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: white !important;
+
+        && * {
+            color: white !important;
+        }
     `}
 `;
 

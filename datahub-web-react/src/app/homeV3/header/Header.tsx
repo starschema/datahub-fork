@@ -9,12 +9,12 @@ import { CenteredContainer, contentWidth } from '@app/homeV3/styledComponents';
 export const HeaderWrapper = styled.div`
     display: flex;
     justify-content: center;
-    padding: 27px 0 24px 0;
-    width: 100%;
-    background: linear-gradient(180deg, #f8fcff 0%, #fafafb 100%);
+    padding: 16px 0 16px 0;
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #4f46e5 100%);
     border-bottom: 1px solid ${colors.gray[100]};
-    border-radius: 12px 12px 0 0;
+    border-radius: 0;
     position: relative;
+    box-sizing: border-box;
 `;
 
 const StyledCenteredContainer = styled(CenteredContainer)`

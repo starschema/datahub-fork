@@ -5,34 +5,25 @@ import { useShowNavBarRedesign } from '@app/useShowNavBarRedesign';
 import { colors } from '@src/alchemy-components';
 
 const Container = styled.div<{ $isShowNavBarRedesign?: boolean }>`
-    color: ${(props) => (props.$isShowNavBarRedesign ? colors.gray[1700] : '#dcdcdc')};
-    background-color: ${(props) => (props.$isShowNavBarRedesign ? colors.white : '#171723')};
+    color: ${colors.gray[600]};
+    background-color: ${colors.gray[50]};
     opacity: 0.9;
-    border-color: black;
+    border-color: ${colors.gray[200]};
     border-radius: 6px;
-    border: 1px solid ${(props) => (props.$isShowNavBarRedesign ? colors.gray[1700] : '#dcdcdc')};
+    border: 1px solid ${colors.gray[200]};
     padding-right: 6px;
     padding-left: 6px;
     margin-right: 4px;
     margin-left: 4px;
-    height: 24px;
-    ${(props) =>
-        props.$isShowNavBarRedesign &&
-        `
-        height: 28px;
-        display: flex;
-    `}
+    height: ${(props) => (props.$isShowNavBarRedesign ? '28px' : '24px')};
+    display: ${(props) => (props.$isShowNavBarRedesign ? 'flex' : 'block')};
 `;
 
 const Letter = styled.span<{ $isShowNavBarRedesign?: boolean }>`
     padding: 2px;
-    ${(props) =>
-        props.$isShowNavBarRedesign &&
-        `
-        color: ${colors.gray[1700]};
-        text-align: center;
-        line-height: 23px;
-    `}
+    color: ${colors.gray[600]};
+    text-align: center;
+    line-height: ${(props) => (props.$isShowNavBarRedesign ? '23px' : 'normal')};
 `;
 
 export const CommandK = () => {
