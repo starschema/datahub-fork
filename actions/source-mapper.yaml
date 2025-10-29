@@ -1,0 +1,16 @@
+name: source_mapper
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+    topic_routes:
+      mcl: "MetadataChangeLog_Timeseries_v1"
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataset"
+action:
+  type: "ingestion_source_mapper"
+  config:
+    enabled: true

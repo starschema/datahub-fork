@@ -9,6 +9,12 @@
 #   docker compose -f datahub-with-data-quality.yml up -d
 #
 # Prerequisites:
+<<<<<<< HEAD
+#   1. Ensure config files exist in same directory:
+#      - executor-action-config.yaml
+#      - data-quality-action-config.yaml
+#   2. The datahub-actions image will be built automatically from ./datahub-actions/Dockerfile
+=======
 #   Option A - Pull pre-built images from GHCR (RECOMMENDED):
 #     ./docker/pull-images.sh
 #
@@ -18,6 +24,7 @@
 #   Ensure config files exist:
 #     - executor-action-config.yaml
 #     - data-quality-action-config.yaml
+>>>>>>> 58328751f655a8202ac1519347e430e9a5923432
 
 version: '3.9'
 
@@ -113,13 +120,18 @@ services:
 
   datahub-actions:
     hostname: actions
-    # Build and use a local image for actions (data quality + AI assistant)
+<<<<<<< HEAD
     build:
       context: ./datahub-actions
       dockerfile: Dockerfile
-    image: ${DATAHUB_ACTIONS_IMAGE:-my-datahub-actions:latest}
+    image: my-datahub-actions:latest
     ports:
       - "8082:8082"
+=======
+    # Use GHCR image by default, fallback to local if not available
+    # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/rykalc/datahub-actions:latest}
+>>>>>>> 58328751f655a8202ac1519347e430e9a5923432
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080

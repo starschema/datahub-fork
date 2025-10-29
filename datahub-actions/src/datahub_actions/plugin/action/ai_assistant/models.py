@@ -141,3 +141,45 @@ class SnowflakeSelfTestResponse(BaseModel):
     ok: bool
     version: Optional[str] = None
     error: Optional[str] = None
+
+
+# Debug connection inspection models
+class DebugConnectionRequest(BaseModel):
+    """Request to inspect connector resolution for a dataset."""
+
+    dataset_urn: str
+
+
+class SourceSummary(BaseModel):
+    name: Optional[str] = None
+    urn: Optional[str] = None
+    type: Optional[str] = None
+
+
+class DebugConnectionResponse(BaseModel):
+    """Details about how connection resolution was derived."""
+
+    platform: Optional[str] = None
+    mapping_property_urn: Optional[str] = None
+    pipeline_name_urn: Optional[str] = None
+    selected_source: Optional[SourceSummary] = None
+    native_available: bool = False
+    engine_available: bool = False
+    candidates_count: int = 0
+
+
+class BackfillMappingRequest(BaseModel):
+    """Request to backfill dataset→source mapping by reading system metadata and persisting it."""
+    dataset_urn: str
+    # Optional override: force map to a specific source URN
+    source_urn: Optional[str] = None
+    # If true, and exactly one candidate source exists for the platform, auto-select it
+    auto_select_if_single: bool = True
+
+
+class BackfillMappingResponse(BaseModel):
+    """Response for backfill operation."""
+
+    ok: bool
+    source_urn: Optional[str] = None
+    error: Optional[str] = None
