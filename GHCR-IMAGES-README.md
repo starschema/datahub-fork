@@ -134,7 +134,13 @@ docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
 - `hcltech` - Stable HCLTech branded version
 - `<git-sha>` - Specific commit versions (e.g., `abc1234`)
 
-**Size:** ~1.22GB
+**Supported Architectures:**
+- `linux/amd64` - Intel/AMD 64-bit (Linux servers, Intel Macs)
+- `linux/arm64` - ARM 64-bit (Apple Silicon M1/M2/M3 Macs)
+
+Docker automatically pulls the correct architecture for your system.
+
+**Size:** ~1.22GB (per architecture)
 
 ### Custom Actions Image (Data Quality + Executor)
 
@@ -162,7 +168,7 @@ If you've made changes to the frontend or actions code and need to push new imag
 #### Prerequisites
 1. Have push access to the `rykalc/Custom-Datahub` repository
 2. Authenticate with GHCR (with `write:packages` permission)
-3. Docker is running
+3. Docker with Buildx support is installed and running (Docker 19.03+)
 
 #### Build and Push Both Images
 
@@ -174,9 +180,12 @@ cd Custom-Datahub/docker
 ```
 
 This will:
-1. Build both custom images
-2. Tag them with git SHA and `latest`
-3. Push to GHCR
+1. Build custom frontend image for **multiple platforms** (linux/amd64, linux/arm64)
+2. Build custom actions image for native platform
+3. Tag them with git SHA and `latest`
+4. Push to GHCR
+
+**Note:** Multi-platform frontend builds take longer (~2-3x) but ensure compatibility across Intel/AMD and Apple Silicon Macs.
 
 #### Build and Push Specific Images
 
@@ -220,6 +229,26 @@ Check the packages on GitHub:
 1. Check the image name is correct
 2. Verify you have read access to the repository/package
 3. Contact repository owner to grant you access
+
+### "no matching manifest for linux/amd64" or Platform Mismatch
+
+**Problem:** Image was built for a different CPU architecture than your system.
+
+**Solution (for frontend images):**
+As of the latest updates, frontend images are **multi-architecture** and support both:
+- `linux/amd64` (Intel/AMD processors)
+- `linux/arm64` (Apple Silicon M1/M2/M3)
+
+If you see this error:
+1. Pull the latest image version:
+   ```bash
+   docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
+   ```
+2. Verify the image has multi-arch support:
+   ```bash
+   docker manifest inspect ghcr.io/rykalc/custom-datahub-frontend-react:latest | grep -A 3 "platform"
+   ```
+3. If the image is older (pre-multi-arch), ask maintainers to rebuild and push a new version
 
 ### Images Pull But Don't Work
 
