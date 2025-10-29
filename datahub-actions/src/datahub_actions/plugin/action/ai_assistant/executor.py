@@ -51,18 +51,39 @@ class SQLExecutor:
 
             platform = self._extract_platform(dataset_urn)
 
-            # For Snowflake, use native connector (SQLAlchemy has auth issues)
-            if platform.lower() == "snowflake":
-                return self._execute_snowflake_native(dataset_urn, sql, row_limit)
+            # Try native connector first (dataset-specific, all platforms)
+            try:
+                native_conn = self.connector_registry.get_native_connection(dataset_urn)
+            except Exception as e:
+                native_conn = None
+                logger.debug(f"Native connection lookup failed: {e}")
 
-            # For other platforms, use SQLAlchemy via ConnectorRegistry
+            if native_conn is not None:
+                logger.info(
+                    f"Executing SQL via native connector for {dataset_urn}: {sql[:100]}..."
+                )
+                cursor = native_conn.native_connection().cursor()
+                cursor.execute(sql)
+                rows = cursor.fetchall()
+                columns = [d[0] for d in cursor.description] if cursor.description else []
+                cursor.close()
+                native_conn.close()
+
+                result_list = [
+                    dict(zip(columns, row)) for row in rows[:row_limit]
+                ] if rows else []
+                passed, metrics = self._parse_query_result(result_list, row_limit)
+                return passed, metrics, None
+
+            # Fallback: SQLAlchemy via ConnectorRegistry (works for all platforms)
             engine = self.connector_registry.get_engine(dataset_urn)
-
+            
             if not engine:
                 return (
                     False,
                     {},
-                    f"No database connection available for platform: {platform}",
+                    "No database connection available (native or SQLAlchemy) for this dataset. "
+                    "Ensure ingestion source exists and secrets resolve, or configure a connector.",
                 )
 
             # Execute query with SQLAlchemy
@@ -107,6 +128,22 @@ class SQLExecutor:
             (passed: bool, metrics: Dict, error: Optional[str])
         """
         try:
+            # Resolve and log the exact ingestion source used for this dataset
+            selected_source = None
+            try:
+                selected_source = self.connector_registry.find_ingestion_source_for_dataset(
+                    dataset_urn
+                )
+                if selected_source:
+                    logger.info(
+                        "Using ingestion source for execution: name=%s urn=%s",
+                        selected_source.get("name"),
+                        selected_source.get("urn"),
+                    )
+            except Exception:
+                # Non-fatal for execution; continue to obtain a connection
+                logger.debug("Could not pre-resolve selected ingestion source for logging")
+
             # Get dataset-specific native connection selected from the exact ingestion source
             connection = self.connector_registry.get_native_connection(dataset_urn)
 

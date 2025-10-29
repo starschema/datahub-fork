@@ -20,6 +20,11 @@ from datahub_actions.plugin.action.ai_assistant.models import (
     GenerateRequest,
     GenerateResponse,
     HealthResponse,
+    DebugConnectionRequest,
+    DebugConnectionResponse,
+    SourceSummary,
+    BackfillMappingRequest,
+    BackfillMappingResponse,
     SnowflakeSelfTestRequest,
     SnowflakeSelfTestResponse,
     PersistRequest,
@@ -282,6 +287,208 @@ def create_app(
                 detail=ErrorResponse(
                     error=str(e),
                     code="SELF_TEST_FAILED",
+                ).dict(),
+            )
+
+    @app.post("/debug/connection-info", response_model=DebugConnectionResponse)
+    async def debug_connection_info(request: DebugConnectionRequest):
+        """Inspect how connector resolution would happen for a dataset (no query executed)."""
+        try:
+            dataset_urn = request.dataset_urn
+            platform = None
+            try:
+                platform = sql_executor._extract_platform(dataset_urn)
+            except Exception:
+                platform = None
+
+            mapping_property_urn = None
+            try:
+                bag = graph.get_entity_semityped(dataset_urn, aspects=["datasetProperties"])
+                if bag and bag.get("datasetProperties"):
+                    dp = bag["datasetProperties"]
+                    custom = getattr(dp, "customProperties", None)
+                    if isinstance(custom, dict):
+                        mapping_property_urn = custom.get("datahub.ingestion.sourceUrn")
+            except Exception:
+                mapping_property_urn = None
+
+            pipeline_name_urn = None
+            try:
+                # Use registry helper to read system metadata pipelineName
+                pipeline_name_urn = connector_registry._get_source_urn_from_system_metadata(dataset_urn)  # type: ignore[attr-defined]
+            except Exception:
+                pipeline_name_urn = None
+
+            selected_source = None
+            try:
+                src = connector_registry.find_ingestion_source_for_dataset(dataset_urn)
+                if src:
+                    selected_source = SourceSummary(
+                        name=src.get("name"), urn=src.get("urn"), type=src.get("type")
+                    )
+            except Exception:
+                selected_source = None
+
+            candidates_count = 0
+            try:
+                # Count candidate sources for this platform
+                sources_map = connector_registry._load_ingestion_sources()  # type: ignore[attr-defined]
+                if platform and sources_map.get(platform):
+                    candidates_count = len(sources_map[platform])
+            except Exception:
+                candidates_count = 0
+
+            native_available = False
+            engine_available = False
+            try:
+                native = connector_registry.get_native_connection(dataset_urn)
+                if native is not None:
+                    native_available = True
+                    try:
+                        native.close()
+                    except Exception:
+                        pass
+            except Exception:
+                native_available = False
+            try:
+                engine = connector_registry.get_engine(dataset_urn)
+                if engine is not None:
+                    engine_available = True
+            except Exception:
+                engine_available = False
+
+            return DebugConnectionResponse(
+                platform=platform,
+                mapping_property_urn=mapping_property_urn,
+                pipeline_name_urn=pipeline_name_urn,
+                selected_source=selected_source,
+                native_available=native_available,
+                engine_available=engine_available,
+                candidates_count=candidates_count,
+            )
+
+        except Exception as e:
+            logger.error(f"Debug connection-info failed: {e}", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail=ErrorResponse(
+                    error=str(e),
+                    code="DEBUG_CONNECTION_INFO_FAILED",
+                ).dict(),
+            )
+
+    @app.post("/debug/backfill-mapping", response_model=BackfillMappingResponse)
+    async def backfill_mapping(request: BackfillMappingRequest):
+        """
+        Backfill dataset→ingestion source mapping by reading system metadata across common aspects
+        and persisting it into DatasetProperties.customProperties.
+        """
+        try:
+            urn = request.dataset_urn
+
+            # 0) Respect explicit override
+            if request.source_urn:
+                try:
+                    from datahub.metadata.schema_classes import DatasetPropertiesClass
+                    existing = graph.get_entity_semityped(urn, aspects=["datasetProperties"]) or {}
+                    dp = existing.get("datasetProperties") or DatasetPropertiesClass(customProperties={})
+                    if dp.customProperties is None:
+                        dp.customProperties = {}
+                    dp.customProperties["datahub.ingestion.sourceUrn"] = request.source_urn
+                    from datahub.emitter.mcp import MetadataChangeProposalWrapper
+                    mcw = MetadataChangeProposalWrapper(entityUrn=urn, aspect=dp)
+                    graph.emit(mcw)
+                    return BackfillMappingResponse(ok=True, source_urn=request.source_urn)
+                except Exception as e:
+                    return BackfillMappingResponse(ok=False, error=str(e))
+
+            # Try existing helpers first
+            source_urn = None
+            try:
+                # 1) Explicit mapping on properties
+                bag = graph.get_entity_semityped(urn, aspects=["datasetProperties"])
+                if bag and bag.get("datasetProperties"):
+                    dp = bag["datasetProperties"]
+                    custom = getattr(dp, "customProperties", None)
+                    if isinstance(custom, dict) and custom.get("datahub.ingestion.sourceUrn"):
+                        return BackfillMappingResponse(ok=True, source_urn=custom.get("datahub.ingestion.sourceUrn"))
+            except Exception:
+                pass
+
+            try:
+                # 2) System metadata via registry helper on datasetProperties
+                source_urn = connector_registry._get_source_urn_from_system_metadata(urn)  # type: ignore[attr-defined]
+            except Exception:
+                source_urn = None
+
+            # 3) If still not found, scan a few aspects with system metadata
+            if not source_urn:
+                aspects_to_scan = ["schemaMetadata", "status", "browsePathsV2", "datasetProperties"]
+                try:
+                    entities = graph.get_entities(
+                        entity_name="dataset",
+                        urns=[urn],
+                        aspects=aspects_to_scan,
+                        with_system_metadata=True,
+                    )
+                    entry = entities.get(urn, {})
+                    for aspect_name in aspects_to_scan:
+                        tpl = entry.get(aspect_name)
+                        if not tpl:
+                            continue
+                        _, sysmeta = tpl
+                        if not sysmeta:
+                            continue
+                        props = getattr(sysmeta, "properties", None)
+                        candidate = None
+                        if isinstance(props, dict):
+                            candidate = props.get("pipelineName")
+                        candidate = candidate or getattr(sysmeta, "pipelineName", None)
+                        if isinstance(candidate, str) and candidate.startswith("urn:li:dataHubIngestionSource:"):
+                            source_urn = candidate
+                            break
+                except Exception:
+                    pass
+
+            if not source_urn or not isinstance(source_urn, str) or not source_urn.startswith("urn:li:dataHubIngestionSource:"):
+                # 4) As a pragmatic fallback, if exactly one candidate source exists for the platform, select it.
+                if request.auto_select_if_single:
+                    try:
+                        platform = sql_executor._extract_platform(urn)
+                        sources_map = connector_registry._load_ingestion_sources()  # type: ignore[attr-defined]
+                        candidates = sources_map.get(platform.lower(), []) if platform else []
+                        if len(candidates) == 1:
+                            source_urn = candidates[0].get("urn")
+                    except Exception:
+                        pass
+                if not source_urn:
+                    return BackfillMappingResponse(ok=False, error="Could not resolve pipelineName from system metadata")
+
+            # Persist mapping
+            try:
+                from datahub.metadata.schema_classes import DatasetPropertiesClass
+                existing = graph.get_entity_semityped(urn, aspects=["datasetProperties"]) or {}
+                dp = existing.get("datasetProperties") or DatasetPropertiesClass(customProperties={})
+                if dp.customProperties is None:
+                    dp.customProperties = {}
+                dp.customProperties["datahub.ingestion.sourceUrn"] = source_urn
+
+                mcp = AssertionPersistence(graph)._build_mcp_for_assertion if False else None  # noqa: placeholder to satisfy import grouping
+                # Emit via DataHubGraph
+                from datahub.emitter.mcp import MetadataChangeProposalWrapper
+                mcw = MetadataChangeProposalWrapper(entityUrn=urn, aspect=dp)
+                graph.emit(mcw)
+                return BackfillMappingResponse(ok=True, source_urn=source_urn)
+            except Exception as e:
+                return BackfillMappingResponse(ok=False, error=str(e))
+
+        except Exception as e:
+            logger.error(f"Backfill mapping failed: {e}", exc_info=True)
+            raise HTTPException(
+                status_code=500,
+                detail=ErrorResponse(
+                    error=str(e),
+                    code="BACKFILL_MAPPING_FAILED",
                 ).dict(),
             )
 

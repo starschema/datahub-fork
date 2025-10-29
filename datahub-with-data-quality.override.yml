@@ -1,0 +1,20 @@
+services:
+  datahub-actions:
+    volumes:
+      - ./actions:/etc/datahub/actions/conf
+    environment:
+      - ACTIONS_CONFIG=/etc/datahub/actions/conf/source-mapper.yaml
+
+  # Sidecar to run only the source-mapper pipeline continuously
+  datahub-actions-mapper:
+    image: my-datahub-actions:latest
+    depends_on:
+      datahub-gms:
+        condition: service_healthy
+    environment:
+      - DATAHUB_GMS_HOST=datahub-gms
+      - DATAHUB_GMS_PORT=8080
+      - DATAHUB_GMS_PROTOCOL=http
+    volumes:
+      - ./actions:/etc/datahub/actions/conf
+    command: ["datahub-actions", "actions", "run", "--config", "/etc/datahub/actions/conf/source-mapper.yaml"]

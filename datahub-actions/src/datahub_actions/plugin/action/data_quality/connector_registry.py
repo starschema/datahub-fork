@@ -517,7 +517,8 @@ class ConnectorRegistry:
             parts = dataset_key.split(".")
             if len(parts) != 3:
                 return False
-            db, schema, table = parts
+            # Snowflake normalizes unquoted identifiers to UPPERCASE
+            db, schema, table = (parts[0].upper(), parts[1].upper(), parts[2].upper())
 
             # Database allowed
             if not cfg.database_pattern.allowed(db):
@@ -574,26 +575,134 @@ class ConnectorRegistry:
 
         return best
 
-    def get_native_connection(self, dataset_urn: str) -> Optional[Any]:
+    def _get_source_urn_from_system_metadata(self, dataset_urn: str) -> Optional[str]:
         """
-        Return a native DB connection for the specific ingestion source that ingested this dataset.
+        Prefer an explicit link: read system metadata for a stable mapping to the
+        ingestion source (pipelineName) that last wrote this dataset.
 
-        This mirrors profiling: select the ingestion source whose config and patterns
-        include the dataset, then build a native connection using that source's config.
+        Returns source URN (e.g., urn:li:dataHubIngestionSource:...) or None.
+        """
+        if not self.graph:
+            return None
+        try:
+            # Access underlying DataHubGraph
+            base_graph = getattr(self.graph, "graph", None)
+            if base_graph is None:
+                return None
+
+            # Fetch datasetProperties with system metadata using OpenAPI v3 client
+            entities = base_graph.get_entities(
+                entity_name="dataset",
+                urns=[dataset_urn],
+                aspects=["datasetProperties"],
+                with_system_metadata=True,
+            )
+            ds = entities.get(dataset_urn)
+            if not ds:
+                return None
+            _, sysmeta = ds.get("datasetProperties", (None, None))
+            if not sysmeta:
+                return None
+
+            # SystemMetadataClass may carry properties map with pipelineName set by ingestion
+            pipeline_name = None
+            props = getattr(sysmeta, "properties", None)
+            if isinstance(props, dict):
+                pipeline_name = props.get("pipelineName")
+
+            # Some versions also place pipelineName directly; be defensive
+            if not pipeline_name:
+                pipeline_name = getattr(sysmeta, "pipelineName", None)
+
+            return pipeline_name
+        except Exception as e:
+            logger.debug(f"Failed to resolve source from system metadata: {e}")
+            return None
+
+    def find_ingestion_source_for_dataset(self, dataset_urn: str) -> Optional[Dict[str, Any]]:
+        # 0) Check explicit mapping on DatasetProperties.customProperties first
+        try:
+            if self.graph and getattr(self.graph, "graph", None):
+                base_graph = self.graph.graph
+                bag = base_graph.get_entity_semityped(dataset_urn, aspects=["datasetProperties"])
+                if bag and bag.get("datasetProperties"):
+                    dp = bag["datasetProperties"]
+                    custom = getattr(dp, "customProperties", None)
+                    if isinstance(custom, dict):
+                        prop_val = custom.get("datahub.ingestion.sourceUrn")
+                        if prop_val and isinstance(prop_val, str):
+                            all_sources = self._load_ingestion_sources()
+                            for lst in all_sources.values():
+                                for src in lst:
+                                    if src.get("urn") == prop_val:
+                                        logger.info(
+                                            "Selected ingestion source via custom property: name=%s urn=%s",
+                                            src.get("name"),
+                                            src.get("urn"),
+                                        )
+                                        return src
+        except Exception as e:
+            logger.debug("Failed reading mapping from DatasetProperties: %s", e)
+        """
+        Determine the best-matching ingestion source for a given dataset URN.
+
+        Returns the full source dict (including name, urn, type, config) or None.
         """
         platform, key = self._parse_dataset_key(dataset_urn)
         if not platform or not key:
+            logger.debug(f"Could not parse platform/key from dataset_urn={dataset_urn}")
             return None
 
+        # 1) Try explicit mapping from system metadata (pipelineName)
+        source_urn = self._get_source_urn_from_system_metadata(dataset_urn)
+        if source_urn:
+            all_sources = self._load_ingestion_sources()
+            # Flatten per-platform lists into a single list for lookup
+            for src_list in all_sources.values():
+                for src in src_list:
+                    if src.get("urn") == source_urn:
+                        logger.info(
+                            "Selected ingestion source via system metadata: name=%s urn=%s",
+                            src.get("name"),
+                            src.get("urn"),
+                        )
+                        return src
+
+        # 2) Fall back to recipe pattern selection within platform
         ing = self._load_ingestion_sources()
         candidates = ing.get(platform, [])
+        logger.info(
+            f"Selecting ingestion source for dataset platform={platform} key={key} candidates={len(candidates)}"
+        )
         if not candidates:
             return None
 
         selected = self._select_best_source(platform, key, candidates)
+        if selected:
+            logger.info(
+                "Selected ingestion source: name=%s urn=%s platform=%s",
+                selected.get("name"),
+                selected.get("urn"),
+                platform,
+            )
+        else:
+            logger.warning(
+                f"No matching ingestion source found for dataset key={key} platform={platform}"
+            )
+        return selected
+
+    def get_native_connection(self, dataset_urn: str) -> Optional[Any]:
+        """
+        Return a native DB connection for the specific ingestion source that ingested this dataset.
+
+        Mirrors profiling: select the ingestion source whose config and patterns
+        include the dataset, then build a native connection using that source's config.
+        """
+        selected = self.find_ingestion_source_for_dataset(dataset_urn)
         if not selected:
             return None
 
+        platform, _ = self._parse_dataset_key(dataset_urn)
         cfg = selected.get("config", {})
 
         try:
@@ -602,12 +711,24 @@ class ConnectorRegistry:
 
                 resolved = self._resolve_secrets(cfg)
                 sf_config = SnowflakeV2Config.parse_obj(resolved)
-                return sf_config.get_connection()  # returns wrapper around native connection
+                conn = sf_config.get_connection()  # wrapper around native connection
+                logger.debug(
+                    "Established native Snowflake connection for source name=%s urn=%s",
+                    selected.get("name"),
+                    selected.get("urn"),
+                )
+                return conn
 
             # TODO: Implement native connections for other platforms as needed
+            logger.warning(f"Native connection not implemented for platform {platform}")
             return None
         except Exception as e:
-            logger.error(f"Failed to create native connection for {platform}: {e}")
+            logger.error(
+                "Failed to create native connection for platform=%s source=%s: %s",
+                platform,
+                selected.get("name"),
+                e,
+            )
             return None
 
     # Backwards-compatibility shim: some callers expect get_connector()
