@@ -5,9 +5,11 @@
 # can pull pre-built images instead of building locally.
 #
 # Prerequisites:
-#   1. Docker is installed and running
+#   1. Docker with Buildx support is installed and running (Docker 19.03+)
 #   2. Authenticated with GHCR: docker login ghcr.io -u YOUR_GITHUB_USERNAME
 #   3. Have push permissions to the starschema/Custom-Datahub repository
+#
+# Note: Frontend images are built for multi-platform (linux/amd64, linux/arm64)
 #
 # Usage:
 #   ./build-push-images.sh [OPTIONS]
@@ -116,6 +118,18 @@ fi
 
 log_info "Tags to be used: ${TAGS[*]}"
 
+# Check if Docker Buildx is available
+check_docker_buildx() {
+    log_info "Checking Docker Buildx support..."
+    if ! docker buildx version >/dev/null 2>&1; then
+        log_error "Docker Buildx is not available"
+        log_error "Multi-platform builds require Docker 19.03+ with Buildx"
+        log_error "See: https://docs.docker.com/buildx/working-with-buildx/"
+        exit 1
+    fi
+    log_success "Docker Buildx is available"
+}
+
 # Check if authenticated with GHCR
 check_ghcr_auth() {
     if [ "$PUSH_IMAGES" = true ]; then
@@ -136,32 +150,50 @@ check_ghcr_auth() {
 
 # Build frontend image
 build_frontend() {
-    log_info "Building custom DataHub frontend image..."
+    log_info "Building custom DataHub frontend image (multi-platform: linux/amd64, linux/arm64)..."
     log_info "This includes HCLTech branding and theme customizations"
 
     # The frontend needs to be built first with gradle
     log_warn "Note: This requires the frontend to be pre-built"
     log_warn "If the build fails, run: cd ../.. && ./gradlew :datahub-frontend:build"
 
-    # Build the Docker image
+    # Build all tags for multi-platform
     cd ../..
-    docker build \
-        -f docker/datahub-frontend/Dockerfile \
-        -t "${FRONTEND_IMAGE_NAME}:hcltech" \
-        --build-arg APP_ENV=prod \
-        .
+
+    # Prepare all tags for buildx
+    BUILDX_TAGS=""
+    for tag in "${TAGS[@]}"; do
+        BUILDX_TAGS="${BUILDX_TAGS} -t ${FRONTEND_REGISTRY_IMAGE}:${tag}"
+    done
+    BUILDX_TAGS="${BUILDX_TAGS} -t ${FRONTEND_REGISTRY_IMAGE}:hcltech"
+
+    if [ "$PUSH_IMAGES" = true ]; then
+        log_info "Building and pushing multi-platform image to registry..."
+        docker buildx build \
+            -f docker/datahub-frontend/Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --build-arg APP_ENV=prod \
+            ${BUILDX_TAGS} \
+            --push \
+            .
+    else
+        log_warn "Building for host platform only (--no-push mode)"
+        docker buildx build \
+            -f docker/datahub-frontend/Dockerfile \
+            --build-arg APP_ENV=prod \
+            -t "${FRONTEND_IMAGE_NAME}:hcltech" \
+            --load \
+            .
+
+        # Tag for GHCR (local only)
+        for tag in "${TAGS[@]}"; do
+            log_info "Tagging frontend image as ${FRONTEND_REGISTRY_IMAGE}:${tag}"
+            docker tag "${FRONTEND_IMAGE_NAME}:hcltech" "${FRONTEND_REGISTRY_IMAGE}:${tag}"
+        done
+        docker tag "${FRONTEND_IMAGE_NAME}:hcltech" "${FRONTEND_REGISTRY_IMAGE}:hcltech"
+    fi
 
     log_success "Frontend image built successfully"
-
-    # Tag for GHCR
-    for tag in "${TAGS[@]}"; do
-        log_info "Tagging frontend image as ${FRONTEND_REGISTRY_IMAGE}:${tag}"
-        docker tag "${FRONTEND_IMAGE_NAME}:hcltech" "${FRONTEND_REGISTRY_IMAGE}:${tag}"
-    done
-
-    # Also keep the hcltech tag
-    docker tag "${FRONTEND_IMAGE_NAME}:hcltech" "${FRONTEND_REGISTRY_IMAGE}:hcltech"
-
     cd docker
 }
 
@@ -194,21 +226,15 @@ build_actions() {
 push_images() {
     if [ "$PUSH_IMAGES" = false ]; then
         log_warn "Skipping push (--no-push flag or not authenticated)"
+        log_info "Note: Multi-platform builds are pushed during the build step when using --push"
         return
     fi
 
-    log_info "Pushing images to GitHub Container Registry..."
-
-    if [ "$BUILD_FRONTEND" = true ]; then
-        for tag in "${TAGS[@]}"; do
-            log_info "Pushing ${FRONTEND_REGISTRY_IMAGE}:${tag}"
-            docker push "${FRONTEND_REGISTRY_IMAGE}:${tag}"
-        done
-        docker push "${FRONTEND_REGISTRY_IMAGE}:hcltech"
-        log_success "Frontend image pushed successfully"
-    fi
+    # Note: For multi-platform frontend builds, images are already pushed during docker buildx build
+    # This function only handles actions image push (non-multi-platform)
 
     if [ "$BUILD_ACTIONS" = true ]; then
+        log_info "Pushing actions images to GitHub Container Registry..."
         for tag in "${TAGS[@]}"; do
             log_info "Pushing ${ACTIONS_REGISTRY_IMAGE}:${tag}"
             docker push "${ACTIONS_REGISTRY_IMAGE}:${tag}"
@@ -260,6 +286,7 @@ main() {
     log_info "Git SHA: ${GIT_SHA}"
     [ -n "$GIT_TAG" ] && log_info "Git Tag: ${GIT_TAG}"
 
+    check_docker_buildx
     check_ghcr_auth
 
     if [ "$BUILD_FRONTEND" = true ]; then

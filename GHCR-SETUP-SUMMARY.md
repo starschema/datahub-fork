@@ -9,11 +9,13 @@ This document summarizes the GitHub Container Registry (GHCR) setup for custom D
 **Location:** `docker/build-push-images.sh`
 
 A comprehensive script that:
-- Builds custom frontend and actions images
+- Builds custom frontend image for **multiple platforms** (linux/amd64, linux/arm64)
+- Builds custom actions image for native platform
 - Tags them with git SHA and latest
 - Pushes to GitHub Container Registry
 - Supports selective building (frontend-only, actions-only)
 - Provides colored output and progress tracking
+- Uses Docker Buildx for multi-platform builds
 
 **Usage:**
 ```bash
@@ -81,10 +83,11 @@ Complete guide covering:
 Automated CI/CD workflow that:
 - Detects when frontend or actions code changes
 - Builds only the images that need updating
+- Builds frontend for **multiple platforms** (linux/amd64, linux/arm64)
 - Pushes to GHCR automatically on commits to main/master
 - Supports manual triggering
 - Builds on releases/tags
-- Uses GitHub's cache for faster builds
+- Uses Docker Buildx with GitHub's cache for faster builds
 - Requires no secrets (uses automatic GITHUB_TOKEN)
 
 **Triggers:**
@@ -103,14 +106,20 @@ Automated CI/CD workflow that:
 
 ### Image Paths
 
-**Frontend Image:**
+**Frontend Image (Multi-Architecture):**
 ```
 ghcr.io/rykalc/custom-datahub-frontend-react:latest
 ghcr.io/rykalc/custom-datahub-frontend-react:hcltech
 ghcr.io/rykalc/custom-datahub-frontend-react:<git-sha>
 ```
 
-**Actions Image:**
+**Supported Platforms:**
+- `linux/amd64` - Intel/AMD 64-bit (Linux servers, Intel Macs)
+- `linux/arm64` - ARM 64-bit (Apple Silicon M1/M2/M3 Macs)
+
+Docker automatically selects the correct architecture when pulling.
+
+**Actions Image (Native Platform):**
 ```
 ghcr.io/rykalc/datahub-actions:latest
 ghcr.io/rykalc/datahub-actions:<git-sha>
@@ -225,9 +234,10 @@ Team members need a GitHub Personal Access Token:
 ### Other Advantages
 1. **Consistency:** Everyone uses the same images
 2. **Onboarding:** New team members get started faster
-3. **CI/CD:** Automated builds ensure images are always up to date
-4. **Version control:** Images tagged with git commits for reproducibility
-5. **Bandwidth:** Team members download once, not build repeatedly
+3. **Cross-Platform:** Works on both Intel/AMD and Apple Silicon Macs
+4. **CI/CD:** Automated builds ensure images are always up to date
+5. **Version control:** Images tagged with git commits for reproducibility
+6. **Bandwidth:** Team members download once, not build repeatedly
 
 ---
 
@@ -307,6 +317,11 @@ Changes: [describe what changed]
 4. **GitHub Actions fails**
    - Check workflow permissions in repository settings
    - Verify GITHUB_TOKEN has package write permissions
+
+5. **"no matching manifest for linux/amd64" or platform errors**
+   - Image was built before multi-arch support was added
+   - Rebuild and push a new version: `./build-push-images.sh`
+   - Verify multi-arch manifest: `docker manifest inspect ghcr.io/rykalc/custom-datahub-frontend-react:latest`
 
 ---
 
