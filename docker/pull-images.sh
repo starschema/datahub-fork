@@ -21,7 +21,7 @@
 set -euo pipefail
 
 # Configuration
-GITHUB_USER="rykalc"
+GITHUB_USER="starschema"
 REGISTRY="ghcr.io"
 
 # Image names

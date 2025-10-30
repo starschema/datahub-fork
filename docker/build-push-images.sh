@@ -24,7 +24,7 @@
 set -euo pipefail
 
 # Configuration
-GITHUB_USER="rykalc"
+GITHUB_USER="starschema"
 GITHUB_REPO="Custom-Datahub"
 REGISTRY="ghcr.io"
 

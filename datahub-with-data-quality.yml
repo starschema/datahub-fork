@@ -32,7 +32,7 @@ services:
     hostname: datahub-frontend-react
     # Use GHCR image by default, fallback to local if not available
     # To use local image: export DATAHUB_FRONTEND_IMAGE=custom-datahub-frontend-react:hcltech
-    image: ${DATAHUB_FRONTEND_IMAGE:-ghcr.io/rykalc/custom-datahub-frontend-react:latest}
+    image: ${DATAHUB_FRONTEND_IMAGE:-ghcr.io/starschema/custom-datahub-frontend-react:latest}
     ports:
       - ${DATAHUB_MAPPED_FRONTEND_PORT:-9002}:9002
     environment:
@@ -115,7 +115,7 @@ services:
     hostname: actions
     # Use GHCR image by default, fallback to local if not available
     # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/rykalc/datahub-actions:latest}
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080

@@ -37,7 +37,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  GITHUB_USER: rykalc
+  GITHUB_USER: starschema
   FRONTEND_IMAGE_NAME: custom-datahub-frontend-react
   ACTIONS_IMAGE_NAME: datahub-actions
 
