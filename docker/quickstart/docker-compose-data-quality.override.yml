@@ -8,7 +8,7 @@ services:
   datahub-actions:
     # Use GHCR image by default, fallback to local if not available
     # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/rykalc/datahub-actions:latest}
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
     volumes:
       # Mount both executor and data quality configuration files
       - ../../executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro

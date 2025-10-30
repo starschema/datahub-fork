@@ -36,12 +36,12 @@ If you prefer to pull images manually:
 
 ```bash
 # Pull frontend image
-docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
-docker tag ghcr.io/rykalc/custom-datahub-frontend-react:latest custom-datahub-frontend-react:hcltech
+docker pull ghcr.io/starschema/custom-datahub-frontend-react:latest
+docker tag ghcr.io/starschema/custom-datahub-frontend-react:latest custom-datahub-frontend-react:hcltech
 
 # Pull actions image
-docker pull ghcr.io/rykalc/datahub-actions:latest
-docker tag ghcr.io/rykalc/datahub-actions:latest my-datahub-actions:latest
+docker pull ghcr.io/starschema/datahub-actions:latest
+docker tag ghcr.io/starschema/datahub-actions:latest my-datahub-actions:latest
 ```
 
 ### Starting DataHub
@@ -65,7 +65,7 @@ docker compose -f datahub-with-data-quality.yml up -d
 
 ### For Public Repositories
 
-If the `rykalc/Custom-Datahub` repository is public, **no authentication is required** - anyone can pull the images.
+If the `starschema/Custom-Datahub` repository is public, **no authentication is required** - anyone can pull the images.
 
 ### For Private Repositories
 
@@ -100,14 +100,14 @@ You should see: `Login Succeeded`
 Test that you can pull images:
 
 ```bash
-docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
+docker pull ghcr.io/starschema/custom-datahub-frontend-react:latest
 ```
 
 ### Access Permissions
 
 **Repository Owners/Maintainers:** If a team member can't access the images, grant them access:
 
-1. Go to the GitHub repository: https://github.com/rykalc/Custom-Datahub
+1. Go to the GitHub repository: https://github.com/starschema/Custom-Datahub
 2. Click "Packages" on the right sidebar
 3. Click on the image name (e.g., "custom-datahub-frontend-react")
 4. Click "Package settings"
@@ -122,7 +122,7 @@ docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
 
 ### Custom Frontend Image (HCLTech Branding)
 
-**Image:** `ghcr.io/rykalc/custom-datahub-frontend-react`
+**Image:** `ghcr.io/starschema/custom-datahub-frontend-react`
 
 **Features:**
 - HCLTech logo and branding
@@ -144,7 +144,7 @@ Docker automatically pulls the correct architecture for your system.
 
 ### Custom Actions Image (Data Quality + Executor)
 
-**Image:** `ghcr.io/rykalc/datahub-actions`
+**Image:** `ghcr.io/starschema/datahub-actions`
 
 **Features:**
 - Data quality action for automated testing
@@ -166,7 +166,7 @@ Docker automatically pulls the correct architecture for your system.
 If you've made changes to the frontend or actions code and need to push new images:
 
 #### Prerequisites
-1. Have push access to the `rykalc/Custom-Datahub` repository
+1. Have push access to the `starschema/Custom-Datahub` repository
 2. Authenticate with GHCR (with `write:packages` permission)
 3. Docker with Buildx support is installed and running (Docker 19.03+)
 
@@ -242,11 +242,11 @@ As of the latest updates, frontend images are **multi-architecture** and support
 If you see this error:
 1. Pull the latest image version:
    ```bash
-   docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest
+   docker pull ghcr.io/starschema/custom-datahub-frontend-react:latest
    ```
 2. Verify the image has multi-arch support:
    ```bash
-   docker manifest inspect ghcr.io/rykalc/custom-datahub-frontend-react:latest | grep -A 3 "platform"
+   docker manifest inspect ghcr.io/starschema/custom-datahub-frontend-react:latest | grep -A 3 "platform"
    ```
 3. If the image is older (pre-multi-arch), ask maintainers to rebuild and push a new version
 
@@ -257,8 +257,8 @@ If you see this error:
 **Solutions:**
 1. Pull the latest version:
    ```bash
-   docker pull ghcr.io/rykalc/custom-datahub-frontend-react:latest --no-cache
-   docker pull ghcr.io/rykalc/datahub-actions:latest --no-cache
+   docker pull ghcr.io/starschema/custom-datahub-frontend-react:latest --no-cache
+   docker pull ghcr.io/starschema/datahub-actions:latest --no-cache
    ```
 2. Check which version you're running:
    ```bash
