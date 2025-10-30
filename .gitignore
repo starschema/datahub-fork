@@ -132,3 +132,10 @@ datahub-executor/
 datahub-integrations-service/
 metadata-ingestion-modules/acryl-cloud
 
+# Prevent duplicate datahub folder and local-only files
+/datahub/
+CLAUDE.md
+QUERY_BASED_QUALITY_TESTS.md
+SECURITY.md
+temp_logs.txt
+temp_logs2.txt
