@@ -206,7 +206,7 @@ This will:
 #### Verify Images Were Pushed
 
 Check the packages on GitHub:
-- https://github.com/orgs/rykalc/packages?repo_name=Custom-Datahub
+- https://github.com/orgs/starschema/packages?repo_name=Custom-Datahub
 
 ---
 
