@@ -39,6 +39,7 @@ ACTIONS_REGISTRY_IMAGE="${REGISTRY}/${GITHUB_USER}/${ACTIONS_IMAGE_NAME}"
 # Get git commit SHA for tagging
 GIT_SHA=$(git rev-parse --short HEAD)
 GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
+DEV_VERSION="0.0.0.dev0+${GIT_SHA}"
 
 # Default settings
 BUILD_FRONTEND=true
@@ -217,8 +218,8 @@ build_actions() {
             -f docker/datahub-actions/Dockerfile \
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_ENV=full \
-            --build-arg RELEASE_VERSION="${GIT_SHA}" \
-            --build-arg BUNDLED_CLI_VERSION="${GIT_SHA}" \
+            --build-arg RELEASE_VERSION="${DEV_VERSION}" \
+            --build-arg BUNDLED_CLI_VERSION="${DEV_VERSION}" \
             ${BUILDX_TAGS} \
             --push \
             .
@@ -227,8 +228,8 @@ build_actions() {
         docker buildx build \
             -f docker/datahub-actions/Dockerfile \
             --build-arg APP_ENV=full \
-            --build-arg RELEASE_VERSION="${GIT_SHA}" \
-            --build-arg BUNDLED_CLI_VERSION="${GIT_SHA}" \
+            --build-arg RELEASE_VERSION="${DEV_VERSION}" \
+            --build-arg BUNDLED_CLI_VERSION="${DEV_VERSION}" \
             -t "${ACTIONS_IMAGE_NAME}:latest" \
             --load \
             .
