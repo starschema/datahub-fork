@@ -65,18 +65,24 @@ jobs:
             echo "frontend=true" >> $GITHUB_OUTPUT
             echo "actions=true" >> $GITHUB_OUTPUT
           else
-            # Check if frontend files changed
-            if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-web-react|datahub-frontend|docker/datahub-frontend)/'; then
+            # Check if workflow or build scripts changed - rebuild everything
+            if git diff --name-only HEAD^ HEAD | grep -E '^(.github/workflows/build-push-custom-images.yml|docker/build-push-images.sh)'; then
               echo "frontend=true" >> $GITHUB_OUTPUT
-            else
-              echo "frontend=false" >> $GITHUB_OUTPUT
-            fi
-
-            # Check if actions files changed
-            if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-actions|metadata-ingestion|docker/datahub-actions)/'; then
               echo "actions=true" >> $GITHUB_OUTPUT
             else
-              echo "actions=false" >> $GITHUB_OUTPUT
+              # Check if frontend files changed
+              if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-web-react|datahub-frontend|docker/datahub-frontend)/'; then
+                echo "frontend=true" >> $GITHUB_OUTPUT
+              else
+                echo "frontend=false" >> $GITHUB_OUTPUT
+              fi
+
+              # Check if actions files changed
+              if git diff --name-only HEAD^ HEAD | grep -E '^(datahub-actions|metadata-ingestion|docker/datahub-actions)/'; then
+                echo "actions=true" >> $GITHUB_OUTPUT
+              else
+                echo "actions=false" >> $GITHUB_OUTPUT
+              fi
             fi
           fi
 
