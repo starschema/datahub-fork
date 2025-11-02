@@ -220,6 +220,7 @@ build_actions() {
             --build-arg APP_ENV=full \
             --build-arg RELEASE_VERSION="${DEV_VERSION}" \
             --build-arg BUNDLED_CLI_VERSION="${DEV_VERSION}" \
+            --build-arg BUNDLED_VENV_PLUGINS="" \
             ${BUILDX_TAGS} \
             --push \
             .
@@ -230,6 +231,7 @@ build_actions() {
             --build-arg APP_ENV=full \
             --build-arg RELEASE_VERSION="${DEV_VERSION}" \
             --build-arg BUNDLED_CLI_VERSION="${DEV_VERSION}" \
+            --build-arg BUNDLED_VENV_PLUGINS="" \
             -t "${ACTIONS_IMAGE_NAME}:latest" \
             --load \
             .
