@@ -527,117 +527,18 @@ RUN chmod +x /tmp/build_bundled_venvs_unified.sh && \
     chmod +x /tmp/build_bundled_venvs_unified.py
 
 USER datahub
-WORKDIR /tmp
-RUN ./build_bundled_venvs_unified.sh
 
+# Build bundled venvs using our self-contained script
+# Disabled for CI builds - bundled venvs require packages on PyPI
+# The main editable install already has all needed dependencies
+# WORKDIR /tmp
+# RUN ./build_bundled_venvs_unified.sh
 
-# Common venv builder setup for Alpine (slim variant - includes metadata-ingestion)
-# Note: Alpine excludes snowflake_tag_propagation due to spacy/blis build issues on musl/ARM64
-FROM alpine-build AS venv-builder-alpine
+# Remove build scripts to reduce image size
+# USER 0
+# RUN rm -rf /tmp/build_bundled_venvs_unified.py /tmp/build_bundled_venvs_unified.sh
 
-COPY --chown=datahub:datahub ./metadata-ingestion/setup.py /metadata-ingestion/
-COPY --chown=datahub:datahub ./metadata-ingestion/src/datahub/_version.py /metadata-ingestion/src/datahub/
-COPY --chown=datahub:datahub ./datahub-actions/setup.py /datahub-actions/
-COPY --chown=datahub:datahub ./datahub-actions/src/datahub_actions/_version.py /datahub-actions/src/datahub_actions/
-COPY --chown=datahub:datahub ./datahub-actions/README.md /datahub-actions/
-
-USER datahub
-# Exclude snowflake_tag_propagation - depends on spacy/blis which doesn't build on musl/ARM64
-RUN echo "-e /metadata-ingestion/ \n -e /datahub-actions/[kafka,executor,slack,teams,tag_propagation,term_propagation,doc_propagation]" | uv pip compile /dev/stdin | grep -v "\-e" | uv pip install -r /dev/stdin
-USER root
-
-COPY --chown=datahub:datahub ./metadata-ingestion /metadata-ingestion
-COPY --chown=datahub:datahub ./datahub-actions /datahub-actions
-
-USER datahub
-
-ARG RELEASE_VERSION
-RUN test -n "$RELEASE_VERSION"
-RUN --mount=type=bind,source=./python-build/version_updater.py,target=/version_updater.py \
-    python /version_updater.py --directory /metadata-ingestion/ --version "$RELEASE_VERSION" --expected-update-count 1 && \
-    python /version_updater.py --directory /datahub-actions/ --version "$RELEASE_VERSION" --expected-update-count 1
-
-RUN uv pip install -e '/metadata-ingestion/[base,s3-slim,gcs-slim,abs-slim]' && \
-    uv pip install -e '/datahub-actions/[kafka,executor,slack,teams,tag_propagation,term_propagation,doc_propagation]'
-
-
-# Venv builder for locked Alpine variant (only datahub-actions, no metadata-ingestion)
-# Note: Alpine excludes snowflake_tag_propagation due to spacy/blis build issues on musl/ARM64
-FROM alpine-build AS venv-builder-locked-alpine
-
-COPY --chown=datahub:datahub ./datahub-actions/setup.py /datahub-actions/
-COPY --chown=datahub:datahub ./datahub-actions/src/datahub_actions/_version.py /datahub-actions/src/datahub_actions/
-COPY --chown=datahub:datahub ./datahub-actions/README.md /datahub-actions/
-
-USER datahub
-# Exclude snowflake_tag_propagation - depends on spacy/blis which doesn't build on musl/ARM64
-RUN echo "-e /datahub-actions/[kafka,executor,slack,teams,tag_propagation,term_propagation,doc_propagation]" | uv pip compile /dev/stdin | grep -v "\-e" | uv pip install -r /dev/stdin
-USER root
-
-COPY --chown=datahub:datahub ./datahub-actions /datahub-actions
-
-USER datahub
-
-ARG RELEASE_VERSION
-RUN test -n "$RELEASE_VERSION"
-RUN --mount=type=bind,source=./python-build/version_updater.py,target=/version_updater.py \
-    python /version_updater.py --directory /datahub-actions/ --version "$RELEASE_VERSION" --expected-update-count 1
-
-RUN uv pip install -e '/datahub-actions/[kafka,executor,slack,teams,tag_propagation,term_propagation,doc_propagation]'
-
-
-# Common final stage setup for Alpine variants
-FROM alpine-base AS final-alpine-common
-
-USER root
-
-ENV DATAHUB_BUNDLED_VENV_PATH=/opt/datahub/venvs
-COPY --from=bundled-venvs-slim-alpine $DATAHUB_BUNDLED_VENV_PATH $DATAHUB_BUNDLED_VENV_PATH
-
-COPY --from=powerman/dockerize:0.24 /usr/local/bin/dockerize /usr/local/bin
-COPY --chown=datahub:datahub ./docker/datahub-actions/start.sh /start_datahub_actions.sh
-COPY --chown=datahub:datahub ./docker/datahub-actions/readiness-check.sh /readiness-check.sh
-COPY --chown=datahub:datahub ./docker/datahub-actions/config /etc/datahub/actions/system/conf
-
-RUN chmod a+x /start_datahub_actions.sh && \
-    mkdir -p /etc/datahub/actions && \
-    mkdir -p /tmp/datahub/logs/actions/system && \
-    chown -R datahub:datahub /etc/datahub /tmp/datahub
-
-
-# Final Alpine slim variant
-FROM final-alpine-common AS final-slim-alpine
-
-COPY --from=venv-builder-alpine --chown=datahub:datahub /home/datahub/.venv /home/datahub/.venv
-COPY --from=venv-builder-alpine --chown=datahub:datahub /home/datahub/.local/share/uv/python /home/datahub/.local/share/uv/python
-
-COPY --chown=datahub:datahub ./metadata-ingestion /metadata-ingestion
-COPY --chown=datahub:datahub ./datahub-actions /datahub-actions
-
-USER datahub
-WORKDIR $HOME
-
-ENTRYPOINT [ ]
-CMD ["dockerize", "-wait", "${DATAHUB_GMS_PROTOCOL:-http}://$DATAHUB_GMS_HOST:$DATAHUB_GMS_PORT/health", "-timeout", "240s", "/start_datahub_actions.sh"]
-
-
-# Final Alpine locked variant (network blocked, bundled venvs only)
-FROM final-alpine-common AS final-locked-alpine
-
-COPY --from=venv-builder-locked-alpine --chown=datahub:datahub /home/datahub/.venv /home/datahub/.venv
-COPY --from=venv-builder-locked-alpine --chown=datahub:datahub /home/datahub/.local/share/uv/python /home/datahub/.local/share/uv/python
-
-COPY --chown=datahub:datahub ./datahub-actions /datahub-actions
-
-# Block network access to PyPI
-ENV UV_INDEX_URL=http://127.0.0.1:1/simple
-ENV PIP_INDEX_URL=http://127.0.0.1:1/simple
-
-USER datahub
-WORKDIR $HOME
-
-ENTRYPOINT [ ]
-CMD ["dockerize", "-wait", "${DATAHUB_GMS_PROTOCOL:-http}://$DATAHUB_GMS_HOST:$DATAHUB_GMS_PORT/health", "-timeout", "240s", "/start_datahub_actions.sh"]
+# USER datahub
 
 # =============================================================================
 # DEFAULT EXPORT - Use APP_ENV to select variant (defaults to full)
