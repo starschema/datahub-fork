@@ -9,7 +9,7 @@
 #   2. Authenticated with GHCR: docker login ghcr.io -u YOUR_GITHUB_USERNAME
 #   3. Have push permissions to the starschema/Custom-Datahub repository
 #
-# Note: Frontend images are built for multi-platform (linux/amd64, linux/arm64)
+# Note: All images are built for multi-platform (linux/amd64, linux/arm64)
 #
 # Usage:
 #   ./build-push-images.sh [OPTIONS]
@@ -199,26 +199,46 @@ build_frontend() {
 
 # Build actions image
 build_actions() {
-    log_info "Building custom DataHub actions image..."
+    log_info "Building custom DataHub actions image (multi-platform: linux/amd64, linux/arm64)..."
     log_info "This includes data quality and executor actions"
 
     # Build the Docker image from root
     cd ../..
-    docker build \
-        -f docker/datahub-actions/Dockerfile \
-        -t "${ACTIONS_IMAGE_NAME}:latest" \
-        --build-arg APP_ENV=full \
-        --build-arg RELEASE_VERSION="${GIT_SHA}" \
-        .
 
-    log_success "Actions image built successfully"
-
-    # Tag for GHCR
+    # Prepare all tags for buildx
+    BUILDX_TAGS=""
     for tag in "${TAGS[@]}"; do
-        log_info "Tagging actions image as ${ACTIONS_REGISTRY_IMAGE}:${tag}"
-        docker tag "${ACTIONS_IMAGE_NAME}:latest" "${ACTIONS_REGISTRY_IMAGE}:${tag}"
+        BUILDX_TAGS="${BUILDX_TAGS} -t ${ACTIONS_REGISTRY_IMAGE}:${tag}"
     done
 
+    if [ "$PUSH_IMAGES" = true ]; then
+        log_info "Building and pushing multi-platform image to registry..."
+        docker buildx build \
+            -f docker/datahub-actions/Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --build-arg APP_ENV=full \
+            --build-arg RELEASE_VERSION="${GIT_SHA}" \
+            ${BUILDX_TAGS} \
+            --push \
+            .
+    else
+        log_warn "Building for host platform only (--no-push mode)"
+        docker buildx build \
+            -f docker/datahub-actions/Dockerfile \
+            --build-arg APP_ENV=full \
+            --build-arg RELEASE_VERSION="${GIT_SHA}" \
+            -t "${ACTIONS_IMAGE_NAME}:latest" \
+            --load \
+            .
+
+        # Tag for GHCR (local only)
+        for tag in "${TAGS[@]}"; do
+            log_info "Tagging actions image as ${ACTIONS_REGISTRY_IMAGE}:${tag}"
+            docker tag "${ACTIONS_IMAGE_NAME}:latest" "${ACTIONS_REGISTRY_IMAGE}:${tag}"
+        done
+    fi
+
+    log_success "Actions image built successfully"
     cd docker
 }
 
@@ -230,17 +250,9 @@ push_images() {
         return
     fi
 
-    # Note: For multi-platform frontend builds, images are already pushed during docker buildx build
-    # This function only handles actions image push (non-multi-platform)
-
-    if [ "$BUILD_ACTIONS" = true ]; then
-        log_info "Pushing actions images to GitHub Container Registry..."
-        for tag in "${TAGS[@]}"; do
-            log_info "Pushing ${ACTIONS_REGISTRY_IMAGE}:${tag}"
-            docker push "${ACTIONS_REGISTRY_IMAGE}:${tag}"
-        done
-        log_success "Actions image pushed successfully"
-    fi
+    # Note: For multi-platform builds, images are already pushed during docker buildx build
+    # with the --push flag, so no separate push step is needed
+    log_info "Images were pushed during the build step (multi-platform builds)"
 }
 
 # Show summary
