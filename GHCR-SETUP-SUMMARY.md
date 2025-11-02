@@ -100,7 +100,7 @@ Automated CI/CD workflow that:
 ## Image Registry Details
 
 ### Organization and Repository
-- GitHub Organization: `rykalc`
+- GitHub Organization: `starschema`
 - GitHub Repository: `Custom-Datahub`
 - Registry: GitHub Container Registry (ghcr.io)
 
@@ -108,9 +108,9 @@ Automated CI/CD workflow that:
 
 **Frontend Image (Multi-Architecture):**
 ```
-ghcr.io/rykalc/custom-datahub-frontend-react:latest
-ghcr.io/rykalc/custom-datahub-frontend-react:hcltech
-ghcr.io/rykalc/custom-datahub-frontend-react:<git-sha>
+ghcr.io/starschema/custom-datahub-frontend-react:latest
+ghcr.io/starschema/custom-datahub-frontend-react:hcltech
+ghcr.io/starschema/custom-datahub-frontend-react:<git-sha>
 ```
 
 **Supported Platforms:**
@@ -121,8 +121,8 @@ Docker automatically selects the correct architecture when pulling.
 
 **Actions Image (Native Platform):**
 ```
-ghcr.io/rykalc/datahub-actions:latest
-ghcr.io/rykalc/datahub-actions:<git-sha>
+ghcr.io/starschema/datahub-actions:latest
+ghcr.io/starschema/datahub-actions:<git-sha>
 ```
 
 ---
@@ -154,7 +154,7 @@ echo YOUR_PAT | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
 #### 2. **Verify Images on GitHub**
 
 After pushing, verify images are visible:
-- Go to: https://github.com/orgs/rykalc/packages
+- Go to: https://github.com/orgs/starschema/packages
 - You should see:
   - `custom-datahub-frontend-react`
   - `datahub-actions`
@@ -199,7 +199,7 @@ Share these instructions with your colleagues:
 
 ```bash
 # 1. Clone repository (if not already done)
-git clone https://github.com/rykalc/Custom-Datahub.git
+git clone https://github.com/starschema/Custom-Datahub.git
 cd Custom-Datahub
 
 # 2. Authenticate with GHCR (only if repository is private)
@@ -321,7 +321,7 @@ Changes: [describe what changed]
 5. **"no matching manifest for linux/amd64" or platform errors**
    - Image was built before multi-arch support was added
    - Rebuild and push a new version: `./build-push-images.sh`
-   - Verify multi-arch manifest: `docker manifest inspect ghcr.io/rykalc/custom-datahub-frontend-react:latest`
+   - Verify multi-arch manifest: `docker manifest inspect ghcr.io/starschema/custom-datahub-frontend-react:latest`
 
 ---
 
@@ -348,4 +348,4 @@ For issues or questions:
 ---
 
 **Last Updated:** $(date)
-**Repository:** https://github.com/rykalc/Custom-Datahub
+**Repository:** https://github.com/starschema/Custom-Datahub
