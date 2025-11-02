@@ -218,6 +218,7 @@ build_actions() {
             --platform linux/amd64,linux/arm64 \
             --build-arg APP_ENV=full \
             --build-arg RELEASE_VERSION="${GIT_SHA}" \
+            --build-arg BUNDLED_CLI_VERSION="${GIT_SHA}" \
             ${BUILDX_TAGS} \
             --push \
             .
@@ -227,6 +228,7 @@ build_actions() {
             -f docker/datahub-actions/Dockerfile \
             --build-arg APP_ENV=full \
             --build-arg RELEASE_VERSION="${GIT_SHA}" \
+            --build-arg BUNDLED_CLI_VERSION="${GIT_SHA}" \
             -t "${ACTIONS_IMAGE_NAME}:latest" \
             --load \
             .

@@ -179,6 +179,7 @@ jobs:
           build-args: |
             APP_ENV=full
             RELEASE_VERSION=${{ steps.git_sha.outputs.sha }}
+            BUNDLED_CLI_VERSION=${{ steps.git_sha.outputs.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
