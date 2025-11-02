@@ -199,6 +199,7 @@ jobs:
             APP_ENV=full
             RELEASE_VERSION=${{ steps.git_sha.outputs.dev_version }}
             BUNDLED_CLI_VERSION=${{ steps.git_sha.outputs.dev_version }}
+            BUNDLED_VENV_PLUGINS=""
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
