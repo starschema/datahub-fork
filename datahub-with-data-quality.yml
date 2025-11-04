@@ -113,9 +113,10 @@ services:
 
   datahub-actions:
     hostname: actions
-    # Use GHCR image by default, fallback to local if not available
-    # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
+    # Use locally built image with governance plugin
+    # Build it first: cd datahub-actions && docker build -t datahub-actions-with-governance:latest .
+    # Or override: export DATAHUB_ACTIONS_IMAGE=your-custom-actions-image
+    image: ${DATAHUB_ACTIONS_IMAGE:-datahub-actions-with-governance:latest}
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
@@ -136,9 +137,11 @@ services:
       datahub-gms:
         condition: service_healthy
     volumes:
-      # Mount both executor and data quality configuration files
+      # Mount executor, data quality, and governance configuration files
       - ./executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro
       - ./data-quality-action-config.yaml:/etc/datahub/actions/conf/data-quality-action.yaml:ro
+      - ./governance-action-config.yaml:/etc/datahub/actions/conf/governance-action.yaml:ro
+      - ./governance-rules.yml:/etc/datahub/actions/conf/governance-rules.yml:ro
 
   # ===== SETUP & UPGRADE JOBS =====
 

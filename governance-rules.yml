@@ -1,0 +1,153 @@
+# Governance Rules Configuration
+# Rules are evaluated in real-time as entity metadata changes
+
+rules:
+  # Rule 1: Production Dataset Governance
+  # All production datasets must have basic governance metadata
+  - name: production_dataset_governance
+    enabled: true
+
+    scope:
+      entity_types: [DATASET]
+      envs: [PROD]
+
+    checks:
+      - type: requires_owner
+        params:
+          min_owners: 1
+          # Any owner type is acceptable
+
+      - type: requires_description
+        params:
+          min_length: 20  # At least 20 characters
+
+    # Results visible in Governance tab
+    emit_test_results: true
+
+    # Don't create incidents, just report
+    create_incident_on_fail: false
+
+  # Rule 2: Tier 1 Data Governance (Strict)
+  # Critical datasets with tier:1 tag need enhanced governance
+  - name: tier1_governance
+    enabled: true
+
+    scope:
+      entity_types: [DATASET]
+      platforms: [snowflake, bigquery, postgres]
+      envs: [PROD]
+      tags_any:
+        - "urn:li:tag:tier:1"
+        - "urn:li:tag:Tier1"
+
+    checks:
+      - type: requires_owner
+        params:
+          min_owners: 2
+          allowed_types:
+            - DATAOWNER
+            - TECHNICAL_OWNER
+
+      - type: requires_description
+        params:
+          min_length: 50
+
+      - type: requires_glossary_term
+        params:
+          any_of:
+            - "urn:li:glossaryTerm:Classification.PII"
+            - "urn:li:glossaryTerm:Classification.Sensitive"
+            - "urn:li:glossaryTerm:Classification.Financial"
+            - "urn:li:glossaryTerm:Classification.Public"
+
+    emit_test_results: true
+    create_incident_on_fail: true
+
+    incident_config:
+      priority: HIGH
+      custom_type: "TIER1_GOVERNANCE_VIOLATION"
+      assignees:
+        - "urn:li:corpGroup:data-governance-team"
+
+  # Rule 3: PII Data Governance
+  # Datasets with PII must have proper classification and compliance tags
+  - name: pii_data_governance
+    enabled: true
+
+    scope:
+      entity_types: [DATASET]
+      tags_any:
+        - "urn:li:tag:PII"
+        - "urn:li:tag:PersonalData"
+
+    checks:
+      - type: requires_owner
+        params:
+          min_owners: 1
+          allowed_types:
+            - DATAOWNER
+
+      - type: requires_glossary_term
+        params:
+          any_of:
+            - "urn:li:glossaryTerm:Classification.PII"
+
+      - type: requires_tag
+        params:
+          any_of:
+            - "urn:li:tag:GDPR"
+            - "urn:li:tag:CCPA"
+            - "urn:li:tag:ComplianceReviewed"
+
+    emit_test_results: true
+    create_incident_on_fail: true
+
+    incident_config:
+      priority: CRITICAL
+      custom_type: "PII_GOVERNANCE_VIOLATION"
+      assignees:
+        - "urn:li:corpGroup:privacy-team"
+        - "urn:li:corpGroup:data-governance-team"
+
+  # Rule 4: Dashboard Governance
+  # Dashboards must have owners and descriptions
+  - name: dashboard_governance
+    enabled: true
+
+    scope:
+      entity_types: [DASHBOARD]
+      platforms: [looker, tableau, superset, powerbi]
+
+    checks:
+      - type: requires_owner
+        params:
+          min_owners: 1
+
+      - type: requires_description
+        params:
+          min_length: 30
+
+    emit_test_results: true
+    create_incident_on_fail: false
+
+  # Rule 5: Snowflake Production Governance
+  # All Snowflake production tables need proper metadata
+  - name: snowflake_production_governance
+    enabled: true
+
+    scope:
+      entity_types: [DATASET]
+      platforms: [snowflake]
+      envs: [PROD]
+
+    checks:
+      - type: requires_owner
+        params:
+          min_owners: 1
+
+      - type: requires_description
+        params:
+          min_length: 10
+
+    emit_test_results: true
+    create_incident_on_fail: false

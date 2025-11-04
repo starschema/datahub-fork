@@ -10,6 +10,7 @@ echo "Starting DataHub Actions with multiple pipelines..."
 CONFIGS=(
     "/etc/datahub/actions/conf/executor-action.yaml"
     "/etc/datahub/actions/conf/data-quality-action.yaml"
+    "/etc/datahub/actions/conf/governance-action.yaml"
 )
 
 # Build the command with multiple --config flags
