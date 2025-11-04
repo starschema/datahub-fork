@@ -168,7 +168,18 @@ class GovernanceRulesEngine:
                 return False
 
             tags = global_tags.get("tags", [])
-            entity_tag_urns = {tag.get("tag") for tag in tags if isinstance(tag, dict)}
+            # Extract URN from nested tag structure: {"tag": {"urn": "...", "name": "..."}}
+            entity_tag_urns = set()
+            for tag in tags:
+                if isinstance(tag, dict):
+                    tag_obj = tag.get("tag")
+                    if isinstance(tag_obj, dict):
+                        tag_urn = tag_obj.get("urn")
+                        if tag_urn:
+                            entity_tag_urns.add(tag_urn)
+                    elif isinstance(tag_obj, str):
+                        # Handle flat structure if present
+                        entity_tag_urns.add(tag_obj)
 
             # Check if entity has any of the required tags
             has_required_tag = any(
