@@ -1,0 +1,41 @@
+# DataHub Actions Configuration for Governance Bot
+#
+# This configuration file sets up the Governance Action to monitor
+# entity changes and enforce governance rules in real-time.
+#
+# See: https://datahubproject.io/docs/actions/
+
+name: "governance_bot"
+enabled: true
+
+# Source: Where do events come from?
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}"
+      schema_registry_url: "${SCHEMA_REGISTRY_URL:-http://localhost:8081}"
+
+# Action: What happens when events are received?
+action:
+  type: "governance"
+  config:
+    enabled: true
+
+    # Path to governance rules YAML file
+    # Update this path to point to your rules configuration
+    rules_file: "./examples/governance/rules.yml"
+
+# DataHub Connection
+# The action needs to connect to DataHub GMS for GraphQL queries
+# and to emit test results and incidents
+datahub:
+  server: "${DATAHUB_GMS_URL:-http://localhost:8080}"
+
+  # Authentication token (optional for local development, required for production)
+  # Generate a token at: http://localhost:9002/settings/tokens
+  token: "${DATAHUB_SYSTEM_CLIENT_SECRET}"
+
+# Logging Configuration
+logging:
+  level: INFO

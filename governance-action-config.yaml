@@ -1,0 +1,37 @@
+# Governance Action Configuration
+# This action monitors entity changes and enforces governance rules in real-time
+
+name: "governance_bot"
+
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+      schema_registry_url: "http://schema-registry:8081"
+    topic_routes:
+      mcl: "MetadataChangeLog_Versioned_v1"
+      pe: "PlatformEvent_v1"
+
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataset"
+    aspectName:
+      - "ownership"
+      - "globalTags"
+      - "glossaryTerms"
+      - "editableProperties"
+      - "institutionalMemory"
+      - "datasetProperties"
+
+action:
+  type: "governance"
+  config:
+    enabled: true
+    rules_file: "/etc/datahub/actions/conf/governance-rules.yml"
+
+datahub:
+  server: "http://datahub-gms:8080"
+  extra_headers:
+    Authorization: "Basic __datahub_system:JohnSnowKnowsNothing"

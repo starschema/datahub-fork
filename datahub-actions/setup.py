@@ -99,6 +99,7 @@ plugins: Dict[str, Set[str]] = {
     "data_quality": {
         "sqlalchemy>=2.0.0",
     },
+    "governance": set(),  # Uses base framework dependencies only
     "ai_assistant": {
         "fastapi>=0.115.0",
         "uvicorn[standard]>=0.34.0",
@@ -192,6 +193,7 @@ entry_points = {
         "snowflake_tag_propagation = datahub_actions.plugin.action.snowflake.tag_propagator:SnowflakeTagPropagatorAction",
         "doc_propagation = datahub_actions.plugin.action.propagation.docs.propagation_action:DocPropagationAction",
         "data_quality = datahub_actions.plugin.action.data_quality.action:DataQualityAction",
+        "governance = datahub_actions.plugin.action.governance.action:GovernanceAction",
         "ingestion_source_mapper = datahub_actions.plugin.action.ingestion_source_mapper.ingestion_source_mapper:IngestionSourceMapperAction",
     ],
     "datahub_actions.transformer.plugins": [],
