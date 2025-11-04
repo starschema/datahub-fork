@@ -97,7 +97,7 @@ class TestEmitter:
             )
             response.raise_for_status()
 
-            logger.debug(f"Successfully emitted {aspect_name} for {entity_urn} via REST API")
+            logger.info(f"Successfully emitted {aspect_name} for {entity_urn} via REST API")
             return True
 
         except Exception as e:
@@ -163,11 +163,19 @@ class TestEmitter:
                     continue
 
                 # Now create TestInfo aspect
+                # definition must be a nested object per TestInfo schema
                 test_info_dict = {
                     "name": f"{result.rule_name} - {check_result.check_type}",
                     "category": "GOVERNANCE",
                     "description": f"Governance check: {check_result.message}",
-                    "definition": f"Rule: {result.rule_name}, Check: {check_result.check_type}",
+                    "definition": {
+                        "type": "JSON",
+                        "json": json.dumps({
+                            "rule": result.rule_name,
+                            "check": check_result.check_type,
+                            "message": check_result.message
+                        })
+                    }
                 }
 
                 success = self._emit_via_rest(
@@ -179,7 +187,7 @@ class TestEmitter:
 
                 if success:
                     self._created_tests.add(test_urn)
-                    logger.debug(f"Created Test entity: {test_urn}")
+                    logger.info(f"Created Test entity: {test_urn}")
 
             except Exception as e:
                 logger.error(f"Failed to create Test entity {test_urn}: {e}")
