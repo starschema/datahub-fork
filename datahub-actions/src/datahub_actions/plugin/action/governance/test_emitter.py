@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 from typing import Any, List
 
@@ -46,6 +47,62 @@ class TestEmitter:
         """
         self.graph = graph
         self._created_tests = set()  # Track created test entities
+
+    def _emit_via_rest(self, entity_urn: str, entity_type: str, aspect_name: str, aspect_value: dict) -> bool:
+        """
+        Emit aspect via REST API to avoid Avro serialization issues.
+
+        Args:
+            entity_urn: URN of the entity
+            entity_type: Type of entity (e.g., "test", "dataset")
+            aspect_name: Name of the aspect (e.g., "testInfo", "testResults")
+            aspect_value: Aspect data as dictionary
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            import requests
+
+            # Get GMS server URL from graph config
+            gms_url = self.graph.graph.config.server
+
+            payload = {
+                "proposal": {
+                    "entityType": entity_type,
+                    "entityUrn": entity_urn,
+                    "aspectName": aspect_name,
+                    "aspect": {
+                        "contentType": "application/json",
+                        "value": json.dumps(aspect_value)
+                    },
+                    "changeType": "UPSERT"
+                }
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "X-RestLi-Protocol-Version": "2.0.0"
+            }
+
+            # Add auth headers if present
+            if self.graph.graph.config.token:
+                headers["Authorization"] = f"Bearer {self.graph.graph.config.token}"
+
+            response = requests.post(
+                f"{gms_url}/aspects?action=ingestProposal",
+                json=payload,
+                headers=headers,
+                timeout=30
+            )
+            response.raise_for_status()
+
+            logger.debug(f"Successfully emitted {aspect_name} for {entity_urn} via REST API")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to emit {aspect_name} via REST API: {e}", exc_info=True)
+            return False
 
     def emit_results(self, rule_results: List[RuleEvaluationResult]) -> None:
         """
@@ -86,29 +143,43 @@ class TestEmitter:
                 continue
 
             try:
-                # Create Test entity
-                test_info = TestInfoClass(
-                    name=f"{result.rule_name} - {check_result.check_type}",
-                    category="GOVERNANCE",
-                    description=f"Governance check: {check_result.message}",
-                    definition=f"Rule: {result.rule_name}, Check: {check_result.check_type}",
+                # First create TestKey aspect (required for Test entity)
+                # Extract the test ID from URN: urn:li:test:governance.rule_name.check_type
+                test_id = test_urn.split(":")[-1]
+
+                test_key_dict = {
+                    "id": test_id
+                }
+
+                key_success = self._emit_via_rest(
+                    entity_urn=test_urn,
+                    entity_type="test",
+                    aspect_name="testKey",
+                    aspect_value=test_key_dict
                 )
 
-                mcp = MetadataChangeProposal(
-                    entityUrn=test_urn,
-                    entityType="test",
-                    aspectName="testInfo",
-                    aspect=test_info,
-                    changeType="UPSERT",
+                if not key_success:
+                    logger.warning(f"Failed to create TestKey for {test_urn}, skipping testInfo")
+                    continue
+
+                # Now create TestInfo aspect
+                test_info_dict = {
+                    "name": f"{result.rule_name} - {check_result.check_type}",
+                    "category": "GOVERNANCE",
+                    "description": f"Governance check: {check_result.message}",
+                    "definition": f"Rule: {result.rule_name}, Check: {check_result.check_type}",
+                }
+
+                success = self._emit_via_rest(
+                    entity_urn=test_urn,
+                    entity_type="test",
+                    aspect_name="testInfo",
+                    aspect_value=test_info_dict
                 )
 
-                # Try emit_mcp first, fall back to emit
-                if hasattr(self.graph.graph, 'emit_mcp'):
-                    self.graph.graph.emit_mcp(mcp)
-                else:
-                    self.graph.graph.emit(mcp)
-                self._created_tests.add(test_urn)
-                logger.debug(f"Created Test entity: {test_urn}")
+                if success:
+                    self._created_tests.add(test_urn)
+                    logger.debug(f"Created Test entity: {test_urn}")
 
             except Exception as e:
                 logger.error(f"Failed to create Test entity {test_urn}: {e}")
@@ -127,39 +198,34 @@ class TestEmitter:
         for check_result in result.check_results:
             test_urn = make_test_urn(result.rule_name, check_result.check_type)
 
-            test_result_entry = TestResultClass(
-                test=test_urn,
-                type="SUCCESS" if check_result.passed else "FAILURE",
-            )
+            test_result_entry = {
+                "test": test_urn,
+                "type": "SUCCESS" if check_result.passed else "FAILURE",
+            }
 
             if check_result.passed:
                 passing_tests.append(test_result_entry)
             else:
                 failing_tests.append(test_result_entry)
 
-        # Create TestResults aspect
-        test_results = TestResultsClass(
-            passing=passing_tests,
-            failing=failing_tests,
-        )
-
-        mcp = MetadataChangeProposal(
-            entityUrn=result.entity_urn,
-            entityType=None,  # Will be inferred from URN
-            aspectName="testResults",
-            aspect=test_results,
-            changeType="UPSERT",
-        )
+        # Create TestResults aspect as dict
+        test_results_dict = {
+            "passing": passing_tests,
+            "failing": failing_tests,
+        }
 
         try:
-            # Try emit_mcp first, fall back to emit
-            if hasattr(self.graph.graph, 'emit_mcp'):
-                self.graph.graph.emit_mcp(mcp)
-            else:
-                self.graph.graph.emit(mcp)
-            logger.info(
-                f"Emitted TestResults for {result.entity_urn}: "
-                f"{len(passing_tests)} passing, {len(failing_tests)} failing"
+            success = self._emit_via_rest(
+                entity_urn=result.entity_urn,
+                entity_type="dataset",  # Entity type of the entity being tested
+                aspect_name="testResults",
+                aspect_value=test_results_dict
             )
+
+            if success:
+                logger.info(
+                    f"Emitted TestResults for {result.entity_urn}: "
+                    f"{len(passing_tests)} passing, {len(failing_tests)} failing"
+                )
         except Exception as e:
             logger.error(f"Failed to emit TestResults aspect: {e}", exc_info=True)
