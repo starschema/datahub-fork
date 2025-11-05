@@ -173,7 +173,7 @@ jobs:
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "sha=$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo "dev_version=1.0.0.dev0+$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "dev_version=1.0.0+$SHORT_SHA" >> $GITHUB_OUTPUT
 
       - name: Extract metadata
         id: meta

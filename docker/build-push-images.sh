@@ -39,7 +39,7 @@ ACTIONS_REGISTRY_IMAGE="${REGISTRY}/${GITHUB_USER}/${ACTIONS_IMAGE_NAME}"
 # Get git commit SHA for tagging
 GIT_SHA=$(git rev-parse --short HEAD)
 GIT_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
-DEV_VERSION="1.0.0.dev0+${GIT_SHA}"
+DEV_VERSION="1.0.0+${GIT_SHA}"
 
 # Default settings
 BUILD_FRONTEND=true
