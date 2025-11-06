@@ -198,14 +198,16 @@ RUN chmod +x /tmp/build_bundled_venvs_unified.sh && \
 USER datahub
 
 # Build bundled venvs using our self-contained script
-WORKDIR /tmp
-RUN ./build_bundled_venvs_unified.sh
+# Disabled for CI builds - bundled venvs require packages on PyPI
+# The main editable install already has all needed dependencies
+# WORKDIR /tmp
+# RUN ./build_bundled_venvs_unified.sh
 
 # Remove build scripts to reduce image size
-USER 0
-RUN rm -rf /tmp/build_bundled_venvs_unified.py /tmp/build_bundled_venvs_unified.sh
+# USER 0
+# RUN rm -rf /tmp/build_bundled_venvs_unified.py /tmp/build_bundled_venvs_unified.sh
 
-USER datahub
+# USER datahub
 
 # =============================================================================
 # END BUNDLED VENVS SECTION
