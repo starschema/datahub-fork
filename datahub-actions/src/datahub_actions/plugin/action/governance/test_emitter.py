@@ -14,6 +14,7 @@
 
 import json
 import logging
+import os
 from typing import Any, List
 
 from datahub.emitter.mce_builder import make_data_platform_urn
@@ -88,6 +89,13 @@ class TestEmitter:
             # Add auth headers if present
             if self.graph.graph.config.token:
                 headers["Authorization"] = f"Bearer {self.graph.graph.config.token}"
+            else:
+                # Fall back to system auth from environment variables
+                system_client_id = os.environ.get("DATAHUB_SYSTEM_CLIENT_ID")
+                system_client_secret = os.environ.get("DATAHUB_SYSTEM_CLIENT_SECRET")
+                if system_client_id and system_client_secret:
+                    headers["Authorization"] = f"Basic {system_client_id}:{system_client_secret}"
+                    logger.debug("Using system auth from environment variables")
 
             response = requests.post(
                 f"{gms_url}/aspects?action=ingestProposal",
