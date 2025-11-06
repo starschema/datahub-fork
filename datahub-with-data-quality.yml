@@ -117,15 +117,19 @@ services:
 
   datahub-actions:
     hostname: actions
-    build:
-      context: ./datahub-actions
-      dockerfile: Dockerfile
-    # Use GHCR image by default, fallback to local if not available
-    # To use local image: export DATAHUB_ACTIONS_IMAGE=my-datahub-actions:latest
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
-    ports:
-      - "8082:8082"
-    restart: unless-stopped
+    # Use locally built image with governance plugin
+    # Build it first: cd datahub-actions && docker build -t datahub-actions-with-governance:latest .
+    # Or override: export DATAHUB_ACTIONS_IMAGE=your-custom-actions-image
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions-with-governance:latest}
+    command:
+      - /bin/sh
+      - -c
+      - |
+        dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s \
+        datahub actions run \
+          --config /etc/datahub/actions/conf/data-quality-action.yaml
+          # TODO: Re-enable when governance plugin is built into image
+          # --config /etc/datahub/actions/conf/governance-action.yaml
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
