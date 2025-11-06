@@ -174,19 +174,11 @@ class ExecutorAction(Action):
         if config.task_configs:
             task_configs = config.task_configs
         else:
-            # Build default task config
-            task_configs = [
-                TaskConfig(
-                    name="RUN_INGEST",
-                    type="acryl.executor.execution.sub_process_ingestion_task.SubProcessIngestionTask",
-                    configs=dict({}),
-                ),
-                TaskConfig(
-                    name="TEST_CONNECTION",
-                    type="acryl.executor.execution.sub_process_test_connection_task.SubProcessTestConnectionTask",
-                    configs={},
-                ),
-            ]
+            # Don't build default task configs - acryl-executor package now handles
+            # default task registration. Providing empty list to avoid duplicate
+            # registration errors when the global task registry already contains
+            # RUN_INGEST and TEST_CONNECTION tasks.
+            task_configs = []
 
         if not ctx.graph:
             raise Exception(
