@@ -116,7 +116,7 @@ services:
     # Use locally built image with governance plugin
     # Build it first: cd datahub-actions && docker build -t datahub-actions-with-governance:latest .
     # Or override: export DATAHUB_ACTIONS_IMAGE=your-custom-actions-image
-    image: ${DATAHUB_ACTIONS_IMAGE:-datahub-actions-with-governance:latest}
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions-with-governance:latest}
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
@@ -226,8 +226,12 @@ services:
   elasticsearch:
     hostname: elasticsearch
     image: ${DATAHUB_SEARCH_IMAGE:-elasticsearch}:${DATAHUB_SEARCH_TAG:-7.10.1}
-    ports:
-      - ${DATAHUB_MAPPED_ELASTIC_PORT:-9200}:9200
+    # SECURITY: Only expose internally to Docker network, not to host/external IPs
+    # Use 'expose' instead of 'ports' to prevent external access
+    expose:
+      - 9200
+    # ports:  # COMMENTED OUT - DO NOT expose Elasticsearch publicly!
+    #   - ${DATAHUB_MAPPED_ELASTIC_PORT:-9200}:9200
     environment:
       - discovery.type=single-node
       - ${XPACK_SECURITY_ENABLED:-xpack.security.enabled=false}
@@ -265,8 +269,11 @@ services:
     hostname: mysql
     image: mysql:${DATAHUB_MYSQL_VERSION:-8.2}
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --default-authentication-plugin=mysql_native_password
-    ports:
-      - ${DATAHUB_MAPPED_MYSQL_PORT:-3306}:3306
+    # SECURITY: Only expose internally to Docker network, not to host/external IPs
+    expose:
+      - 3306
+    # ports:  # COMMENTED OUT - DO NOT expose MySQL publicly!
+    #   - ${DATAHUB_MAPPED_MYSQL_PORT:-3306}:3306
     environment:
       - MYSQL_DATABASE=datahub
       - MYSQL_USER=datahub
@@ -301,8 +308,12 @@ services:
   broker:
     hostname: broker
     image: ${DATAHUB_CONFLUENT_KAFKA_IMAGE:-confluentinc/cp-kafka}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
-    ports:
-      - ${DATAHUB_MAPPED_KAFKA_BROKER_PORT:-9092}:9092
+    # SECURITY: Only expose internally to Docker network, not to host/external IPs
+    expose:
+      - 9092
+      - 29092
+    # ports:  # COMMENTED OUT - DO NOT expose Kafka publicly!
+    #   - ${DATAHUB_MAPPED_KAFKA_BROKER_PORT:-9092}:9092
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
@@ -329,8 +340,11 @@ services:
   zookeeper:
     hostname: zookeeper
     image: ${DATAHUB_CONFLUENT_ZOOKEEPER_IMAGE:-confluentinc/cp-zookeeper}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
-    ports:
-      - ${DATAHUB_MAPPED_ZK_PORT:-2181}:2181
+    # SECURITY: Only expose internally to Docker network, not to host/external IPs
+    expose:
+      - 2181
+    # ports:  # COMMENTED OUT - DO NOT expose Zookeeper publicly!
+    #   - ${DATAHUB_MAPPED_ZK_PORT:-2181}:2181
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
@@ -347,8 +361,11 @@ services:
   schema-registry:
     hostname: schema-registry
     image: ${DATAHUB_CONFLUENT_SCHEMA_REGISTRY_IMAGE:-confluentinc/cp-schema-registry}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
-    ports:
-      - ${DATAHUB_MAPPED_SCHEMA_REGISTRY_PORT:-8081}:8081
+    # SECURITY: Only expose internally to Docker network, not to host/external IPs
+    expose:
+      - 8081
+    # ports:  # COMMENTED OUT - DO NOT expose Schema Registry publicly!
+    #   - ${DATAHUB_MAPPED_SCHEMA_REGISTRY_PORT:-8081}:8081
     environment:
       - SCHEMA_REGISTRY_HOST_NAME=schemaregistry
       - SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL=PLAINTEXT
