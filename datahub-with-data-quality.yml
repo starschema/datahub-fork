@@ -86,7 +86,7 @@ services:
       - KAFKA_SCHEMAREGISTRY_URL=http://schema-registry:8081
       - MAE_CONSUMER_ENABLED=true
       - MCE_CONSUMER_ENABLED=true
-      - METADATA_SERVICE_AUTH_ENABLED=${METADATA_SERVICE_AUTH_ENABLED:-false}
+      - METADATA_SERVICE_AUTH_ENABLED=${METADATA_SERVICE_AUTH_ENABLED:-true}
       # Neo4j configuration - points to external Neo4j or container
       - NEO4J_USERNAME=neo4j
       - NEO4J_PASSWORD=P@ssword1
