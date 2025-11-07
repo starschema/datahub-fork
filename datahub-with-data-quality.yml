@@ -117,10 +117,16 @@ services:
 
   datahub-actions:
     hostname: actions
-    # Use locally built image with governance plugin
-    # Build it first: cd datahub-actions && docker build -t datahub-actions-with-governance:latest .
-    # Or override: export DATAHUB_ACTIONS_IMAGE=your-custom-actions-image
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions-with-governance:latest}
+    # OLD (Samarth's governance-specific image - doesn't exist in GHCR):
+    # # Use locally built image with governance plugin
+    # # Build it first: cd datahub-actions && docker build -t datahub-actions-with-governance:latest .
+    # # Or override: export DATAHUB_ACTIONS_IMAGE=your-custom-actions-image
+    # image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions-with-governance:latest}
+
+    # NEW (Working image from GHCR - includes governance, data quality, executor, AI assistant):
+    # This image is built by ./docker/build-push-images.sh and pushed to GHCR
+    # To use a different image: export DATAHUB_ACTIONS_IMAGE=your-custom-image
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
     command:
       - /bin/sh
       - -c
@@ -203,13 +209,20 @@ services:
       - METADATA_AUDIT_EVENT_NAME=MetadataAuditEvent_v4
       - METADATA_CHANGE_EVENT_NAME=MetadataChangeEvent_v4
       - METADATA_CHANGE_PROPOSAL_TOPIC_NAME=MetadataChangeProposal_v1
-      - EBEAN_DATASOURCE_HOST=datahub-gms
-      - EBEAN_DATASOURCE_PORT=8080
+      - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
+      - EBEAN_DATASOURCE_HOST=mysql:3306
+      - EBEAN_DATASOURCE_PASSWORD=datahub
+      - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8&enabledTLSProtocols=TLSv1.2
+      - EBEAN_DATASOURCE_USERNAME=datahub
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+      - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-mce-consumer/resources/entity-registry.yml
     depends_on:
       - broker
       - schema-registry
+      - mysql
       - datahub-gms
 
   datahub-mae-consumer:
@@ -227,6 +240,7 @@ services:
       - ELASTICSEARCH_PORT=9200
       - NEO4J_HOST=http://host.docker.internal:7474
       - SKIP_NEO4J_CHECK=true
+      - ENTITY_REGISTRY_CONFIG_PATH=/datahub/datahub-mae-consumer/resources/entity-registry.yml
     depends_on:
       - broker
       - schema-registry
