@@ -129,6 +129,7 @@ services:
       - |
         dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s \
         datahub actions run \
+          --config /etc/datahub/actions/system/conf/executor.yaml \
           --config /etc/datahub/actions/conf/data-quality-action.yaml
           # TODO: Re-enable when governance plugin is built into image
           # --config /etc/datahub/actions/conf/governance-action.yaml
