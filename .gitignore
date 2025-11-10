@@ -132,3 +132,4 @@ datahub-executor/
 datahub-integrations-service/
 metadata-ingestion-modules/acryl-cloud
 
+datahub-isolated-test/
