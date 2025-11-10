@@ -30,6 +30,13 @@ action:
   type: "executor"
   config:
     executor_id: "default"
+    task_configs:
+      - name: "RUN_INGEST"
+        type: "acryl.executor.execution.sub_process_ingestion_task.SubProcessIngestionTask"
+        configs: {}
+      - name: "TEST_CONNECTION"
+        type: "acryl.executor.execution.sub_process_test_connection_task.SubProcessTestConnectionTask"
+        configs: {}
 
 datahub:
   server: "http://datahub-gms:8080"
