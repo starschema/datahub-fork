@@ -146,10 +146,18 @@ export function AIAssistantTab() {
         setPhase('persisted');
 
         try {
-            const response = await persistAssertion(datasetUrn, generateResponse.sql, generateResponse.config, nlRule, {
-                title: `AI: ${nlRule.substring(0, 50)}`,
-                description: `AI-generated assertion: ${nlRule}`,
-            });
+            const response = await persistAssertion(
+                datasetUrn,
+                generateResponse.sql,
+                generateResponse.config,
+                nlRule,
+                {
+                    title: `AI: ${nlRule.substring(0, 50)}`,
+                    description: `AI-generated assertion: ${nlRule}`,
+                },
+                executeResponse?.passed,
+                executeResponse?.metrics,
+            );
             setAssertionUrn(response.assertion_urn);
         } catch (err: any) {
             setError(err.message || 'Persistence failed');

@@ -125,6 +125,8 @@ export async function persistAssertion(
         description?: string;
         tags?: string[];
     },
+    passed?: boolean,
+    metrics?: Record<string, any>,
 ): Promise<PersistResponse> {
     const response = await fetch(`${AI_ASSISTANT_BASE_URL}/persist`, {
         method: 'POST',
@@ -137,6 +139,8 @@ export async function persistAssertion(
             config,
             nl_rule: nlRule,
             metadata,
+            passed,
+            metrics,
         }),
     });
 
