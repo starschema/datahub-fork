@@ -77,26 +77,21 @@ export default defineConfig(async ({ mode }) => {
         changeOrigin: true,
         configure: proxyDebugConfig,
     };
-
+    // Setup proxy to the AI Assistant service (datahub-actions).
+    const aiAssistantProxy = {
+        target: 'http://localhost:8082',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ai-assistant/, ''),
+    };
     const proxyOptions = {
         '/logIn': frontendProxy,
         '/authenticate': frontendProxy,
         '/api/v2/graphql': frontendProxy,
         '/openapi/v1/tracking/track': frontendProxy,
-        '/openapi/v1/files': frontendProxy,
-        '/mfe/config': frontendProxy,
+        '/api/ai-assistant': aiAssistantProxy,
     };
 
-    const isHttps = process.env.REACT_APP_HTTPS === 'true';
-    const devPlugins: PluginOption[] = mode === 'development' ? [injectMeticulous()] : [];
-    if (isHttps) {
-        devPlugins.push(
-            basicSsl({
-                name: 'datahub-dev-ssl',
-                domains: ['localhost'],
-            }),
-        );
-    }
+    const devPlugins = mode === 'development' ? [injectMeticulous()] : [];
 
     return {
         appType: 'spa',

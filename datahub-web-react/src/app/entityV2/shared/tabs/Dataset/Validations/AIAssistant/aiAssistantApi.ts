@@ -1,8 +1,9 @@
 /**
  * API client for AI Assistant backend service.
+ * Uses relative path for automatic dev/production compatibility.
  */
 
-const AI_ASSISTANT_BASE_URL = 'http://localhost:8082';
+const AI_ASSISTANT_BASE_URL = '/api/ai-assistant';
 
 export interface ColumnSchema {
     name: string;
