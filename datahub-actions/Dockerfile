@@ -42,7 +42,7 @@ RUN mkdir -p src/datahub_actions/plugin/action && \
     touch src/datahub_actions/plugin/action/__init__.py
 
 # Install dependencies (this gets cached!)
-RUN pip install -e ".[data_quality,executor,ai_assistant]"
+RUN pip install -e ".[data_quality,executor,ai_assistant,assertion_executor]"
 
 # ==========================================
 # Copy source code AFTER dependencies installed
@@ -75,7 +75,7 @@ RUN WHEEL=$(ls dist/*.whl) && pip install --force-reinstall "${WHEEL}"
 # Build-time assertion: Verify entry points are registered
 RUN python -c "from importlib.metadata import entry_points; \
     eps = [ep.name for ep in entry_points(group='datahub_actions.action.plugins')]; \
-    required = ['data_quality', 'executor', 'governance']; \
+    required = ['data_quality', 'executor', 'governance', 'assertion_executor', 'ingestion_source_mapper']; \
     missing = [r for r in required if r not in eps]; \
     assert not missing, f'Missing entry points: {missing}. Found: {eps}'; \
     print(f'✓ Entry point verification passed: {required}')"

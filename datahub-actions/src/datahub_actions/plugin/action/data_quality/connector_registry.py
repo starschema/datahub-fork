@@ -77,6 +77,8 @@ class ConnectorRegistry:
         self._engines: Dict[str, Engine] = {}
         # Cached map of platform -> list of ingestion sources (each source is a dict)
         self._ingestion_source_cache: Optional[Dict[str, List[Dict[str, Any]]]] = None
+        # O(1) URN-indexed cache for fast source lookup by URN
+        self._source_by_urn_cache: Optional[Dict[str, Dict[str, Any]]] = None
         # Cache for native Snowflake connections keyed by platform name
         self._sf_connections: Dict[str, Any] = {}
 
@@ -173,9 +175,19 @@ class ConnectorRegistry:
                     )
 
             self._ingestion_source_cache = source_map
+
+            # Build O(1) URN-indexed cache for fast lookup
+            urn_map: Dict[str, Dict[str, Any]] = {}
+            for src_list in source_map.values():
+                for src in src_list:
+                    if src.get("urn"):
+                        urn_map[src["urn"]] = src
+            self._source_by_urn_cache = urn_map
+
             if source_map:
                 logger.info(
-                    f"Loaded connection configs for platforms: {', '.join(source_map.keys())}"
+                    f"Loaded connection configs for platforms: {', '.join(source_map.keys())} "
+                    f"({len(urn_map)} sources indexed by URN)"
                 )
             else:
                 logger.info(
@@ -620,7 +632,7 @@ class ConnectorRegistry:
             return None
 
     def find_ingestion_source_for_dataset(self, dataset_urn: str) -> Optional[Dict[str, Any]]:
-        # 0) Check explicit mapping on DatasetProperties.customProperties first
+        # 0) Check explicit mapping on DatasetProperties.customProperties first (OPTIMIZED O(1))
         try:
             if self.graph and getattr(self.graph, "graph", None):
                 base_graph = self.graph.graph
@@ -631,16 +643,17 @@ class ConnectorRegistry:
                     if isinstance(custom, dict):
                         prop_val = custom.get("datahub.ingestion.sourceUrn")
                         if prop_val and isinstance(prop_val, str):
-                            all_sources = self._load_ingestion_sources()
-                            for lst in all_sources.values():
-                                for src in lst:
-                                    if src.get("urn") == prop_val:
-                                        logger.info(
-                                            "Selected ingestion source via custom property: name=%s urn=%s",
-                                            src.get("name"),
-                                            src.get("urn"),
-                                        )
-                                        return src
+                            # Load sources (cached after first call)
+                            self._load_ingestion_sources()
+                            # O(1) URN lookup instead of nested loop
+                            if self._source_by_urn_cache and prop_val in self._source_by_urn_cache:
+                                src = self._source_by_urn_cache[prop_val]
+                                logger.info(
+                                    "Selected ingestion source via custom property (O(1) lookup): name=%s urn=%s",
+                                    src.get("name"),
+                                    src.get("urn"),
+                                )
+                                return src
         except Exception as e:
             logger.debug("Failed reading mapping from DatasetProperties: %s", e)
         """
@@ -653,20 +666,19 @@ class ConnectorRegistry:
             logger.debug(f"Could not parse platform/key from dataset_urn={dataset_urn}")
             return None
 
-        # 1) Try explicit mapping from system metadata (pipelineName)
+        # 1) Try explicit mapping from system metadata (pipelineName) - OPTIMIZED O(1)
         source_urn = self._get_source_urn_from_system_metadata(dataset_urn)
         if source_urn:
-            all_sources = self._load_ingestion_sources()
-            # Flatten per-platform lists into a single list for lookup
-            for src_list in all_sources.values():
-                for src in src_list:
-                    if src.get("urn") == source_urn:
-                        logger.info(
-                            "Selected ingestion source via system metadata: name=%s urn=%s",
-                            src.get("name"),
-                            src.get("urn"),
-                        )
-                        return src
+            self._load_ingestion_sources()
+            # O(1) URN lookup instead of nested loop
+            if self._source_by_urn_cache and source_urn in self._source_by_urn_cache:
+                src = self._source_by_urn_cache[source_urn]
+                logger.info(
+                    "Selected ingestion source via system metadata (O(1) lookup): name=%s urn=%s",
+                    src.get("name"),
+                    src.get("urn"),
+                )
+                return src
 
         # 2) Fall back to recipe pattern selection within platform
         ing = self._load_ingestion_sources()
