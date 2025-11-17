@@ -66,6 +66,7 @@ class AssertionPersistence:
             custom_properties = {
                 "ai_generated": "true",
                 "persistent": "true",
+                "category": "AI_GENERATED",
                 "sql_hash": self._hash_sql(sql),
                 "created_with": "AI Assistant v1",
             }
@@ -128,7 +129,7 @@ class AssertionPersistence:
                     rowCount=metrics.get("row_count"),
                     actualAggValue=(
                         float(metrics.get("result_value"))
-                        if metrics.get("result_value")
+                        if metrics.get("result_value") is not None
                         and str(metrics.get("result_value")).replace(".", "").replace("-", "").isdigit()
                         else None
                     ),
@@ -148,6 +149,9 @@ class AssertionPersistence:
             )
 
         except Exception as e:
+            # TODO: Fix Avro serialization issue with AssertionRunEvent
+            # The auto-generated partitionSpec causes AvroTypeException during serialization
+            # This is a known DataHub SDK issue - assertion is created but result not reported
             logger.error(f"Failed to report assertion result: {e}", exc_info=True)
 
     def _generate_assertion_urn(self, dataset_urn: str, sql: str) -> str:

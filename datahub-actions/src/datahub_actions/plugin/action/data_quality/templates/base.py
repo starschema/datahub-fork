@@ -91,6 +91,15 @@ class BaseTestTemplate(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def get_category(self) -> str:
+        """
+        Return the assertion category.
+
+        Categories: VOLUME, SCHEMA, COLUMN, FRESHNESS, UNIQUENESS, COMPLETENESS, CUSTOM_SQL
+        """
+        pass
+
+    @abstractmethod
     def execute(
         self, profile: Optional[DatasetProfileClass] = None
     ) -> TestResult:
@@ -141,7 +150,10 @@ class BaseTestTemplate(metaclass=ABCMeta):
         return AssertionInfo(
             type=AssertionType.DATASET,
             datasetAssertion=dataset_assertion,
-            customProperties={"test_name": self.test_name},
+            customProperties={
+                "test_name": self.test_name,
+                "category": self.get_category(),
+            },
         )
 
     def build_assertion_result(
