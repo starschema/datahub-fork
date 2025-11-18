@@ -11,6 +11,8 @@ CONFIGS=(
     "/etc/datahub/actions/conf/executor-action.yaml"
     "/etc/datahub/actions/conf/data-quality-action.yaml"
     "/etc/datahub/actions/conf/governance-action.yaml"
+    "/etc/datahub/actions/conf/ingestion-source-mapper-action.yaml"
+    "/etc/datahub/actions/conf/assertion-executor-action.yaml"
 )
 
 # Build the command with multiple --config flags

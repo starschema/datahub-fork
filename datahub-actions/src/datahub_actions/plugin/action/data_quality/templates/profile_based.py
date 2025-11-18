@@ -48,6 +48,9 @@ class TableRowCountTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.ROW_COUNT
 
+    def get_category(self) -> str:
+        return "VOLUME"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_rows = self.params.get("min_rows")
         max_rows = self.params.get("max_rows")
@@ -110,6 +113,9 @@ class TableRowCountEqualsTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.ROW_COUNT
 
+    def get_category(self) -> str:
+        return "VOLUME"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         value = self.params.get("value")
         return AssertionStdParameters(
@@ -159,6 +165,9 @@ class TableColumnCountEqualsTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.COLUMN_COUNT
 
+    def get_category(self) -> str:
+        return "SCHEMA"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         value = self.params.get("value")
         return AssertionStdParameters(
@@ -206,6 +215,9 @@ class TableColumnCountBetweenTest(BaseTestTemplate):
 
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.COLUMN_COUNT
+
+    def get_category(self) -> str:
+        return "SCHEMA"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -270,6 +282,9 @@ class ColumnValuesNotNullTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.NULL_COUNT
 
+    def get_category(self) -> str:
+        return "COMPLETENESS"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         return AssertionStdParameters(
             value=AssertionStdParameter(
@@ -330,6 +345,10 @@ class ColumnValuesUniqueTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.UNIQUE_COUNT
 
+    def get_category(self) -> str:
+        return "UNIQUENESS"
+        return "COLUMN"
+
     def execute(
         self, profile: Optional[DatasetProfileClass] = None
     ) -> TestResult:
@@ -389,6 +408,9 @@ class ColumnMinBetweenTest(BaseTestTemplate):
 
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.MIN
+
+    def get_category(self) -> str:
+        return "COLUMN"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -461,6 +483,9 @@ class ColumnMaxBetweenTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.MAX
 
+    def get_category(self) -> str:
+        return "COLUMN"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
         max_value = self.params.get("max_value")
@@ -531,6 +556,9 @@ class ColumnMeanBetweenTest(BaseTestTemplate):
 
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.MEAN
+
+    def get_category(self) -> str:
+        return "COLUMN"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -603,6 +631,9 @@ class ColumnMedianBetweenTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.MEDIAN
 
+    def get_category(self) -> str:
+        return "COLUMN"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
         max_value = self.params.get("max_value")
@@ -674,6 +705,9 @@ class ColumnStddevBetweenTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.STDDEV
 
+    def get_category(self) -> str:
+        return "COLUMN"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
         max_value = self.params.get("max_value")
@@ -744,6 +778,10 @@ class ColumnDistinctCountBetweenTest(BaseTestTemplate):
 
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.UNIQUE_COUNT
+
+    def get_category(self) -> str:
+        return "UNIQUENESS"
+        return "COLUMN"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -818,6 +856,10 @@ class ColumnUniqueProportionBetweenTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.UNIQUE_PROPOTION
 
+    def get_category(self) -> str:
+        return "UNIQUENESS"
+        return "COLUMN"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
         max_value = self.params.get("max_value")
@@ -891,6 +933,9 @@ class ColumnNullCountEqualsTest(BaseTestTemplate):
     def get_aggregation(self) -> AssertionStdAggregation:
         return AssertionStdAggregation.NULL_COUNT
 
+    def get_category(self) -> str:
+        return "COMPLETENESS"
+
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         value = self.params.get("value")
         return AssertionStdParameters(
@@ -929,6 +974,298 @@ class ColumnNullCountEqualsTest(BaseTestTemplate):
             native_results={
                 "actual_null_count": str(actual_null_count),
                 "expected_count": str(expected_count),
+                "status": "PASS" if success else "FAIL",
+            },
+        )
+
+
+class DatasetProfileFreshnessTest(BaseTestTemplate):
+    """
+    Validate dataset profile was updated within specified time window.
+
+    Uses profile timestamp to check data freshness.
+    """
+
+    def get_test_type(self) -> str:
+        return "dataset_profile_freshness"
+
+    def get_scope(self) -> DatasetAssertionScope:
+        return DatasetAssertionScope.DATASET_ROWS
+
+    def get_operator(self) -> AssertionStdOperator:
+        return AssertionStdOperator.LESS_THAN
+
+    def get_aggregation(self) -> AssertionStdAggregation:
+        return AssertionStdAggregation._NATIVE_
+
+    def get_category(self) -> str:
+        return "FRESHNESS"
+
+    def get_parameters(self) -> Optional[AssertionStdParameters]:
+        max_age_hours = self.params.get("max_age_hours")
+        return AssertionStdParameters(
+            value=AssertionStdParameter(
+                value=str(max_age_hours) if max_age_hours else None,
+                type=AssertionStdParameterType.NUMBER,
+            ),
+        )
+
+    def execute(
+        self, profile: Optional[DatasetProfileClass] = None
+    ) -> TestResult:
+        import time
+
+        if profile is None or profile.timestampMillis is None:
+            return TestResult(
+                success=False,
+                native_results={"error": "Profile timestamp not available"},
+            )
+
+        max_age_hours = float(self.params.get("max_age_hours", 24))
+        max_age_ms = max_age_hours * 60 * 60 * 1000
+
+        current_time_ms = int(round(time.time() * 1000))
+        profile_age_ms = current_time_ms - profile.timestampMillis
+        profile_age_hours = profile_age_ms / (60 * 60 * 1000)
+
+        success = profile_age_ms <= max_age_ms
+
+        return TestResult(
+            success=success,
+            actual_value=str(profile_age_hours),
+            native_results={
+                "profile_age_hours": f"{profile_age_hours:.2f}",
+                "max_age_hours": str(max_age_hours),
+                "profile_timestamp": str(profile.timestampMillis),
+                "status": "PASS" if success else "FAIL",
+            },
+        )
+
+
+class ColumnNullPercentageBetweenTest(BaseTestTemplate):
+    """Validate column null percentage is within acceptable range."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.column:
+            raise ValueError("column parameter is required for column_null_percentage_between test")
+
+    def get_test_type(self) -> str:
+        return "column_null_percentage_between"
+
+    def get_scope(self) -> DatasetAssertionScope:
+        return DatasetAssertionScope.DATASET_COLUMN
+
+    def get_operator(self) -> AssertionStdOperator:
+        return AssertionStdOperator.BETWEEN
+
+    def get_aggregation(self) -> AssertionStdAggregation:
+        return AssertionStdAggregation.NULL_PROPORTION
+
+    def get_category(self) -> str:
+        return "COMPLETENESS"
+
+    def get_parameters(self) -> Optional[AssertionStdParameters]:
+        min_percentage = self.params.get("min_percentage", 0)
+        max_percentage = self.params.get("max_percentage", 100)
+        return AssertionStdParameters(
+            minValue=AssertionStdParameter(
+                value=str(float(min_percentage) / 100.0),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+            maxValue=AssertionStdParameter(
+                value=str(float(max_percentage) / 100.0),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+        )
+
+    def execute(
+        self, profile: Optional[DatasetProfileClass] = None
+    ) -> TestResult:
+        if profile is None or not profile.fieldProfiles or profile.rowCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": "Profile data not available"},
+            )
+
+        field_profile = next(
+            (fp for fp in profile.fieldProfiles if fp.fieldPath == self.column), None
+        )
+
+        if field_profile is None or field_profile.nullCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": f"Null count not available for column '{self.column}'"},
+            )
+
+        null_percentage = (float(field_profile.nullCount) / float(profile.rowCount) * 100.0) if profile.rowCount > 0 else 0.0
+        min_percentage = float(self.params.get("min_percentage", 0))
+        max_percentage = float(self.params.get("max_percentage", 100))
+
+        success = min_percentage <= null_percentage <= max_percentage
+
+        return TestResult(
+            success=success,
+            actual_value=str(null_percentage),
+            native_results={
+                "actual_null_percentage": f"{null_percentage:.2f}%",
+                "null_count": str(field_profile.nullCount),
+                "row_count": str(profile.rowCount),
+                "min_percentage": f"{min_percentage}%",
+                "max_percentage": f"{max_percentage}%",
+                "status": "PASS" if success else "FAIL",
+            },
+        )
+
+
+class ColumnCompletenessPercentageBetweenTest(BaseTestTemplate):
+    """Validate column completeness percentage (non-null %) is within range."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.column:
+            raise ValueError("column parameter is required for column_completeness_percentage_between test")
+
+    def get_test_type(self) -> str:
+        return "column_completeness_percentage_between"
+
+    def get_scope(self) -> DatasetAssertionScope:
+        return DatasetAssertionScope.DATASET_COLUMN
+
+    def get_operator(self) -> AssertionStdOperator:
+        return AssertionStdOperator.BETWEEN
+
+    def get_aggregation(self) -> AssertionStdAggregation:
+        return AssertionStdAggregation._NATIVE_
+
+    def get_category(self) -> str:
+        return "COMPLETENESS"
+
+    def get_parameters(self) -> Optional[AssertionStdParameters]:
+        min_percentage = self.params.get("min_percentage", 0)
+        max_percentage = self.params.get("max_percentage", 100)
+        return AssertionStdParameters(
+            minValue=AssertionStdParameter(
+                value=str(min_percentage),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+            maxValue=AssertionStdParameter(
+                value=str(max_percentage),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+        )
+
+    def execute(
+        self, profile: Optional[DatasetProfileClass] = None
+    ) -> TestResult:
+        if profile is None or not profile.fieldProfiles or profile.rowCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": "Profile data not available"},
+            )
+
+        field_profile = next(
+            (fp for fp in profile.fieldProfiles if fp.fieldPath == self.column), None
+        )
+
+        if field_profile is None or field_profile.nullCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": f"Null count not available for column '{self.column}'"},
+            )
+
+        non_null_count = profile.rowCount - field_profile.nullCount
+        completeness_percentage = (float(non_null_count) / float(profile.rowCount) * 100.0) if profile.rowCount > 0 else 0.0
+        min_percentage = float(self.params.get("min_percentage", 0))
+        max_percentage = float(self.params.get("max_percentage", 100))
+
+        success = min_percentage <= completeness_percentage <= max_percentage
+
+        return TestResult(
+            success=success,
+            actual_value=str(completeness_percentage),
+            native_results={
+                "actual_completeness_percentage": f"{completeness_percentage:.2f}%",
+                "non_null_count": str(non_null_count),
+                "row_count": str(profile.rowCount),
+                "min_percentage": f"{min_percentage}%",
+                "max_percentage": f"{max_percentage}%",
+                "status": "PASS" if success else "FAIL",
+            },
+        )
+
+
+class ColumnUniquenessPercentageBetweenTest(BaseTestTemplate):
+    """Validate column uniqueness percentage (unique values / total values) is within range."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.column:
+            raise ValueError("column parameter is required for column_uniqueness_percentage_between test")
+
+    def get_test_type(self) -> str:
+        return "column_uniqueness_percentage_between"
+
+    def get_scope(self) -> DatasetAssertionScope:
+        return DatasetAssertionScope.DATASET_COLUMN
+
+    def get_operator(self) -> AssertionStdOperator:
+        return AssertionStdOperator.BETWEEN
+
+    def get_aggregation(self) -> AssertionStdAggregation:
+        return AssertionStdAggregation.UNIQUE_PROPOTION
+
+    def get_category(self) -> str:
+        return "UNIQUENESS"
+
+    def get_parameters(self) -> Optional[AssertionStdParameters]:
+        min_percentage = self.params.get("min_percentage", 0)
+        max_percentage = self.params.get("max_percentage", 100)
+        return AssertionStdParameters(
+            minValue=AssertionStdParameter(
+                value=str(float(min_percentage) / 100.0),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+            maxValue=AssertionStdParameter(
+                value=str(float(max_percentage) / 100.0),
+                type=AssertionStdParameterType.NUMBER,
+            ),
+        )
+
+    def execute(
+        self, profile: Optional[DatasetProfileClass] = None
+    ) -> TestResult:
+        if profile is None or not profile.fieldProfiles or profile.rowCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": "Profile data not available"},
+            )
+
+        field_profile = next(
+            (fp for fp in profile.fieldProfiles if fp.fieldPath == self.column), None
+        )
+
+        if field_profile is None or field_profile.uniqueCount is None:
+            return TestResult(
+                success=False,
+                native_results={"error": f"Unique count not available for column '{self.column}'"},
+            )
+
+        uniqueness_percentage = (float(field_profile.uniqueCount) / float(profile.rowCount) * 100.0) if profile.rowCount > 0 else 0.0
+        min_percentage = float(self.params.get("min_percentage", 0))
+        max_percentage = float(self.params.get("max_percentage", 100))
+
+        success = min_percentage <= uniqueness_percentage <= max_percentage
+
+        return TestResult(
+            success=success,
+            actual_value=str(uniqueness_percentage),
+            native_results={
+                "actual_uniqueness_percentage": f"{uniqueness_percentage:.2f}%",
+                "unique_count": str(field_profile.uniqueCount),
+                "row_count": str(profile.rowCount),
+                "min_percentage": f"{min_percentage}%",
+                "max_percentage": f"{max_percentage}%",
                 "status": "PASS" if success else "FAIL",
             },
         )

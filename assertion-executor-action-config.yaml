@@ -1,0 +1,36 @@
+# Assertion Executor Action Configuration
+# This action automatically executes assertions when datasets are ingested or profiled
+
+name: "assertion_executor"
+
+source:
+  type: "kafka"
+  config:
+    connection:
+      bootstrap: "broker:29092"
+      schema_registry_url: "http://schema-registry:8081"
+    topic_routes:
+      mcl: "MetadataChangeLog_Versioned_v1"
+      pe: "PlatformEvent_v1"
+
+filter:
+  event_type: "MetadataChangeLogEvent_v1"
+  event:
+    entityType: "dataset"
+    aspectName:
+      - "status"  # Triggers ON_INGESTION assertions
+      - "datasetProfile"  # Triggers ON_PROFILE assertions
+
+action:
+  type: "assertion_executor"
+  config:
+    enabled: true
+    trigger_on_ingestion: true  # Execute assertions when datasets are ingested
+    trigger_on_profile: true  # Execute assertions when datasets are profiled
+    max_retries: 2
+    timeout_seconds: 60
+    emit_results: true  # Emit AssertionRunEvent results
+
+datahub:
+  server: "http://datahub-gms:8080"
+  # Authentication handled automatically via DATAHUB_SYSTEM_CLIENT_ID and DATAHUB_SYSTEM_CLIENT_SECRET env vars

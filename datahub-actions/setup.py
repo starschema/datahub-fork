@@ -55,6 +55,10 @@ base_requirements = {
     "azure-identity==1.21.0",
     "aws-msk-iam-sasl-signer-python==1.0.2",
     "h11>=0.16",
+    # Needed for loading ingestion source configs with classification transformers
+    f"acryl-datahub-classify{_self_pin}",
+    # Needed for SQL parsing in connector registry
+    "sqlparse",
 }
 
 framework_common = {
@@ -94,8 +98,13 @@ plugins: Dict[str, Set[str]] = {
     "doc_propagation": set(),
     "data_quality": {
         "sqlalchemy>=2.0.0",
+        f"acryl-datahub[snowflake-slim]{_self_pin}",  # Needs Snowflake connector for execution
     },
     "governance": set(),  # Uses base framework dependencies only
+    "assertion_executor": {
+        "sqlalchemy>=2.0.0",  # Needs SQL connectors like data_quality
+        f"acryl-datahub[snowflake-slim]{_self_pin}",  # Needs Snowflake connector for execution
+    },
     "ai_assistant": {
         "fastapi>=0.115.0",
         "uvicorn[standard]>=0.34.0",
@@ -191,6 +200,7 @@ entry_points = {
         "data_quality = datahub_actions.plugin.action.data_quality.action:DataQualityAction",
         "governance = datahub_actions.plugin.action.governance.action:GovernanceAction",
         "ingestion_source_mapper = datahub_actions.plugin.action.ingestion_source_mapper.ingestion_source_mapper:IngestionSourceMapperAction",
+        "assertion_executor = datahub_actions.plugin.action.assertion_executor.action:AssertionExecutorAction",
     ],
     "datahub_actions.transformer.plugins": [],
     "datahub_actions.source.plugins": [],

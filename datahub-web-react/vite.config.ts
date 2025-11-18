@@ -44,11 +44,18 @@ export default defineConfig(async ({ mode }) => {
         target: process.env.REACT_APP_PROXY_TARGET || 'http://localhost:9002',
         changeOrigin: true,
     };
+    // Setup proxy to the AI Assistant service (datahub-actions).
+    const aiAssistantProxy = {
+        target: 'http://localhost:8082',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ai-assistant/, ''),
+    };
     const proxyOptions = {
         '/logIn': frontendProxy,
         '/authenticate': frontendProxy,
         '/api/v2/graphql': frontendProxy,
         '/openapi/v1/tracking/track': frontendProxy,
+        '/api/ai-assistant': aiAssistantProxy,
     };
 
     const devPlugins = mode === 'development' ? [injectMeticulous()] : [];

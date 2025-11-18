@@ -1,8 +1,9 @@
 /**
  * API client for AI Assistant backend service.
+ * Uses relative path for automatic dev/production compatibility.
  */
 
-const AI_ASSISTANT_BASE_URL = 'http://localhost:8082';
+const AI_ASSISTANT_BASE_URL = '/api/ai-assistant';
 
 export interface ColumnSchema {
     name: string;
@@ -124,6 +125,8 @@ export async function persistAssertion(
         description?: string;
         tags?: string[];
     },
+    passed?: boolean,
+    metrics?: Record<string, any>,
 ): Promise<PersistResponse> {
     const response = await fetch(`${AI_ASSISTANT_BASE_URL}/persist`, {
         method: 'POST',
@@ -136,6 +139,8 @@ export async function persistAssertion(
             config,
             nl_rule: nlRule,
             metadata,
+            passed,
+            metrics,
         }),
     });
 
