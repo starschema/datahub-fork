@@ -1,13 +1,9 @@
-# DataHub with Data Quality & AI Assistant (Production-Grade)
+# DataHub with Data Quality & AI Assistant Support
 #
 # This unified Docker Compose file includes:
 # - All standard DataHub services (GMS, Frontend, Elasticsearch, MySQL, Kafka, etc.)
 # - Custom datahub-actions container with executor + data_quality + AI assistant
 # - Optional Neo4j container (commented out - uncomment if not using external Neo4j)
-#
-# PRODUCTION NOTES:
-# - AI Assistant API (port 8082) is NOT exposed externally - access via nginx proxy
-# - For local development with direct port access, use datahub_deployment_local.yml
 #
 # Usage:
 #   docker compose -f datahub-with-data-quality.yml up -d
@@ -22,10 +18,6 @@
 #   Ensure config files exist:
 #     - executor-action-config.yaml
 #     - data-quality-action-config.yaml
-#   1. Ensure config files exist in same directory:
-#      - executor-action-config.yaml
-#      - data-quality-action-config.yaml
-#   2. The datahub-actions image will be built automatically from ./datahub-actions/Dockerfile
 
 version: '3.9'
 
@@ -139,8 +131,9 @@ services:
     # # For production: export DATAHUB_ACTIONS_IMAGE=ghcr.io/starschema/datahub-actions-with-governance:latest
     # image: ${DATAHUB_ACTIONS_IMAGE:-datahub-actions-local:latest}
     restart: unless-stopped
-    # NOTE: Port 8082 not exposed in production - access via nginx proxy: /api/ai-assistant -> http://actions:8082
-    # For local dev with port access, use datahub_deployment_local.yml instead
+    ports:
+      - "127.0.0.1:8082:8082"  # AI Assistant API - For local dev only (yarn start)
+    # Note: In production, remove ports and use nginx proxy: /api/ai-assistant -> http://actions:8082
 
     # NEW (Working image from GHCR - includes governance, data quality, executor, AI assistant):
     # This image is built by ./docker/build-push-images.sh and pushed to GHCR
