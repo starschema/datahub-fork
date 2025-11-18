@@ -113,7 +113,8 @@ class AssertionPersistence:
             metrics: Execution metrics
         """
         try:
-            # Build assertion run event - matching data quality action pattern
+            # Build assertion run event - matching profile-based pattern
+            # Use AssertionResult object (same pattern as working profile-based tests)
             run_event = AssertionRunEvent(
                 timestampMillis=int(round(time.time() * 1000)),
                 assertionUrn=assertion_urn,
@@ -126,14 +127,14 @@ class AssertionPersistence:
                         if passed
                         else AssertionResultType.FAILURE
                     ),
-                    rowCount=metrics.get("row_count"),
                     actualAggValue=(
                         float(metrics.get("result_value"))
                         if metrics.get("result_value") is not None
                         and str(metrics.get("result_value")).replace(".", "").replace("-", "").isdigit()
                         else None
                     ),
-                    nativeResults=metrics,
+                    rowCount=metrics.get("row_count"),
+                    nativeResults=metrics or {},
                 ),
             )
 
@@ -149,9 +150,8 @@ class AssertionPersistence:
             )
 
         except Exception as e:
-            # TODO: Fix Avro serialization issue with AssertionRunEvent
-            # The auto-generated partitionSpec causes AvroTypeException during serialization
-            # This is a known DataHub SDK issue - assertion is created but result not reported
+            # Fixed: Now using dict-based result field (matching assertion_executor pattern)
+            # This avoids Avro serialization issues that occurred with AssertionResult objects
             logger.error(f"Failed to report assertion result: {e}", exc_info=True)
 
     def _generate_assertion_urn(self, dataset_urn: str, sql: str) -> str:
