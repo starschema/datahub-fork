@@ -189,6 +189,102 @@ public class Application extends Controller {
             });
   }
 
+  /**
+   * Proxies requests to the AI Assistant API service
+   *
+   * <p>This method forwards requests from /api/ai-assistant/* to the actions service
+   * running the AI Assistant API, stripping the /api/ai-assistant prefix.
+   */
+  @Security.Authenticated(Authenticator.class)
+  public CompletableFuture<Result> proxyAiAssistant(String path, Http.Request request) {
+    final String authorizationHeaderValue = getAuthorizationHeaderValueToProxy(request);
+
+    // AI Assistant service configuration - defaults for Docker Compose deployment
+    final String aiAssistantHost =
+        ConfigUtil.getString(config, "aiAssistant.host", "actions");
+    final int aiAssistantPort =
+        ConfigUtil.getInt(config, "aiAssistant.port", 8082);
+    // Internal Docker network - no SSL needed
+    final String protocol = "http";
+
+    // Strip /api/ai-assistant prefix and forward remaining path
+    final String targetPath = "/" + path;
+    final String targetUrl =
+        String.format("%s://%s:%s%s", protocol, aiAssistantHost, aiAssistantPort, targetPath);
+
+    logger.debug("Proxying AI Assistant request to: {}", targetUrl);
+
+    HttpRequest.Builder httpRequestBuilder =
+        HttpRequest.newBuilder().uri(URI.create(targetUrl)).timeout(Duration.ofSeconds(120));
+    httpRequestBuilder.method(request.method(), buildBodyPublisher(request));
+
+    Map<String, List<String>> headers = request.getHeaders().toMap();
+    if (headers.containsKey(Http.HeaderNames.HOST)
+        && !headers.containsKey(Http.HeaderNames.X_FORWARDED_HOST)) {
+      headers.put(Http.HeaderNames.X_FORWARDED_HOST, headers.get(Http.HeaderNames.HOST));
+    }
+    if (!headers.containsKey(Http.HeaderNames.X_FORWARDED_PROTO)) {
+      final String schema =
+          Optional.ofNullable(URI.create(request.uri()).getScheme()).orElse("http");
+      headers.put(Http.HeaderNames.X_FORWARDED_PROTO, List.of(schema));
+    }
+
+    headers.entrySet().stream()
+        .filter(
+            entry ->
+                !RESTRICTED_HEADERS.contains(entry.getKey().toLowerCase())
+                    && !AuthenticationConstants.LEGACY_X_DATAHUB_ACTOR_HEADER.equalsIgnoreCase(
+                        entry.getKey())
+                    && !Http.HeaderNames.CONTENT_TYPE.equalsIgnoreCase(entry.getKey())
+                    && !Http.HeaderNames.AUTHORIZATION.equalsIgnoreCase(entry.getKey()))
+        .forEach(
+            entry -> entry.getValue().forEach(v -> httpRequestBuilder.header(entry.getKey(), v)));
+
+    if (!authorizationHeaderValue.isEmpty()) {
+      httpRequestBuilder.header(Http.HeaderNames.AUTHORIZATION, authorizationHeaderValue);
+    }
+    httpRequestBuilder.header(
+        AuthenticationConstants.LEGACY_X_DATAHUB_ACTOR_HEADER, getDataHubActorHeader(request));
+    request
+        .contentType()
+        .ifPresent(ct -> httpRequestBuilder.header(Http.HeaderNames.CONTENT_TYPE, ct));
+
+    return httpClient
+        .sendAsync(httpRequestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray())
+        .thenApply(
+            apiResponse -> {
+              final ResponseHeader header =
+                  new ResponseHeader(
+                      apiResponse.statusCode(),
+                      apiResponse.headers().map().entrySet().stream()
+                          .filter(
+                              entry ->
+                                  !Http.HeaderNames.CONTENT_LENGTH.equalsIgnoreCase(entry.getKey()))
+                          .filter(
+                              entry ->
+                                  !Http.HeaderNames.CONTENT_TYPE.equalsIgnoreCase(entry.getKey()))
+                          .map(entry -> Pair.of(entry.getKey(), String.join(";", entry.getValue())))
+                          .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)));
+              final HttpEntity body =
+                  new HttpEntity.Strict(
+                      ByteString.fromArray(apiResponse.body()),
+                      apiResponse.headers().firstValue(Http.HeaderNames.CONTENT_TYPE));
+              return new Result(header, body);
+            })
+        .exceptionally(
+            ex -> {
+              Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+              logger.error("AI Assistant proxy error", cause);
+              if (cause instanceof java.net.http.HttpTimeoutException) {
+                return status(GATEWAY_TIMEOUT, "AI Assistant request timed out.");
+              } else if (cause instanceof java.net.ConnectException) {
+                return status(BAD_GATEWAY, "AI Assistant connection failed: " + cause.getMessage());
+              } else {
+                return internalServerError("AI Assistant proxy error: " + cause.getMessage());
+              }
+            });
+  }
+
   private HttpRequest.BodyPublisher buildBodyPublisher(Http.Request request) {
     if (request.body().asBytes() != null) {
       return HttpRequest.BodyPublishers.ofByteArray(request.body().asBytes().toArray());

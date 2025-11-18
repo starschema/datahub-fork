@@ -22,6 +22,12 @@ GET           /callback/:protocol                                             co
 POST          /callback/:protocol                                             controllers.SsoCallbackController.handleCallback(protocol: String, request: Request)
 GET           /logOut                                                         controllers.CentralLogoutController.executeLogout(request: Request)
 
+# Proxies AI Assistant API requests to the datahub-actions service
+GET           /api/ai-assistant/*path                                     controllers.Application.proxyAiAssistant(path: String, request: Request)
+POST          /api/ai-assistant/*path                                     controllers.Application.proxyAiAssistant(path: String, request: Request)
+DELETE        /api/ai-assistant/*path                                     controllers.Application.proxyAiAssistant(path: String, request: Request)
+PUT           /api/ai-assistant/*path                                     controllers.Application.proxyAiAssistant(path: String, request: Request)
+PATCH         /api/ai-assistant/*path                                     controllers.Application.proxyAiAssistant(path: String, request: Request)
 # Proxies API requests to the metadata service api
 GET           /api/*path                                                      controllers.Application.proxy(path: String, request: Request)
 POST          /api/*path                                                      controllers.Application.proxy(path: String, request: Request)
