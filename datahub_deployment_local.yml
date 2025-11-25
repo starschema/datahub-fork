@@ -138,17 +138,24 @@ services:
     # NEW (Working image from GHCR - includes governance, data quality, executor, AI assistant):
     # This image is built by ./docker/build-push-images.sh and pushed to GHCR
     # To use a different image: export DATAHUB_ACTIONS_IMAGE=your-custom-image
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:latest}
+    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:1fe7eb6f30-fixed6}
     command:
       - /bin/sh
       - -c
       - |
-        dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s \
+        dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s
+        # Start AI Assistant API in background
+        python -m uvicorn datahub_actions.plugin.action.ai_assistant.api:create_app --factory --host 0.0.0.0 --port 8082 &
+        # Start Actions framework (runs in foreground)
         datahub actions run \
           --config /etc/datahub/actions/system/conf/executor.yaml \
           --config /etc/datahub/actions/conf/data-quality-action.yaml
-          # TODO: Re-enable when governance plugin is built into image
-          # --config /etc/datahub/actions/conf/governance-action.yaml
+
+
+
+
+
+
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
@@ -169,13 +176,16 @@ services:
       datahub-gms:
         condition: service_healthy
     volumes:
-      # Mount executor, data quality, governance, assertion executor, and ingestion source mapper configuration files
-      - ./executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro
+      # Mount executor config for ingestion testing (system/conf path)
+      - ./docker/datahub-actions/config/executor.yaml:/etc/datahub/actions/system/conf/executor.yaml:ro
+      # Mount data quality config
       - ./data-quality-action-config.yaml:/etc/datahub/actions/conf/data-quality-action.yaml:ro
-      - ./governance-action-config.yaml:/etc/datahub/actions/conf/governance-action.yaml:ro
-      - ./governance-rules.yml:/etc/datahub/actions/conf/governance-rules.yml:ro
-      - ./ingestion-source-mapper-action-config.yaml:/etc/datahub/actions/conf/ingestion-source-mapper-action.yaml:ro
-      - ./assertion-executor-action-config.yaml:/etc/datahub/actions/conf/assertion-executor-action.yaml:ro
+      # Optional: mount other action configs if they exist
+      # - ./executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro
+      # - ./governance-action-config.yaml:/etc/datahub/actions/conf/governance-action.yaml:ro
+      # - ./governance-rules.yml:/etc/datahub/actions/conf/governance-rules.yml:ro
+      # - ./ingestion-source-mapper-action-config.yaml:/etc/datahub/actions/conf/ingestion-source-mapper-action.yaml:ro
+      # - ./assertion-executor-action-config.yaml:/etc/datahub/actions/conf/assertion-executor-action.yaml:ro
 
   # ===== SETUP & UPGRADE JOBS =====
 

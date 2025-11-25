@@ -79,9 +79,11 @@ def create_app(
         graph = DataHubGraph(config=config)
         logger.info(f"Initialized DataHub graph client: {gms_server}")
 
+    # Wrap DataHubGraph in AcrylDataHubGraph for proper timeseries aspect handling
+    # This wrapper provides the necessary context for emitting AssertionRunEvent
+    acryl_graph = AcrylDataHubGraph(baseGraph=graph)
+
     if connector_registry is None:
-        # Wrap DataHubGraph in AcrylDataHubGraph for ingestion source querying
-        acryl_graph = AcrylDataHubGraph(baseGraph=graph)
         # Create connector registry - will auto-discover from ingestion sources
         connector_registry = ConnectorRegistry({}, graph=acryl_graph)
         logger.info("Initialized connector registry with auto-discovery")
@@ -94,7 +96,7 @@ def create_app(
 
     schema_validator = SchemaValidator(graph)
     sql_executor = SQLExecutor(connector_registry, graph)
-    assertion_persistence = AssertionPersistence(graph)
+    assertion_persistence = AssertionPersistence(acryl_graph)
 
     logger.info("AI Assistant API initialized successfully")
 
@@ -502,23 +504,30 @@ def create_app(
         try:
             logger.info(f"Persist request for {request.dataset_urn}")
 
-            # Persist assertion
-            assertion_urn = assertion_persistence.persist_assertion(
-                dataset_urn=request.dataset_urn,
-                sql=request.sql,
-                config=request.config,
-                nl_rule=request.nl_rule,
-                metadata=request.metadata,
-            )
-
-            # Report execution result if provided
+            # Use new atomic method when result is provided
+            # This follows the Great Expectations ingestion pattern
             if request.passed is not None and request.metrics is not None:
-                logger.info(f"Reporting assertion result: passed={request.passed}")
-                assertion_persistence.report_assertion_result(
-                    assertion_urn=assertion_urn,
+                logger.info(
+                    f"Persisting assertion with result atomically: passed={request.passed}"
+                )
+                assertion_urn = assertion_persistence.persist_assertion_with_result(
                     dataset_urn=request.dataset_urn,
+                    sql=request.sql,
+                    config=request.config,
                     passed=request.passed,
                     metrics=request.metrics,
+                    nl_rule=request.nl_rule,
+                    metadata=request.metadata,
+                )
+            else:
+                # Fallback to old method if only creating assertion without result
+                logger.info("Persisting assertion without result")
+                assertion_urn = assertion_persistence.persist_assertion(
+                    dataset_urn=request.dataset_urn,
+                    sql=request.sql,
+                    config=request.config,
+                    nl_rule=request.nl_rule,
+                    metadata=request.metadata,
                 )
 
             return PersistResponse(assertion_urn=assertion_urn)

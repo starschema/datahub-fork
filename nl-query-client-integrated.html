@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI Query - DataHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+            display: flex;
+            font-size: 13px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .logo-section {
+            padding: 14px 18px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logo-text {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .logo-brand {
+            font-size: 12px;
+            color: #0066CC;
+            font-weight: 700;
+        }
+
+        .logo-product {
+            font-size: 12px;
+            color: #7662e3;
+            font-weight: 600;
+        }
+
+        .nav-section {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .nav-label {
+            padding: 6px 18px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            padding: 7px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+        a.nav-item {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #f5f6fa;
+            color: #262626;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #5b4fde 0%, #7662e3 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: #8c8c8c;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .nav-item.active .nav-icon svg {
+            stroke: white;
+        }
+
+        .nav-item:hover .nav-icon svg {
+            stroke: #262626;
+        }
+
+        .nav-item.active:hover .nav-icon svg {
+            stroke: white;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top header bar */
+        .top-header {
+            background: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #5b4fde;
+            box-shadow: 0 0 0 3px rgba(91, 79, 222, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            border-color: #5b4fde;
+            color: #5b4fde;
+        }
+
+        .view-all-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #5b4fde;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Page content */
+        .page-content {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .greeting {
+            font-size: 22px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .card-title-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #5b4fde 0%, #7662e3 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 9px;
+            background: linear-gradient(135deg, #5b4fde 0%, #7662e3 100%);
+            color: white;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        #questionInput {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        #questionInput:focus {
+            outline: none;
+            border-color: #5b4fde;
+            box-shadow: 0 0 0 2px rgba(91, 79, 222, 0.1);
+        }
+
+        #askButton {
+            padding: 10px 24px;
+            font-size: 12px;
+            font-weight: 500;
+            background: linear-gradient(135deg, #5b4fde 0%, #7662e3 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        #askButton:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(91, 79, 222, 0.3);
+        }
+
+        #askButton:disabled {
+            background: #d9d9d9;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .examples-label {
+            width: 100%;
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .example-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: #f5f6fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #262626;
+        }
+
+        .example-chip:hover {
+            background: #ebebf0;
+            border-color: #5b4fde;
+            color: #5b4fde;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e8e8e8;
+            border-top-color: #5b4fde;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .result-icon {
+            font-size: 20px;
+        }
+
+        .result-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .graphql-query, .json-result {
+            background: #f8f9fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .json-result {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #suggestionBox {
+            display: none;
+            background: #fff9e6;
+            border: 1px solid #ffe58f;
+            border-left: 4px solid #faad14;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .error {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            border-left: 4px solid #ff4d4f;
+            padding: 16px;
+            border-radius: 8px;
+            color: #cf1322;
+        }
+
+        /* URN List Styles */
+        .urn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .urn-item {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .urn-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .urn-header {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .urn-expand-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .urn-item.expanded .urn-expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .urn-platform-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #5b4fde 0%, #7662e3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .urn-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .urn-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 3px;
+        }
+
+        .urn-meta {
+            font-size: 10px;
+            color: #8c8c8c;
+        }
+
+        .urn-select-btn {
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #5b4fde 0%, #7662e3 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .urn-select-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(91, 79, 222, 0.3);
+        }
+
+        .urn-summary {
+            display: none;
+            padding: 0 10px 10px 10px;
+            border-top: 1px solid #f0f0f0;
+            margin-top: 8px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .urn-item.expanded .urn-summary {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary-loading {
+            text-align: center;
+            padding: 16px;
+            color: #8c8c8c;
+            font-size: 11px;
+        }
+
+        .summary-content {
+            display: grid;
+            gap: 12px;
+            padding-top: 12px;
+        }
+
+        .summary-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .summary-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: #8c8c8c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            color: #595959;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-size: 11px;
+            color: #262626;
+            font-weight: 400;
+        }
+
+        .summary-description {
+            font-size: 11px;
+            color: #595959;
+            line-height: 1.5;
+            padding: 6px 0;
+        }
+
+        .summary-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .summary-tag {
+            padding: 3px 8px;
+            background: #f5f6fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            font-size: 10px;
+            color: #262626;
+        }
+
+        .summary-owners {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .summary-owner {
+            font-size: 10px;
+            color: #595959;
+        }
+
+        .summary-lineage {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .lineage-direction {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .lineage-icon {
+            font-size: 13px;
+            margin-top: 1px;
+        }
+
+        .lineage-info {
+            flex: 1;
+        }
+
+        .lineage-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #595959;
+            margin-bottom: 3px;
+        }
+
+        .lineage-details {
+            font-size: 10px;
+            color: #8c8c8c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 16px;
+            color: #8c8c8c;
+            font-size: 11px;
+        }
+
+        /* Two-Panel Layout */
+        .results-two-panel {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 14px;
+        }
+
+        .results-single-panel {
+            display: block;
+        }
+
+        .output-panel {
+            background: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 18px;
+            min-height: 300px;
+        }
+
+        .output-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            color: #8c8c8c;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .output-content {
+            display: none;
+        }
+
+        .output-content.visible {
+            display: block;
+        }
+
+        .output-section {
+            margin-bottom: 16px;
+        }
+
+        .output-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .output-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8c8c8c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .output-query-text {
+            font-size: 12px;
+            color: #262626;
+            padding: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-section">
+            <div class="logo-text">
+                <div class="logo-brand">HCLTech</div>
+                <div class="logo-product">DataHub Core</div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <a href="http://localhost:9002/" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </span>
+                <span>Home</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Govern</div>
+            <a href="http://localhost:9002/glossary" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="10" y1="2" x2="10" y2="8"/></svg>
+                </span>
+                <span>Glossary</span>
+            </a>
+            <a href="http://localhost:9002/tags" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                </span>
+                <span>Tags</span>
+            </a>
+            <a href="http://localhost:9002/domains" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </span>
+                <span>Domains</span>
+            </a>
+            <a href="http://localhost:9002/settings/properties" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="7" y2="6"/><line x1="10" y1="6" x2="14" y2="6"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="7" y2="18"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+                </span>
+                <span>Structured Properties</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Admin</div>
+            <a href="http://localhost:9002/settings/ingestion" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 18h6"/><path d="M10 12v-2a2 2 0 0 1 4 0v2"/><rect x="6" y="12" width="12" height="6" rx="1"/></svg>
+                </span>
+                <span>Data Sources</span>
+            </a>
+            <a href="http://localhost:9002/analytics" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </span>
+                <span>Analytics</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-label">Tools</div>
+            <div class="nav-item active">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span>AI Query</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="http://localhost:9002/settings/me" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 14c-2.5 0-4.5 1.5-4.5 3.5v1.5"/><path d="M16.5 19v-1.5c0-2-2-3.5-4.5-3.5"/><circle cx="12" cy="9" r="3"/></svg>
+                </span>
+                <span>Profile</span>
+            </a>
+            <a href="http://localhost:9002/settings" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </span>
+                <span>Settings</span>
+            </a>
+            <a href="https://datahubproject.io/docs" target="_blank" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </span>
+                <span>Help</span>
+            </a>
+            <a href="http://localhost:9002/logout" class="nav-item">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </span>
+                <span>Sign out</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Content -->
+        <div class="page-content">
+            <div class="greeting">
+                AI Query
+            </div>
+
+            <!-- Query Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title-section">
+                        <div>
+                            <div class="card-title">
+                                Ask a Question
+                                <span class="badge">GPT-4</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        id="questionInput"
+                        placeholder="e.g., What columns are in the customer table?"
+                        autocomplete="off"
+                    />
+                    <button id="askButton" onclick="askQuestion()">Ask</button>
+                </div>
+
+                <div class="examples">
+                    <div class="examples-label">Try these examples:</div>
+                    <span class="example-chip" onclick="fillExample('search for customer datasets')">
+                        Search for customer datasets
+                    </span>
+                    <span class="example-chip" onclick="fillExample('show me columns in test_db.tpch_1000.customer')">
+                        Show table columns
+                    </span>
+                    <span class="example-chip" onclick="fillExample('what data quality checks exist')">
+                        Data quality checks
+                    </span>
+                    <span class="example-chip" onclick="fillExample('show upstream datasets')">
+                        Show lineage
+                    </span>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loadingSection" class="card loading">
+                <div class="spinner"></div>
+                <p>Thinking and querying DataHub...</p>
+            </div>
+
+            <!-- Results -->
+            <div id="resultsSection" class="results-section">
+                <div class="card">
+                    <div class="result-header">
+                        <span class="result-title">Your Question</span>
+                    </div>
+                    <p id="displayQuestion" style="font-size: 12px; color: #555;"></p>
+                </div>
+
+                <div class="card">
+                    <div class="result-header">
+                        <span class="result-title">Generated GraphQL Query</span>
+                    </div>
+                    <div class="graphql-query" id="displayGraphQL"></div>
+                </div>
+
+                <!-- Results Container (Adaptive Layout) -->
+                <div id="resultsContainer">
+                    <!-- Two-Panel Mode (for search results) -->
+                    <div id="twoPanelMode" class="results-two-panel" style="display: none;">
+                        <!-- Left Panel: URN List -->
+                        <div class="card">
+                            <div class="result-header">
+                                <span class="result-title">Search Results</span>
+                            </div>
+                            <div id="suggestionBox">
+                                <strong>Suggestion:</strong> <span id="suggestionText"></span>
+                            </div>
+                            <div id="displayResults"></div>
+                        </div>
+
+                        <!-- Right Panel: Output Box -->
+                        <div class="output-panel">
+                            <div id="outputPlaceholder" class="output-placeholder">
+                                Select the entity you want to run this query on!
+                            </div>
+                            <div id="outputContent" class="output-content">
+                                <div class="output-section">
+                                    <div class="output-section-title">Modified Query</div>
+                                    <div class="output-query-text" id="outputModifiedQuery"></div>
+                                </div>
+                                <div class="output-section">
+                                    <div class="output-section-title">Generated GraphQL</div>
+                                    <div class="graphql-query" id="outputGraphQL"></div>
+                                </div>
+                                <div class="output-section">
+                                    <div class="output-section-title">Results</div>
+                                    <pre class="json-result" id="outputResults"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Single-Panel Mode (for direct results) -->
+                    <div id="singlePanelMode" class="results-single-panel" style="display: none;">
+                        <div class="card">
+                            <div class="result-header">
+                                <span class="result-title">Results</span>
+                            </div>
+                            <pre class="json-result" id="singlePanelResults"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error -->
+            <div id="errorSection" class="card" style="display: none;">
+                <div class="error">
+                    <div id="errorMessage"></div>
+                    <div id="errorSuggestion" style="margin-top: 10px; font-style: italic;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/query';
+        const SUMMARY_API_URL = '/entity-summary';
+        const input = document.getElementById('questionInput');
+        const askButton = document.getElementById('askButton');
+
+        let currentQuestion = '';
+        let summaryCache = new Map();
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askQuestion();
+        });
+
+        function fillExample(text) {
+            input.value = text;
+            input.focus();
+        }
+
+        async function askQuestion(question = null) {
+            if (!question) {
+                question = input.value.trim();
+            }
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+
+            currentQuestion = question;
+            document.getElementById('loadingSection').style.display = 'block';
+            document.getElementById('resultsSection').classList.remove('visible');
+            document.getElementById('errorSection').style.display = 'none';
+            askButton.disabled = true;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error || 'Failed to query');
+
+                document.getElementById('displayQuestion').textContent = question;
+                document.getElementById('displayGraphQL').textContent = data.graphqlQuery;
+
+                const isSearchResults = data.results?.data?.search?.searchResults;
+
+                // Adaptive Layout: Show two-panel for search results, single-panel for direct results
+                if (isSearchResults) {
+                    // Two-Panel Mode
+                    document.getElementById('twoPanelMode').style.display = 'grid';
+                    document.getElementById('singlePanelMode').style.display = 'none';
+
+                    // Reset Output box
+                    document.getElementById('outputPlaceholder').style.display = 'flex';
+                    document.getElementById('outputContent').classList.remove('visible');
+
+                    renderUrnList(data.results.data.search);
+
+                    if (data.suggestion) {
+                        document.getElementById('suggestionBox').style.display = 'block';
+                        document.getElementById('suggestionText').textContent = data.suggestion;
+                    } else {
+                        document.getElementById('suggestionBox').style.display = 'none';
+                    }
+                } else {
+                    // Single-Panel Mode
+                    document.getElementById('twoPanelMode').style.display = 'none';
+                    document.getElementById('singlePanelMode').style.display = 'block';
+                    document.getElementById('singlePanelResults').textContent = JSON.stringify(data.results, null, 2);
+                }
+
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('resultsSection').classList.add('visible');
+
+            } catch (error) {
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('errorSection').style.display = 'block';
+                document.getElementById('errorMessage').textContent = 'Error: ' + error.message;
+                document.getElementById('errorSuggestion').textContent = 'Try being more specific with the full table path';
+            } finally {
+                askButton.disabled = false;
+            }
+        }
+
+        function renderUrnList(searchData) {
+            const container = document.getElementById('displayResults');
+            const total = searchData.total;
+            const results = searchData.searchResults;
+
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="empty-state">No results found</div>';
+                return;
+            }
+
+            let html = `<div class="urn-list">`;
+
+            results.forEach((result, index) => {
+                const entity = result.entity;
+                const urn = entity.urn;
+                const name = entity.name || 'Unnamed';
+                const platform = entity.platform?.name || 'Unknown';
+                const platformInitial = platform.charAt(0).toUpperCase();
+
+                html += `
+                    <div class="urn-item" id="urn-item-${index}">
+                        <div class="urn-header" onclick="toggleUrnExpand(${index}, '${urn.replace(/'/g, "\\'")}')">
+                            <div class="urn-expand-icon">▶</div>
+                            <div class="urn-platform-icon">${platformInitial}</div>
+                            <div class="urn-info">
+                                <div class="urn-name">${name}</div>
+                                <div class="urn-meta">${platform}</div>
+                            </div>
+                            <button class="urn-select-btn" onclick="selectUrn(event, '${urn.replace(/'/g, "\\'")}')">Select</button>
+                        </div>
+                        <div class="urn-summary" id="urn-summary-${index}">
+                            <div class="summary-loading">Loading summary...</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        async function toggleUrnExpand(index, urn) {
+            const item = document.getElementById(`urn-item-${index}`);
+            const summaryContainer = document.getElementById(`urn-summary-${index}`);
+            const isExpanded = item.classList.contains('expanded');
+
+            document.querySelectorAll('.urn-item.expanded').forEach(el => {
+                if (el.id !== `urn-item-${index}`) {
+                    el.classList.remove('expanded');
+                }
+            });
+
+            if (isExpanded) {
+                item.classList.remove('expanded');
+                return;
+            }
+
+            item.classList.add('expanded');
+
+            if (summaryCache.has(urn)) {
+                renderSummary(summaryContainer, summaryCache.get(urn));
+                return;
+            }
+
+            try {
+                const response = await fetch(SUMMARY_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ urn }),
+                    credentials: 'include'
+                });
+
+                const summary = await response.json();
+
+                if (!response.ok) throw new Error(summary.error || 'Failed to fetch summary');
+
+                summaryCache.set(urn, summary);
+                renderSummary(summaryContainer, summary);
+
+            } catch (error) {
+                summaryContainer.innerHTML = `<div class="empty-state">Failed to load summary: ${error.message}</div>`;
+            }
+        }
+
+        function renderSummary(container, summary) {
+            const formatNumber = (num) => {
+                if (!num) return 'N/A';
+                return num.toLocaleString();
+            };
+
+            const formatBytes = (bytes) => {
+                if (!bytes) return 'N/A';
+                const gb = bytes / (1024 * 1024 * 1024);
+                if (gb >= 1) return `${gb.toFixed(2)} GB`;
+                const mb = bytes / (1024 * 1024);
+                return `${mb.toFixed(2)} MB`;
+            };
+
+            const formatLineageTypes = (byType) => {
+                if (!byType || Object.keys(byType).length === 0) return 'None';
+                return Object.entries(byType)
+                    .map(([type, count]) => `${count} ${type.toLowerCase()}${count > 1 ? 's' : ''}`)
+                    .join(', ');
+            };
+
+            let html = '<div class="summary-content">';
+
+            if (summary.stats) {
+                html += `
+                    <div class="summary-section">
+                        <div class="summary-section-title">Statistics</div>
+                        <div class="summary-row">
+                            <div class="summary-label">Rows</div>
+                            <div class="summary-value">${formatNumber(summary.stats.rowCount)}</div>
+                        </div>
+                        <div class="summary-row">
+                            <div class="summary-label">Columns</div>
+                            <div class="summary-value">${formatNumber(summary.stats.columnCount)}</div>
+                        </div>
+                        <div class="summary-row">
+                            <div class="summary-label">Size</div>
+                            <div class="summary-value">${formatBytes(summary.stats.sizeInBytes)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (summary.description || summary.domain || summary.container) {
+                html += `<div class="summary-section"><div class="summary-section-title">Metadata</div>`;
+
+                if (summary.description) {
+                    html += `<div class="summary-description">${summary.description}</div>`;
+                }
+
+                if (summary.domain) {
+                    html += `
+                        <div class="summary-row">
+                            <div class="summary-label">Domain</div>
+                            <div class="summary-value">${summary.domain}</div>
+                        </div>
+                    `;
+                }
+
+                if (summary.container) {
+                    html += `
+                        <div class="summary-row">
+                            <div class="summary-label">Container</div>
+                            <div class="summary-value">${summary.container}</div>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+            }
+
+            if (summary.owners && summary.owners.length > 0) {
+                html += `
+                    <div class="summary-section">
+                        <div class="summary-section-title">Owners</div>
+                        <div class="summary-owners">
+                `;
+                summary.owners.forEach(owner => {
+                    html += `<div class="summary-owner">${owner.displayName || owner.username}</div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (summary.tags && summary.tags.length > 0) {
+                html += `
+                    <div class="summary-section">
+                        <div class="summary-section-title">Tags</div>
+                        <div class="summary-tags">
+                `;
+                summary.tags.forEach(tag => {
+                    html += `<span class="summary-tag">${tag.name}</span>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (summary.lineage) {
+                const hasUpstream = summary.lineage.upstream.total > 0;
+                const hasDownstream = summary.lineage.downstream.total > 0;
+
+                if (hasUpstream || hasDownstream) {
+                    html += `
+                        <div class="summary-section">
+                            <div class="summary-section-title">Lineage</div>
+                            <div class="summary-lineage">
+                    `;
+
+                    if (hasUpstream) {
+                        html += `
+                            <div class="lineage-direction">
+                                <div class="lineage-icon">↑</div>
+                                <div class="lineage-info">
+                                    <div class="lineage-label">UPSTREAM</div>
+                                    <div class="lineage-details">Depends on ${formatLineageTypes(summary.lineage.upstream.byType)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (hasDownstream) {
+                        html += `
+                            <div class="lineage-direction">
+                                <div class="lineage-icon">↓</div>
+                                <div class="lineage-info">
+                                    <div class="lineage-label">DOWNSTREAM</div>
+                                    <div class="lineage-details">Used by ${formatLineageTypes(summary.lineage.downstream.byType)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    html += `</div></div>`;
+                }
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        async function selectUrn(event, urn) {
+            event.stopPropagation();
+
+            // Show loading in output box
+            document.getElementById('outputPlaceholder').style.display = 'none';
+            document.getElementById('outputContent').classList.add('visible');
+            document.getElementById('outputResults').textContent = 'Loading...';
+
+            try {
+                // Construct modified question with URN
+                const newQuestion = `Show me details for ${urn}`;
+                document.getElementById('outputModifiedQuery').textContent = newQuestion;
+
+                // Call backend with modified question
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: newQuestion }),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error || 'Failed to query');
+
+                // Update Output box
+                document.getElementById('outputGraphQL').textContent = data.graphqlQuery;
+                document.getElementById('outputResults').textContent = JSON.stringify(data.results, null, 2);
+
+            } catch (error) {
+                document.getElementById('outputResults').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -150,12 +150,13 @@ services:
       - /bin/sh
       - -c
       - |
-        dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s \
+        dockerize -wait $${DATAHUB_GMS_PROTOCOL:-http}://$${DATAHUB_GMS_HOST}:$${DATAHUB_GMS_PORT}/health -timeout 240s
+        # Start AI Assistant API in background
+        python -m uvicorn datahub_actions.plugin.action.ai_assistant.api:create_app --factory --host 0.0.0.0 --port 8082 &
+        # Start Actions framework (runs in foreground)
         datahub actions run \
           --config /etc/datahub/actions/system/conf/executor.yaml \
           --config /etc/datahub/actions/conf/data-quality-action.yaml
-          # TODO: Re-enable when governance plugin is built into image
-          # --config /etc/datahub/actions/conf/governance-action.yaml
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
