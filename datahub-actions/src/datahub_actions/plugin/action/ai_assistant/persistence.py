@@ -3,10 +3,10 @@
 import hashlib
 import logging
 import time
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from datahub.emitter.mcp import MetadataChangeProposalWrapper
-from datahub.ingestion.graph.client import DataHubGraph
 from datahub.metadata.com.linkedin.pegasus2avro.assertion import (
     AssertionInfo,
     AssertionResult,
@@ -23,6 +23,7 @@ from datahub.metadata.com.linkedin.pegasus2avro.assertion import (
     DatasetAssertionScope,
 )
 
+from datahub_actions.api.action_graph import AcrylDataHubGraph
 from datahub_actions.plugin.action.ai_assistant.models import (
     AssertionConfig,
     AssertionMetadata,
@@ -34,7 +35,7 @@ logger = logging.getLogger(__name__)
 class AssertionPersistence:
     """Persists AI-generated assertions to DataHub."""
 
-    def __init__(self, graph: DataHubGraph):
+    def __init__(self, graph: AcrylDataHubGraph):
         self.graph = graph
 
     def persist_assertion(
@@ -87,7 +88,7 @@ class AssertionPersistence:
                 entityUrn=assertion_urn,
                 aspect=assertion_info,
             )
-            self.graph.emit(mcp)
+            self.graph.graph.emit(mcp)
 
             logger.info(f"Persisted AI assertion: {assertion_urn}")
             return assertion_urn
@@ -96,63 +97,138 @@ class AssertionPersistence:
             logger.error(f"Failed to persist assertion: {e}", exc_info=True)
             raise ValueError(f"Assertion persistence failed: {str(e)}")
 
-    def report_assertion_result(
+    def persist_assertion_with_result(
         self,
-        assertion_urn: str,
         dataset_urn: str,
+        sql: str,
+        config: AssertionConfig,
         passed: bool,
         metrics: Dict[str, Any],
-    ) -> None:
+        nl_rule: Optional[str] = None,
+        metadata: Optional[AssertionMetadata] = None,
+    ) -> str:
         """
-        Report assertion execution result.
+        Create and persist an AI-generated assertion with its execution result to DataHub.
+
+        This follows the PROFILE TEST pattern (WORKING!):
+        1. Simple AssertionRunEvent (no BatchSpec, PartitionSpec, runtimeContext)
+        2. Use graph.emit() (NOT DatahubRestEmitter)
+        3. Emit only 2 aspects:
+           - AssertionInfo (definition)
+           - AssertionRunEvent (result - timeseries aspect)
 
         Args:
-            assertion_urn: URN of the assertion
-            dataset_urn: URN of the dataset being asserted on
+            dataset_urn: URN of the dataset this assertion applies to
+            sql: SQL query for the assertion
+            config: Assertion configuration
             passed: Whether the assertion passed
             metrics: Execution metrics
+            nl_rule: Original natural language rule
+            metadata: Optional metadata (title, description, tags)
+
+        Returns:
+            assertion_urn: URN of the created assertion
         """
         try:
-            # Build assertion run event - matching profile-based pattern
-            # Use AssertionResult object (same pattern as working profile-based tests)
+            # Generate assertion URN
+            assertion_urn = self._generate_assertion_urn(dataset_urn, sql)
+
+            # Build custom properties
+            custom_properties = {
+                "ai_generated": "true",
+                "persistent": "true",
+                "category": "AI_GENERATED",
+                "sql_hash": self._hash_sql(sql),
+                "created_with": "AI Assistant v1",
+            }
+            if nl_rule:
+                custom_properties["nl_rule"] = nl_rule
+
+            # 1. Build AssertionInfo aspect
+            assertion_info = self._build_assertion_info(
+                dataset_urn=dataset_urn,
+                sql=sql,
+                config=config,
+                metadata=metadata,
+                custom_properties=custom_properties,
+            )
+
+            # 2. Build AssertionRunEvent aspect
+            (
+                native_results,
+                row_count,
+                actual_agg_value,
+            ) = self._normalize_metrics(metrics or {})
+
+            # Create simple AssertionRunEvent - following PROFILE TEST pattern (WORKING!)
+            # NO BatchSpec, NO PartitionSpec, NO runtimeContext - just the essentials!
+            # See: datahub-actions/plugin/action/data_quality/templates/base.py:163-184
             run_event = AssertionRunEvent(
                 timestampMillis=int(round(time.time() * 1000)),
                 assertionUrn=assertion_urn,
-                asserteeUrn=dataset_urn,  # Dataset being asserted on
-                runId=f"ai_assistant_{int(time.time())}",
-                status=AssertionRunStatus.COMPLETE,
+                asserteeUrn=dataset_urn,
+                runId=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 result=AssertionResult(
                     type=(
                         AssertionResultType.SUCCESS
                         if passed
                         else AssertionResultType.FAILURE
                     ),
-                    actualAggValue=(
-                        float(metrics.get("result_value"))
-                        if metrics.get("result_value") is not None
-                        and str(metrics.get("result_value")).replace(".", "").replace("-", "").isdigit()
-                        else None
-                    ),
-                    rowCount=metrics.get("row_count"),
-                    nativeResults=metrics or {},
+                    rowCount=row_count,
+                    actualAggValue=actual_agg_value,
+                    # MUST be str->str for Avro serialization (match profile-based pattern)
+                    nativeResults=native_results,
                 ),
+                status=AssertionRunStatus.COMPLETE,
             )
 
-            # Emit run event
-            mcp = MetadataChangeProposalWrapper(
+            # Use graph.graph.emit() like profile tests (NOT DatahubRestEmitter!)
+            # CRITICAL: self.graph is AcrylDataHubGraph, need .graph.emit() for underlying DataHubGraph
+            # See: datahub-actions/plugin/action/data_quality/action.py:139
+            logger.info(f"Emitting assertion to DataHub: {assertion_urn}")
+
+            # Emit only 2 MCPs (like profile tests - NO DataPlatformInstance needed)
+            assertion_info_mcp = MetadataChangeProposalWrapper(
+                entityUrn=assertion_urn,
+                aspect=assertion_info,
+            )
+            self.graph.graph.emit(assertion_info_mcp)  # CRITICAL: .graph.graph (not just .graph)
+
+            assertion_result_mcp = MetadataChangeProposalWrapper(
                 entityUrn=assertion_urn,
                 aspect=run_event,
             )
-            self.graph.emit(mcp)
+            self.graph.graph.emit(assertion_result_mcp)  # CRITICAL: .graph.graph (not just .graph)
 
             logger.info(
-                f"Reported assertion result for {assertion_urn}: passed={passed}"
+                f"Successfully persisted AI assertion with result: {assertion_urn}, passed={passed}"
             )
+            return assertion_urn
 
         except Exception as e:
-            # Fixed: Now using dict-based result field (matching assertion_executor pattern)
-            # This avoids Avro serialization issues that occurred with AssertionResult objects
-            logger.error(f"Failed to report assertion result: {e}", exc_info=True)
+            logger.error(f"Failed to persist assertion with result: {e}", exc_info=True)
+            raise ValueError(f"Assertion persistence with result failed: {str(e)}")
+
+    def report_assertion_result(
+        self,
+        assertion_urn: str,
+        dataset_urn: str,
+        passed: bool,
+        metrics: Dict[str, Any],
+        sql: str,
+        config: AssertionConfig,
+        nl_rule: Optional[str] = None,
+        metadata: Optional[AssertionMetadata] = None,
+    ) -> None:
+        """
+        DEPRECATED: Use persist_assertion_with_result instead.
+
+        This method is kept for backward compatibility but should not be used.
+        The new approach emits all 3 aspects atomically using DatahubRestEmitter.
+        """
+        logger.warning(
+            "report_assertion_result is deprecated. Use persist_assertion_with_result instead."
+        )
 
     def _generate_assertion_urn(self, dataset_urn: str, sql: str) -> str:
         """Generate a unique URN for the assertion."""
@@ -207,6 +283,42 @@ class AssertionPersistence:
             description=description,
             customProperties=custom_properties,
         )
+
+    def _normalize_metrics(
+        self, metrics: Dict[str, Any]
+    ) -> tuple[Dict[str, str], Optional[int], Optional[float]]:
+        """
+        Normalize executor metrics to the shapes expected by AssertionResult:
+        - nativeResults must be a map of strings (Avro requirement)
+        - rowCount should be an int when provided
+        - actualAggValue should be a float when numeric, else None
+        """
+        native_results: Dict[str, str] = {}
+        row_count: Optional[int] = None
+        actual_value: Optional[float] = None
+
+        # row_count -> rowCount
+        if "row_count" in metrics:
+            try:
+                row_count = int(metrics["row_count"])
+            except (ValueError, TypeError):
+                row_count = None
+
+        # result_value -> actualAggValue
+        if "result_value" in metrics:
+            try:
+                actual_value = float(metrics["result_value"])
+            except (ValueError, TypeError):
+                actual_value = None
+
+        # Everything else -> nativeResults (stringified)
+        for k, v in metrics.items():
+            try:
+                native_results[k] = str(v)
+            except Exception:
+                native_results[k] = repr(v)
+
+        return native_results, row_count, actual_value
 
     def _map_operator(self, operator: str) -> AssertionStdOperator:
         """Map string operator to AssertionStdOperator."""
