@@ -1,0 +1,29 @@
+source:
+  type: snowflake
+  config:
+    account_id: "STARSCHEMA-STARSCHEMA"
+    username: "DATAHUB_USER"
+    password: "datahub"
+    warehouse: "DATAHUB_WH"
+    role: "DATAHUB_ROLE"
+
+    # Include only COVID19 database
+    database_pattern:
+      allow:
+        - "COVID19"
+
+    # Enable profiling with all tables
+    profiling:
+      enabled: true
+      profile_table_level_only: false
+      include_views: true
+      profile_if_updated_since_days: null  # Always profile
+
+    # Disable stateful ingestion (as user requested)
+    stateful_ingestion:
+      enabled: false
+
+sink:
+  type: datahub-rest
+  config:
+    server: "http://localhost:8888"

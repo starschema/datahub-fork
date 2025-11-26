@@ -67,7 +67,9 @@ class AssertionPersistence:
             custom_properties = {
                 "ai_generated": "true",
                 "persistent": "true",
-                "category": "AI_GENERATED",
+                # UI-recognized bucket for now; ai_category retains the semantic intent
+                "category": "CUSTOM_SQL",
+                "ai_category": "AI_GENERATED",
                 "sql_hash": self._hash_sql(sql),
                 "created_with": "AI Assistant v1",
             }
@@ -137,7 +139,9 @@ class AssertionPersistence:
             custom_properties = {
                 "ai_generated": "true",
                 "persistent": "true",
-                "category": "AI_GENERATED",
+                # UI-recognized bucket for now; ai_category retains the semantic intent
+                "category": "CUSTOM_SQL",
+                "ai_category": "AI_GENERATED",
                 "sql_hash": self._hash_sql(sql),
                 "created_with": "AI Assistant v1",
             }
@@ -277,8 +281,17 @@ class AssertionPersistence:
             nativeParameters={k: str(v) for k, v in config.params.items()},
         )
 
+        # Derive correct AssertionType based on scope/aggregation/category
+        # This ensures AI assertions appear in the correct UI group (SQL, Volume, Schema, etc.)
+        # instead of always showing in "Other"
+        assertion_type = self._derive_assertion_type(
+            scope=dataset_assertion.scope,
+            aggregation=dataset_assertion.aggregation,
+            category=custom_properties.get("category", ""),
+        )
+
         return AssertionInfo(
-            type=AssertionType.DATASET,
+            type=assertion_type,
             datasetAssertion=dataset_assertion,
             description=description,
             customProperties=custom_properties,
@@ -319,6 +332,44 @@ class AssertionPersistence:
                 native_results[k] = repr(v)
 
         return native_results, row_count, actual_value
+
+    def _derive_assertion_type(
+        self,
+        scope: DatasetAssertionScope,
+        aggregation: AssertionStdAggregation,
+        category: str,
+    ) -> AssertionType:
+        """
+        Map assertion characteristics to AssertionType for UI grouping.
+
+        The DataHub UI groups assertions by AssertionType (enum), not by customProperties["category"].
+        This method derives the correct AssertionType so AI assertions appear in the right UI group.
+
+        Based on: datahub-actions/plugin/action/data_quality/templates/base.py:162-188
+        """
+        category_upper = (category or "").upper()
+
+        # IMPORTANT: Check explicit category first before aggregation-based fallbacks
+        # This ensures CUSTOM_SQL assertions don't get misclassified as VOLUME
+
+        # Custom SQL → SQL (appears in "SQL" group)
+        if category_upper == "CUSTOM_SQL":
+            return AssertionType.SQL
+
+        # Column-scoped assertions → Field (appears in "Column" group)
+        if scope == DatasetAssertionScope.DATASET_COLUMN:
+            return AssertionType.FIELD
+
+        # Schema-related → DataSchema (appears in "Schema" group)
+        if aggregation == AssertionStdAggregation.COLUMN_COUNT or category_upper == "SCHEMA":
+            return AssertionType.DATA_SCHEMA
+
+        # Volume-related → Volume (appears in "Volume" group)
+        if aggregation == AssertionStdAggregation.ROW_COUNT or category_upper == "VOLUME":
+            return AssertionType.VOLUME
+
+        # Fallback → Dataset (appears in "Other" group)
+        return AssertionType.DATASET
 
     def _map_operator(self, operator: str) -> AssertionStdOperator:
         """Map string operator to AssertionStdOperator."""

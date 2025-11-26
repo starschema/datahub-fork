@@ -231,6 +231,34 @@ docker logs datahub-datahub-actions-1 -f  # Data quality action logs
 
 ---
 
+## Deploying AI Assistant Behind a Proxy (nginx/ingress)
+
+- In production, keep the AI Assistant internal (do not map port 8082). Front it with your ingress/proxy and enforce auth (Bearer/PAT + X-DataHub-Actor).
+- Build or pull the actions image you want:
+  ```bash
+  docker build -t datahub-actions:ai-fix -f datahub-actions/Dockerfile datahub-actions
+  ```
+- Point compose to that image and recreate the actions service (prod-style compose keeps 8082 internal):
+  ```bash
+  export DATAHUB_ACTIONS_IMAGE=datahub-actions:ai-fix
+  docker compose -f datahub-with-data-quality.yml up -d --force-recreate datahub-actions
+  ```
+- Example nginx location to proxy the AI API:
+  ```nginx
+  location /api/ai-assistant/ {
+    proxy_pass http://actions:8082/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # enforce auth here (Bearer/PAT) and set X-DataHub-Actor as needed
+  }
+  ```
+- If you mount the app under a path prefix, start uvicorn with a root path (optional but safer for absolute URLs):
+  ```bash
+  uvicorn datahub_actions.plugin.action.ai_assistant.api:create_app --factory --host 0.0.0.0 --port 8082 --root-path /api/ai-assistant
+  ```
+- For local dev, `datahub_deployment_local.yml` still exposes 8082; for production use `datahub-with-data-quality.yml` with no port mapping and access only through the proxy.
+
 ## Additional Resources
 
 - 📖 **Detailed Setup Guide:** [QUICKSTART.md](./QUICKSTART.md)
