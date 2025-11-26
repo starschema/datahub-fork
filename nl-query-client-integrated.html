@@ -21,28 +21,79 @@
         /* Sidebar */
         .sidebar {
             width: 220px;
-            background: white;
-            border-right: 1px solid #e8e8e8;
+            background: #f5f6fa;
             display: flex;
             flex-direction: column;
             height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
+            transition: width 250ms ease-in-out;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
         }
 
         .logo-section {
             padding: 14px 18px;
-            border-bottom: 1px solid #e8e8e8;
             display: flex;
             align-items: center;
             gap: 6px;
+            position: relative;
+        }
+
+        .collapse-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            padding: 0;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #595959;
+        }
+
+        .collapse-btn:hover {
+            background: #e8e8e8;
+            color: #262626;
+        }
+
+        .sidebar.collapsed .collapse-btn {
+            right: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        .collapse-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s;
+        }
+
+        .sidebar.collapsed .collapse-icon {
+            transform: rotate(180deg);
         }
 
         .logo-text {
             display: flex;
             align-items: baseline;
             gap: 8px;
+            transition: opacity 250ms ease-in-out;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
         }
 
         .logo-brand {
@@ -59,7 +110,6 @@
 
         .nav-section {
             padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
         }
 
         .nav-label {
@@ -67,8 +117,16 @@
             font-size: 10px;
             font-weight: 600;
             color: #999;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
+            transition: opacity 250ms ease-in-out;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .nav-label {
+            opacity: 0;
+            width: 0;
+            padding: 0;
         }
 
         .nav-item {
@@ -76,11 +134,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #595959;
+            color: #999999;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
             font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 7px 0;
+        }
+
+        .sidebar.collapsed .nav-item span:not(.nav-icon) {
+            display: none;
         }
 
         a.nav-item {
@@ -89,14 +157,16 @@
         }
 
         .nav-item:hover {
-            background: #f5f6fa;
+            background: #e8e8e8;
             color: #262626;
         }
 
         .nav-item.active {
-            background: linear-gradient(90deg, #5b4fde 0%, #7662e3 100%);
-            color: white;
+            background: #ede9f9;
+            color: #6e63e8;
             font-weight: 500;
+            border: 1px solid #d0cae5;
+            border-radius: 6px;
         }
 
         .nav-icon {
@@ -118,7 +188,8 @@
         }
 
         .nav-item.active .nav-icon svg {
-            stroke: white;
+            stroke: #6e63e8;
+            fill: #6e63e8;
         }
 
         .nav-item:hover .nav-icon svg {
@@ -126,13 +197,13 @@
         }
 
         .nav-item.active:hover .nav-icon svg {
-            stroke: white;
+            stroke: #6e63e8;
+            fill: #6e63e8;
         }
 
         .sidebar-footer {
             margin-top: auto;
             padding: 16px 0;
-            border-top: 1px solid #f0f0f0;
         }
 
         /* Main content area */
@@ -142,6 +213,11 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: margin-left 250ms ease-in-out;
+        }
+
+        .main-content.collapsed {
+            margin-left: 60px;
         }
 
         /* Top header bar */
@@ -747,12 +823,24 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="logo-section">
             <div class="logo-text">
                 <div class="logo-brand">HCLTech</div>
                 <div class="logo-product">DataHub Core</div>
             </div>
+            <button class="collapse-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Outer rectangle (not rounded) -->
+                    <rect x="3" y="5" width="18" height="14"></rect>
+                    <!-- Vertical divider line -->
+                    <line x1="9" y1="5" x2="9" y2="19"></line>
+                    <!-- Three horizontal dashes attached to left edge, shorter and closer together -->
+                    <line x1="3.5" y1="7.5" x2="5.25" y2="7.5"></line>
+                    <line x1="3.5" y1="10" x2="5.25" y2="10"></line>
+                    <line x1="3.5" y1="12.5" x2="5.25" y2="12.5"></line>
+                </svg>
+            </button>
         </div>
 
         <div class="nav-section">
@@ -768,7 +856,15 @@
             <div class="nav-label">Govern</div>
             <a href="http://localhost:9002/glossary" class="nav-item">
                 <span class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="10" y1="2" x2="10" y2="8"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Book with curved spine -->
+                        <path d="M6.5 3H19v18H6.5A2 2 0 0 1 4.5 19V5A2 2 0 0 1 6.5 3z"/>
+                        <path d="M4.5 19A2 2 0 0 0 6.5 21H19"/>
+                        <!-- Pages at bottom -->
+                        <line x1="6.5" y1="19" x2="19" y2="19"/>
+                        <!-- Wide bookmark ribbon outline with V-cut (moved slightly left) -->
+                        <path d="M11.5 3 L11.5 14 L13.5 12 L15.5 14 L15.5 3"/>
+                    </svg>
                 </span>
                 <span>Glossary</span>
             </a>
@@ -796,7 +892,27 @@
             <div class="nav-label">Admin</div>
             <a href="http://localhost:9002/settings/ingestion" class="nav-item">
                 <span class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 18h6"/><path d="M10 12v-2a2 2 0 0 1 4 0v2"/><rect x="6" y="12" width="12" height="6" rx="1"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Plug (bottom left) -->
+                        <!-- Semi-circular body -->
+                        <path d="M 6 18 Q 4 16 6 14 L 9 14 Q 11 16 9 18 Z" fill="currentColor" opacity="0.2"/>
+                        <path d="M 6 18 Q 4 16 6 14 L 9 14 Q 11 16 9 18"/>
+                        <!-- Prongs extending toward top right -->
+                        <line x1="9" y1="14.7" x2="10.5" y2="13.2"/>
+                        <line x1="9" y1="17.3" x2="10.5" y2="15.8"/>
+                        <!-- Wire from middle going bottom left -->
+                        <path d="M 5.5 16 L 3 18.5"/>
+
+                        <!-- Socket (top right) -->
+                        <!-- Semi-circular body -->
+                        <path d="M 18 6 Q 20 8 18 10 L 15 10 Q 13 8 15 6 Z" fill="currentColor" opacity="0.2"/>
+                        <path d="M 18 6 Q 20 8 18 10 L 15 10 Q 13 8 15 6"/>
+                        <!-- Holes extending toward bottom left -->
+                        <line x1="15" y1="6.7" x2="13.5" y2="8.2"/>
+                        <line x1="15" y1="9.3" x2="13.5" y2="10.8"/>
+                        <!-- Wire from middle going top right -->
+                        <path d="M 18.5 8 L 21 5.5"/>
+                    </svg>
                 </span>
                 <span>Data Sources</span>
             </a>
@@ -847,7 +963,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="mainContent">
         <!-- Page Content -->
         <div class="page-content">
             <div class="greeting">
@@ -983,6 +1099,21 @@
 
         let currentQuestion = '';
         let summaryCache = new Map();
+        let isCollapsed = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('collapsed');
+            }
+        }
 
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') askQuestion();

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DataHub GraphQL Client</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #1e1e1e; color: #d4d4d4; }
+        h2 { color: #4ec9b0; }
+        textarea { width: 100%; height: 200px; background: #252526; color: #d4d4d4; border: 1px solid #3e3e42; padding: 10px; font-family: monospace; }
+        button { background: #0e639c; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #1177bb; }
+        pre { background: #252526; padding: 15px; border: 1px solid #3e3e42; overflow: auto; max-height: 500px; }
+        .examples { margin: 20px 0; }
+        .example-btn { background: #2d2d30; margin: 5px; padding: 8px 12px; }
+        .example-btn:hover { background: #3e3e42; }
+    </style>
+</head>
+<body>
+    <h2>DataHub GraphQL Client</h2>
+    <p>Endpoint: <strong>http://localhost:8080/api/graphql</strong></p>
+
+    <div class="examples">
+        <strong>Quick Examples:</strong><br>
+        <button class="example-btn" onclick="loadExample('columns')">Get Table Columns</button>
+        <button class="example-btn" onclick="loadExample('assertions')">Get Assertions</button>
+        <button class="example-btn" onclick="loadExample('search')">Search Datasets</button>
+        <button class="example-btn" onclick="loadExample('full')">Full Metadata</button>
+    </div>
+
+    <h3>Query:</h3>
+    <textarea id="query">query {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)") {
+    name
+    platform { name }
+    schemaMetadata {
+      fields {
+        fieldPath
+        type
+        nativeDataType
+        description
+      }
+    }
+  }
+}</textarea>
+
+    <br><br>
+    <button onclick="runQuery()">Run Query</button>
+    <button onclick="clearResults()">Clear</button>
+
+    <h3>Response:</h3>
+    <pre id="result">Click "Run Query" to execute...</pre>
+
+    <script>
+        const ENDPOINT = '/graphql';  // Use proxy on same origin
+
+        const examples = {
+            columns: `query {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)") {
+    name
+    platform { name }
+    schemaMetadata {
+      fields {
+        fieldPath
+        type
+        nativeDataType
+        description
+        nullable
+      }
+    }
+  }
+}`,
+            assertions: `query {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)") {
+    name
+    assertions(start: 0, count: 100) {
+      total
+      assertions {
+        urn
+        info {
+          type
+          description
+          datasetAssertion {
+            scope
+            fields { path }
+          }
+        }
+        runEvents(status: COMPLETE, limit: 1) {
+          succeeded
+          failed
+          runEvents {
+            timestampMillis
+            result {
+              type
+              actualAggValue
+              rowCount
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+            search: `query {
+  search(input: {
+    type: DATASET
+    query: "customer"
+    start: 0
+    count: 10
+  }) {
+    total
+    searchResults {
+      entity {
+        ... on Dataset {
+          urn
+          name
+          platform { name }
+          description
+        }
+      }
+    }
+  }
+}`,
+            full: `query {
+  dataset(urn: "urn:li:dataset:(urn:li:dataPlatform:snowflake,test_db.tpch_1000.customer,PROD)") {
+    urn
+    name
+    platform { name }
+    description
+
+    # Schema/Columns
+    schemaMetadata {
+      fields {
+        fieldPath
+        type
+        nativeDataType
+        description
+        nullable
+        tags {
+          tags {
+            tag {
+              name
+              description
+            }
+          }
+        }
+      }
+      primaryKeys
+    }
+
+    # Assertions/Data Quality
+    assertions(start: 0, count: 100) {
+      total
+      assertions {
+        urn
+        info {
+          type
+          description
+          datasetAssertion {
+            scope
+            operator
+            fields { path }
+          }
+        }
+        runEvents(status: COMPLETE, limit: 1) {
+          succeeded
+          failed
+          runEvents {
+            timestampMillis
+            result {
+              type
+              actualAggValue
+            }
+          }
+        }
+      }
+    }
+
+    # Ownership
+    ownership {
+      owners {
+        owner {
+          ... on CorpUser {
+            username
+          }
+        }
+        type
+      }
+    }
+  }
+}`
+        };
+
+        function loadExample(type) {
+            document.getElementById('query').value = examples[type];
+        }
+
+        async function runQuery() {
+            const query = document.getElementById('query').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.textContent = 'Running query...';
+
+            try {
+                const response = await fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('result').textContent = 'Results cleared.';
+        }
+    </script>
+</body>
+</html>

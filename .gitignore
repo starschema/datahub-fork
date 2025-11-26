@@ -142,3 +142,24 @@ metadata-ingestion-modules/acryl-cloud
 
 .claude/
 datahub-isolated-test/
+
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+*.ico
+*.webp
+
+# PDF files
+*.pdf
+
+# Build artifacts and logs
+*.jar
+*.log
+nul
+temp-jar/
+test_search_result.json
+node_modules/

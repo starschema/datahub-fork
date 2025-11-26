@@ -1,6 +1,7 @@
 import {
     AppWindow,
     BookBookmark,
+    ChatCircle,
     Gear,
     Globe,
     HardDrives,
@@ -328,12 +329,26 @@ export const NavSidebar = () => {
                     },
                 ],
             },
-            ...(contextMenuItems ? [contextMenuItems] : []),
-        ],
-    };
-
-    const footerMenu: NavBarMenuItems = {
-        items: [
+            {
+                type: NavBarMenuItemTypes.Group,
+                key: 'tools',
+                title: 'Tools',
+                items: [
+                    {
+                        type: NavBarMenuItemTypes.Item,
+                        title: 'AI Query',
+                        key: 'aiQuery',
+                        icon: <ChatCircle />,
+                        selectedIcon: <ChatCircle weight="fill" />,
+                        link: PageRoutes.AI_QUERY,
+                    },
+                ],
+            },
+            {
+                type: NavBarMenuItemTypes.Custom,
+                key: 'spacer',
+                render: () => <Spacer />,
+            },
             {
                 type: NavBarMenuItemTypes.Item,
                 title: 'Profile',

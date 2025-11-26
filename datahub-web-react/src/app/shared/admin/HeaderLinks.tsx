@@ -2,6 +2,7 @@ import {
     ApiOutlined,
     BarChartOutlined,
     BookOutlined,
+    CommentOutlined,
     DownOutlined,
     GlobalOutlined,
     SettingOutlined,
@@ -169,6 +170,18 @@ export function HeaderLinks(props: Props) {
                     </Link>
                 </LinkWrapper>
             )}
+            <LinkWrapper>
+                <Link to={PageRoutes.AI_QUERY}>
+                    <Button type="text">
+                        <Tooltip title="Query your data using natural language">
+                            <NavTitleContainer>
+                                <CommentOutlined />
+                                <NavTitleText>AI Query</NavTitleText>
+                            </NavTitleContainer>
+                        </Tooltip>
+                    </Button>
+                </Link>
+            </LinkWrapper>
             <Dropdown trigger={['click']} menu={{ items }}>
                 <LinkWrapper>
                     <Button type="text">
