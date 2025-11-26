@@ -347,7 +347,6 @@ class ColumnValuesUniqueTest(BaseTestTemplate):
 
     def get_category(self) -> str:
         return "UNIQUENESS"
-        return "COLUMN"
 
     def execute(
         self, profile: Optional[DatasetProfileClass] = None
@@ -410,7 +409,8 @@ class ColumnMinBetweenTest(BaseTestTemplate):
         return AssertionStdAggregation.MIN
 
     def get_category(self) -> str:
-        return "COLUMN"
+        # Column-level statistical check; surface under custom SQL/other numeric checks
+        return "CUSTOM_SQL"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -484,7 +484,7 @@ class ColumnMaxBetweenTest(BaseTestTemplate):
         return AssertionStdAggregation.MAX
 
     def get_category(self) -> str:
-        return "COLUMN"
+        return "CUSTOM_SQL"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -558,7 +558,7 @@ class ColumnMeanBetweenTest(BaseTestTemplate):
         return AssertionStdAggregation.MEAN
 
     def get_category(self) -> str:
-        return "COLUMN"
+        return "CUSTOM_SQL"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -632,7 +632,7 @@ class ColumnMedianBetweenTest(BaseTestTemplate):
         return AssertionStdAggregation.MEDIAN
 
     def get_category(self) -> str:
-        return "COLUMN"
+        return "CUSTOM_SQL"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -706,7 +706,7 @@ class ColumnStddevBetweenTest(BaseTestTemplate):
         return AssertionStdAggregation.STDDEV
 
     def get_category(self) -> str:
-        return "COLUMN"
+        return "CUSTOM_SQL"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -781,7 +781,6 @@ class ColumnDistinctCountBetweenTest(BaseTestTemplate):
 
     def get_category(self) -> str:
         return "UNIQUENESS"
-        return "COLUMN"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")
@@ -858,7 +857,6 @@ class ColumnUniqueProportionBetweenTest(BaseTestTemplate):
 
     def get_category(self) -> str:
         return "UNIQUENESS"
-        return "COLUMN"
 
     def get_parameters(self) -> Optional[AssertionStdParameters]:
         min_value = self.params.get("min_value")

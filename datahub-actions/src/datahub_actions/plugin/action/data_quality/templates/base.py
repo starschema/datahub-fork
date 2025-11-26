@@ -136,6 +136,9 @@ class BaseTestTemplate(metaclass=ABCMeta):
 
     def build_assertion_info(self) -> AssertionInfo:
         """Build AssertionInfo aspect for this test."""
+        # Derive a UI-friendly assertion type so categories don't land in "Other".
+        assertion_type = self._derive_assertion_type()
+
         dataset_assertion = DatasetAssertionInfo(
             dataset=self.dataset_urn,
             fields=[self.field_urn] if self.field_urn else None,
@@ -148,13 +151,41 @@ class BaseTestTemplate(metaclass=ABCMeta):
         )
 
         return AssertionInfo(
-            type=AssertionType.DATASET,
+            type=assertion_type,
             datasetAssertion=dataset_assertion,
             customProperties={
                 "test_name": self.test_name,
                 "category": self.get_category(),
             },
         )
+
+    def _derive_assertion_type(self) -> AssertionType:
+        """
+        Map template scope/category/aggregation to a UI-recognized AssertionType so assertions
+        group under Volume/Schema/Column/SQL instead of Other.
+        """
+        scope = self.get_scope()
+        category = (self.get_category() or "").upper()
+        aggregation = self.get_aggregation()
+
+        # Column-scoped assertions should appear under Field/Column
+        if scope == DatasetAssertionScope.DATASET_COLUMN:
+            return AssertionType.FIELD
+
+        # Schema-related (column count) -> DataSchema
+        if aggregation == AssertionStdAggregation.COLUMN_COUNT or category == "SCHEMA":
+            return AssertionType.DATA_SCHEMA
+
+        # Volume-related (row count) -> Volume
+        if aggregation == AssertionStdAggregation.ROW_COUNT or category == "VOLUME":
+            return AssertionType.VOLUME
+
+        # Custom SQL / other dataset-row checks -> Sql
+        if category == "CUSTOM_SQL":
+            return AssertionType.SQL
+
+        # Fallback
+        return AssertionType.DATASET
 
     def build_assertion_result(
         self, test_result: TestResult, assertion_urn: str

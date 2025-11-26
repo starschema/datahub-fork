@@ -138,7 +138,7 @@ services:
     # NEW (Working image from GHCR - includes governance, data quality, executor, AI assistant):
     # This image is built by ./docker/build-push-images.sh and pushed to GHCR
     # To use a different image: export DATAHUB_ACTIONS_IMAGE=your-custom-image
-    image: ${DATAHUB_ACTIONS_IMAGE:-ghcr.io/starschema/datahub-actions:1fe7eb6f30-fixed6}
+    image: ${DATAHUB_ACTIONS_IMAGE:-datahub-actions:ai-fix}
     command:
       - /bin/sh
       - -c
