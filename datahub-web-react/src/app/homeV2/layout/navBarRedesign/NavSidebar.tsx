@@ -1,6 +1,7 @@
 import {
     AppWindow,
     BookBookmark,
+    ChatCircle,
     Gear,
     Globe,
     HardDrives,
@@ -235,6 +236,21 @@ export const NavSidebar = () => {
                         key: 'analytics',
                         isHidden: !showAnalytics,
                         link: PageRoutes.ANALYTICS,
+                    },
+                ],
+            },
+            {
+                type: NavBarMenuItemTypes.Group,
+                key: 'tools',
+                title: 'Tools',
+                items: [
+                    {
+                        type: NavBarMenuItemTypes.Item,
+                        title: 'AI Query',
+                        key: 'aiQuery',
+                        icon: <ChatCircle />,
+                        selectedIcon: <ChatCircle weight="fill" />,
+                        link: PageRoutes.AI_QUERY,
                     },
                 ],
             },

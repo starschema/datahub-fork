@@ -1,6 +1,7 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 
+import AiQueryPage from '@app/aiQuery/AiQueryPage';
 import { AnalyticsPage } from '@app/analyticsDashboard/components/AnalyticsPage';
 import { ManageApplications } from '@app/applications/ManageApplications';
 import { BrowseResultsPage } from '@app/browse/BrowseResultsPage';
@@ -86,6 +87,7 @@ export const SearchRoutes = (): JSX.Element => {
                 {showTags ? <Route path={PageRoutes.MANAGE_TAGS} render={() => <ManageTags />} /> : null}
                 <Route path={PageRoutes.MANAGE_APPLICATIONS} render={() => <ManageApplications />} />
                 <Route path={PageRoutes.ANALYTICS} render={() => <AnalyticsPage />} />
+                <Route path={PageRoutes.AI_QUERY} render={() => <AiQueryPage />} />
                 <Route path={PageRoutes.POLICIES} render={() => <Redirect to="/settings/permissions/policies" />} />
                 <Route
                     path={PageRoutes.SETTINGS_POLICIES}
