@@ -8,7 +8,7 @@ services:
     ports:
       - "9002:9002"
     volumes:
-      - C:/Users/rishi/Downloads/DataHub/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - datahub_network
     depends_on:
@@ -26,7 +26,7 @@ services:
     ports:
       - "7777:7777"
     volumes:
-      - C:/Users/rishi/Downloads/DataHub/graphrag-demo:/app:ro
+      - ./graphrag-demo:/app:ro
     command: node graphql-proxy-server.js
     networks:
       - datahub_network
@@ -39,12 +39,12 @@ services:
   datahub-actions-quickstart:
     volumes:
       # Mount all custom action configs
-      - C:/Users/rishi/Downloads/DataHub/executor-action-config.yaml:/etc/datahub/actions/executor-action-config.yaml:ro
-      - C:/Users/rishi/Downloads/DataHub/governance-action-config.yaml:/etc/datahub/actions/governance-action-config.yaml:ro
-      - C:/Users/rishi/Downloads/DataHub/governance-rules.yml:/etc/datahub/actions/governance-rules.yml:ro
-      - C:/Users/rishi/Downloads/DataHub/data-quality-action-config.yaml:/etc/datahub/actions/data-quality-action-config.yaml:ro
-      - C:/Users/rishi/Downloads/DataHub/assertion-executor-action-config.yaml:/etc/datahub/actions/assertion-executor-action-config.yaml:ro
-      - C:/Users/rishi/Downloads/DataHub/ingestion-source-mapper-action-config.yaml:/etc/datahub/actions/ingestion-source-mapper-action-config.yaml:ro
+      - ./executor-action-config.yaml:/etc/datahub/actions/executor-action-config.yaml:ro
+      - ./governance-action-config.yaml:/etc/datahub/actions/governance-action-config.yaml:ro
+      - ./governance-rules.yml:/etc/datahub/actions/governance-rules.yml:ro
+      - ./data-quality-action-config.yaml:/etc/datahub/actions/data-quality-action-config.yaml:ro
+      - ./assertion-executor-action-config.yaml:/etc/datahub/actions/assertion-executor-action-config.yaml:ro
+      - ./ingestion-source-mapper-action-config.yaml:/etc/datahub/actions/ingestion-source-mapper-action-config.yaml:ro
     environment:
       # Configure actions to use all configs (comma-separated)
       ACTIONS_CONFIG: >-
