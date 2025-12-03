@@ -111,9 +111,9 @@ export default defineConfig(async ({ mode }) => {
             viteStaticCopy({
                 targets: [
                     // Self-host images by copying them to the build directory
-                    { src: path.resolve(__dirname, 'src/images/*'), dest: 'assets/platforms' },
+                    { src: 'src/images/*', dest: 'assets/platforms' },
                     // Also keep the theme json files in the build directory
-                    { src: path.resolve(__dirname, 'src/conf/theme/*.json'), dest: 'assets/conf/theme' },
+                    { src: 'src/conf/theme/*.json', dest: 'assets/conf/theme' },
                 ],
             }),
             viteStaticCopy({
@@ -154,8 +154,6 @@ export default defineConfig(async ({ mode }) => {
             target: 'esnext',
             minify: 'esbuild',
             reportCompressedSize: false,
-            // Limit number of worker threads to reduce CPU pressure
-            workers: 3, // default is number of CPU cores
         },
         server: {
             open: false,
