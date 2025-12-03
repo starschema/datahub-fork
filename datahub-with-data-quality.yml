@@ -63,7 +63,7 @@ services:
       - AI_ASSISTANT_PORT=8082
     depends_on:
       datahub-gms:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - ${HOME}/.datahub/plugins:/etc/datahub/plugins
 
@@ -114,7 +114,11 @@ services:
       - THEME_V2_DEFAULT=true
       - UI_INGESTION_ENABLED=true
     healthcheck:
-      disable: true
+      interval: 1s
+      retries: 3
+      start_period: 90s
+      test: curl -sS --fail http://datahub-gms:${DATAHUB_GMS_PORT:-8080}/health
+      timeout: 5s
     depends_on:
       datahub-upgrade:
         condition: service_completed_successfully
@@ -142,9 +146,6 @@ services:
       - /bin/sh
       - -c
       - |
-        # Wait for GMS to be ready (simple sleep since dockerize is not available)
-        echo "Waiting for GMS to be ready..."
-        sleep 30
         # Start AI Assistant API in background
         python -m uvicorn datahub_actions.plugin.action.ai_assistant.api:create_app --factory --host 0.0.0.0 --port 8082 &
         # Start Actions framework (runs in foreground)
@@ -169,7 +170,7 @@ services:
       - GEMINI_MODEL=gemini-2.0-flash-exp
     depends_on:
       datahub-gms:
-        condition: service_started
+        condition: service_healthy
     volumes:
       # Mount executor, data quality, governance, assertion executor, and ingestion source mapper configuration files
       - ./executor-action-config.yaml:/etc/datahub/actions/conf/executor-action.yaml:ro
@@ -411,7 +412,8 @@ services:
     # ports:  # COMMENTED OUT - DO NOT expose Schema Registry publicly!
     #   - ${DATAHUB_MAPPED_SCHEMA_REGISTRY_PORT:-8081}:8081
     environment:
-      - SCHEMA_REGISTRY_HOST_NAME=schemaregistry
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
       - SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL=PLAINTEXT
       - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=broker:29092
     healthcheck:
