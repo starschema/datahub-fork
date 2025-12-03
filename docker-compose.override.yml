@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # ===== NGINX REVERSE PROXY FOR AI QUERY =====
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: datahub-nginx-proxy
+    ports:
+      - "9002:9002"
+    volumes:
+      - C:/Users/rishi/Downloads/DataHub/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - datahub_network
+    depends_on:
+      datahub-frontend-react:
+        condition: service_started
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ===== GRAPHRAG DEMO PROXY SERVER =====
+  graphrag-proxy:
+    image: node:18-alpine
+    container_name: datahub-graphrag-proxy
+    working_dir: /app
+    ports:
+      - "7777:7777"
+    volumes:
+      - C:/Users/rishi/Downloads/DataHub/graphrag-demo:/app:ro
+    command: node graphql-proxy-server.js
+    networks:
+      - datahub_network
+    depends_on:
+      datahub-gms-quickstart:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ===== ENHANCED DATAHUB-ACTIONS WITH GOVERNANCE & DATA QUALITY =====
+  datahub-actions-quickstart:
+    volumes:
+      # Mount all custom action configs
+      - C:/Users/rishi/Downloads/DataHub/executor-action-config.yaml:/etc/datahub/actions/executor-action-config.yaml:ro
+      - C:/Users/rishi/Downloads/DataHub/governance-action-config.yaml:/etc/datahub/actions/governance-action-config.yaml:ro
+      - C:/Users/rishi/Downloads/DataHub/governance-rules.yml:/etc/datahub/actions/governance-rules.yml:ro
+      - C:/Users/rishi/Downloads/DataHub/data-quality-action-config.yaml:/etc/datahub/actions/data-quality-action-config.yaml:ro
+      - C:/Users/rishi/Downloads/DataHub/assertion-executor-action-config.yaml:/etc/datahub/actions/assertion-executor-action-config.yaml:ro
+      - C:/Users/rishi/Downloads/DataHub/ingestion-source-mapper-action-config.yaml:/etc/datahub/actions/ingestion-source-mapper-action-config.yaml:ro
+    environment:
+      # Configure actions to use all configs (comma-separated)
+      ACTIONS_CONFIG: >-
+        /etc/datahub/actions/executor-action-config.yaml,
+        /etc/datahub/actions/governance-action-config.yaml,
+        /etc/datahub/actions/data-quality-action-config.yaml,
+        /etc/datahub/actions/assertion-executor-action-config.yaml,
+        /etc/datahub/actions/ingestion-source-mapper-action-config.yaml
+      # System credentials for automated actions
+      DATAHUB_SYSTEM_CLIENT_ID: __datahub_system
+      DATAHUB_SYSTEM_CLIENT_SECRET: JohnSnowKnowsNothing
+
+networks:
+  datahub_network:
+    external: true
