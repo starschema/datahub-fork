@@ -23,6 +23,3 @@ generates:
             - 'typescript-react-apollo'
             - add:
                   content: '/* eslint-disable */'
-hooks:
-    afterAllFileWrite:
-        - prettier --write
