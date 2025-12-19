@@ -84,6 +84,7 @@ services:
         condition: service_healthy
     volumes:
       - ${HOME}/.datahub/plugins:/etc/datahub/plugins
+      - ./datahub-web-react/public/assets/platforms:/datahub-frontend/public/assets/platforms
 
   datahub-gms:
     hostname: datahub-gms
