@@ -27,6 +27,9 @@ metadata-events/mxe-registration/src/main/resources/**/*.avsc
 # Java
 .java-version
 
+# Environment files with secrets
+.env
+
 # Python
 .venv
 venv/

@@ -18,6 +18,24 @@ This is a customized DataHub implementation designed to serve as a **metadata-po
 
 ---
 
+## ⚠️ BREAKING CHANGE - Secret Encryption Key Migration
+
+**If you're upgrading from a previous version:**
+
+All existing secrets (Snowflake credentials, database passwords, API keys) will become **unreadable** after this update. This is a **one-time migration** to fix a critical bug where secrets were lost on every container restart.
+
+**Before upgrading:**
+1. Document all your current credentials (Snowflake, databases, APIs)
+2. Export any critical configurations
+3. Plan for re-entry of all secrets after upgrade
+
+**Why this is necessary:**
+- Previous versions used auto-generated encryption keys that changed on every restart
+- This fix implements a persistent encryption key
+- One-time pain now prevents continuous secret loss in the future
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -27,7 +45,7 @@ This is a customized DataHub implementation designed to serve as a **metadata-po
 - **Minimum 8GB RAM** (16GB recommended)
 - **10GB free disk space**
 
-### Start DataHub in 3 Steps
+### Start DataHub in 4 Steps
 
 **1. Clone the Repository**
 ```bash
@@ -35,14 +53,24 @@ git clone https://github.com/starschema/Custom-Datahub.git
 cd datahub
 ```
 
-**2. Start All Services (with Data Quality)**
+**2. Configure Secret Encryption (CRITICAL)**
+
+A `.env` file has been created with a secure encryption key. This key is used to encrypt all stored secrets (database passwords, API keys, Snowflake credentials, etc.).
+
+**⚠️ IMPORTANT:**
+- The `.env` file contains your `SECRET_SERVICE_ENCRYPTION_KEY`
+- **NEVER commit this file to git** (already in `.gitignore`)
+- **NEVER change this key** after creating secrets, or they'll become unreadable
+- **BACK UP this key** securely - losing it means losing all encrypted credentials
+
+**3. Start All Services (with Data Quality)**
 ```bash
 docker-compose -f datahub-with-data-quality.yml up -d
 ```
 
 > **Note:** This boots DataHub with automatic data quality testing enabled. Tests run automatically when you ingest data.
 
-**3. Access the UI**
+**4. Access the UI**
 
 Open your browser and navigate to: **http://localhost:9002**
 
