@@ -1,0 +1,21 @@
+{
+  "name": "datahub-nl-query-server",
+  "version": "2.0.0",
+  "description": "Natural Language Query Server for DataHub with OpenAI integration",
+  "main": "nl-query-server-v2-cached.js",
+  "scripts": {
+    "start": "node nl-query-server-v2-cached.js",
+    "dev": "nodemon nl-query-server-v2-cached.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

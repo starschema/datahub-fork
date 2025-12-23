@@ -79,6 +79,8 @@ services:
       # AI Assistant API proxy configuration
       - AI_ASSISTANT_HOST=actions
       - AI_ASSISTANT_PORT=8082
+      # OpenAI API key for AI Query / GraphRAG features
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       datahub-gms:
         condition: service_healthy
