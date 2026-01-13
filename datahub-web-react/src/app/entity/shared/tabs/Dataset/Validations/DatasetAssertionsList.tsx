@@ -230,31 +230,29 @@ export const DatasetAssertionsList = ({
             dataIndex: '',
             key: '',
             render: (_, record: any) => {
+                const platformName = record.platform?.properties?.displayName ||
+                    (record.platform?.name ? capitalizeFirstLetterOnly(record.platform.name) : 'Unknown');
+                const logoUrl = record.platform?.properties?.logoUrl;
+
                 return (
                     showMenu && (
                         <ActionButtonContainer>
-                            <Tooltip
-                                title={
-                                    record.platform.properties?.displayName ||
-                                    capitalizeFirstLetterOnly(record.platform.name)
-                                }
-                            >
-                                <PlatformContainer>
-                                    {(record.platform.properties?.logoUrl && (
-                                        <Image
-                                            preview={false}
-                                            height={20}
-                                            width={20}
-                                            src={record.platform.properties?.logoUrl}
-                                        />
-                                    )) || (
-                                        <Typography.Text>
-                                            {record.platform.properties?.displayName ||
-                                                capitalizeFirstLetterOnly(record.platform.name)}
-                                        </Typography.Text>
-                                    )}
-                                </PlatformContainer>
-                            </Tooltip>
+                            {record.platform && (
+                                <Tooltip title={platformName}>
+                                    <PlatformContainer>
+                                        {logoUrl ? (
+                                            <Image
+                                                preview={false}
+                                                height={20}
+                                                width={20}
+                                                src={logoUrl}
+                                            />
+                                        ) : (
+                                            <Typography.Text>{platformName}</Typography.Text>
+                                        )}
+                                    </PlatformContainer>
+                                </Tooltip>
+                            )}
                             <Button onClick={() => onDeleteAssertion(record.urn)} type="text" shape="circle" danger>
                                 <DeleteOutlined />
                             </Button>

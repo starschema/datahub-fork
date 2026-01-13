@@ -255,6 +255,8 @@ export const getAggregationPlainText = (
  */
 
 export const getDatasetAssertionPlainTextDescription = (datasetAssertion: DatasetAssertionInfo): string => {
+    if (!datasetAssertion) return 'Dataset assertion';
+
     const { scope, aggregation, fields, operator, parameters, nativeType } = datasetAssertion;
     const aggregationPlainText = getAggregationPlainText(scope, aggregation, fields);
     const operatorPlainText = getOperatorPlainText(operator, parameters || undefined, nativeType || undefined);
@@ -267,6 +269,8 @@ export const getDatasetAssertionPlainTextDescription = (datasetAssertion: Datase
  * A human-readable Plain Text description of a Volume Assertion.
  */
 export const getVolumeAssertionPlainTextDescription = (assertionInfo: VolumeAssertionInfo): string => {
+    if (!assertionInfo) return 'Volume assertion';
+
     const volumeType = assertionInfo.type;
     const volumeTypeInfo = getVolumeTypeInfo(assertionInfo);
     const volumeTypeDescription = getVolumeTypeDescription(volumeType);
@@ -285,6 +289,8 @@ export const getVolumeAssertionPlainTextDescription = (assertionInfo: VolumeAsse
  * A human-readable Plain Text description of a Field Assertion.
  */
 export const getFieldAssertionPlainTextDescription = (assertionInfo: FieldAssertionInfo) => {
+    if (!assertionInfo) return 'Field assertion';
+
     const field = getFieldDescription(assertionInfo);
     const transform = getFieldTransformDescription(assertionInfo);
     // Do not pluralize if this is a metric assertion since you're checking one metric, not multiple values
@@ -301,6 +307,8 @@ export const getFieldAssertionPlainTextDescription = (assertionInfo: FieldAssert
  * A human-readable Plain Text description of a Schema Assertion.
  */
 export const getSchemaAssertionPlainTextDescription = (assertionInfo: SchemaAssertionInfo) => {
+    if (!assertionInfo) return 'Schema assertion';
+
     const { compatibility } = assertionInfo;
     const matchText = compatibility === SchemaAssertionCompatibility.ExactMatch ? 'exactly match' : 'include';
     const expectedColumnCount = assertionInfo?.fields?.length || 0;
@@ -316,6 +324,8 @@ export const getFreshnessAssertionPlainTextDescription = (
     assertionInfo: FreshnessAssertionInfo,
     monitorSchedule: CronSchedule,
 ) => {
+    if (!assertionInfo) return 'Freshness assertion';
+
     const scheduleType = assertionInfo.schedule?.type;
     const freshnessType = assertionInfo.type;
 
@@ -374,21 +384,45 @@ const useBuildPrimaryLabel = (
                 );
                 break;
             case AssertionType.Volume:
-                primaryLabel = (
-                    <VolumeAssertionDescription assertionInfo={assertionInfo.volumeAssertion as VolumeAssertionInfo} />
-                );
+                // Check if using old format (datasetAssertion) or new format (volumeAssertion)
+                if (assertionInfo.volumeAssertion) {
+                    primaryLabel = (
+                        <VolumeAssertionDescription assertionInfo={assertionInfo.volumeAssertion as VolumeAssertionInfo} />
+                    );
+                } else if (assertionInfo.datasetAssertion) {
+                    // Old format: use DatasetAssertionDescription
+                    primaryLabel = (
+                        <DatasetAssertionDescription
+                            assertionInfo={assertionInfo.datasetAssertion as DatasetAssertionInfo}
+                        />
+                    );
+                } else {
+                    primaryLabel = <Typography.Text>Volume assertion information unavailable</Typography.Text>;
+                }
                 break;
             case AssertionType.Sql:
                 primaryLabel = <SqlAssertionDescription assertionInfo={assertionInfo} />;
                 break;
             case AssertionType.Field:
-                primaryLabel = (
-                    <FieldAssertionDescription
-                        assertionDescription={assertionInfo?.description}
-                        assertionInfo={assertionInfo.fieldAssertion as FieldAssertionInfo}
-                        showColumnTag={options?.showColumnTag}
-                    />
-                );
+                // Check if using old format (datasetAssertion) or new format (fieldAssertion)
+                if (assertionInfo.fieldAssertion) {
+                    primaryLabel = (
+                        <FieldAssertionDescription
+                            assertionDescription={assertionInfo?.description}
+                            assertionInfo={assertionInfo.fieldAssertion as FieldAssertionInfo}
+                            showColumnTag={options?.showColumnTag}
+                        />
+                    );
+                } else if (assertionInfo.datasetAssertion) {
+                    // Old format: use DatasetAssertionDescription
+                    primaryLabel = (
+                        <DatasetAssertionDescription
+                            assertionInfo={assertionInfo.datasetAssertion as DatasetAssertionInfo}
+                        />
+                    );
+                } else {
+                    primaryLabel = <Typography.Text>Field assertion information unavailable</Typography.Text>;
+                }
                 break;
             case AssertionType.DataSchema:
                 primaryLabel = (
@@ -532,7 +566,44 @@ export const getPlainTextDescriptionFromAssertion = (assertionInfo?: AssertionIn
         return assertionInfo.description;
     }
 
-    return assertionInfo
-        ? getDatasetAssertionPlainTextDescription(assertionInfo.datasetAssertion as DatasetAssertionInfo)
-        : '';
+    if (!assertionInfo) return '';
+
+    // Handle different assertion types with fallback to old datasetAssertion format
+    switch (assertionInfo.type) {
+        case AssertionType.Volume:
+            if (assertionInfo.volumeAssertion) {
+                return getVolumeAssertionPlainTextDescription(assertionInfo.volumeAssertion as VolumeAssertionInfo);
+            } else if (assertionInfo.datasetAssertion) {
+                // Old format: use dataset assertion description
+                return getDatasetAssertionPlainTextDescription(assertionInfo.datasetAssertion as DatasetAssertionInfo);
+            }
+            return 'Volume assertion';
+        case AssertionType.Field:
+            if (assertionInfo.fieldAssertion) {
+                return getFieldAssertionPlainTextDescription(assertionInfo.fieldAssertion as FieldAssertionInfo);
+            } else if (assertionInfo.datasetAssertion) {
+                // Old format: use dataset assertion description
+                return getDatasetAssertionPlainTextDescription(assertionInfo.datasetAssertion as DatasetAssertionInfo);
+            }
+            return 'Field assertion';
+        case AssertionType.DataSchema:
+            if (assertionInfo.schemaAssertion) {
+                return getSchemaAssertionPlainTextDescription(assertionInfo.schemaAssertion as SchemaAssertionInfo);
+            }
+            return 'Schema assertion';
+        case AssertionType.Freshness:
+            if (assertionInfo.freshnessAssertion) {
+                return getFreshnessAssertionPlainTextDescription(
+                    assertionInfo.freshnessAssertion as FreshnessAssertionInfo,
+                    {} as CronSchedule,
+                );
+            }
+            return 'Freshness assertion';
+        case AssertionType.Dataset:
+        default:
+            if (assertionInfo.datasetAssertion) {
+                return getDatasetAssertionPlainTextDescription(assertionInfo.datasetAssertion as DatasetAssertionInfo);
+            }
+            return 'Dataset assertion';
+    }
 };

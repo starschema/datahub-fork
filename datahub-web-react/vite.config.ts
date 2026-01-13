@@ -115,7 +115,7 @@ export default defineConfig(async ({ mode }) => {
         },
         server: {
             open: false,
-            host: false,
+            host: true,  // Listen on all network interfaces (allows Docker to connect)
             port: 3000,
             proxy: proxyOptions,
         },

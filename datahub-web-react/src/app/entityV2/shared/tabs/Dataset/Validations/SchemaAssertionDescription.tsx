@@ -14,6 +14,11 @@ type Props = {
  */
 export const SchemaAssertionDescription = ({ assertionInfo }: Props) => {
     const [showSchemaSummary, setShowSchemaSummary] = useState(false);
+
+    if (!assertionInfo) {
+        return <Typography.Text>Schema assertion information unavailable</Typography.Text>;
+    }
+
     const { compatibility } = assertionInfo;
     const matchText = compatibility === SchemaAssertionCompatibility.ExactMatch ? 'exactly match' : 'include';
     const expectedColumnCount = assertionInfo?.fields?.length || 0;

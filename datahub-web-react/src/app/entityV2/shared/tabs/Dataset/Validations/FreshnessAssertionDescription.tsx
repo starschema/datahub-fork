@@ -48,6 +48,14 @@ export const createSinceTheLastCheckText = (monitorSchedule?: Maybe<CronSchedule
  * A human-readable description of an Freshness Assertion.
  */
 export const FreshnessAssertionDescription = ({ assertionInfo, monitorSchedule }: Props) => {
+    if (!assertionInfo) {
+        return (
+            <div>
+                <Typography.Text>Freshness assertion information unavailable</Typography.Text>
+            </div>
+        );
+    }
+
     const scheduleType = assertionInfo.schedule?.type;
     const freshnessType = assertionInfo.type;
 
