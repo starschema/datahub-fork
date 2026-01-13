@@ -30,6 +30,9 @@ action:
   type: "executor"
   config:
     executor_id: "default"
+    # System authentication - passed to ingestion processes
+    system_id: "__datahub_system"
+    # The secret is automatically picked up from DATAHUB_SYSTEM_CLIENT_SECRET env var
     task_configs:
       - name: "RUN_INGEST"
         type: "acryl.executor.execution.sub_process_ingestion_task.SubProcessIngestionTask"
@@ -40,5 +43,6 @@ action:
 
 datahub:
   server: "http://datahub-gms:8080"
-  extra_headers:
-    Authorization: "Basic __datahub_system:JohnSnowKnowsNothing"
+  # Token-based authentication for ingestion processes
+  # The executor will pass this token to spawned ingestion subprocesses
+  token: "${DATAHUB_SYSTEM_CLIENT_SECRET}"

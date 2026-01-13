@@ -1,3 +1,8 @@
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
 # Gradle & Avro
 .project
 .settings

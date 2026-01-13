@@ -23,8 +23,6 @@
 #     - executor-action-config.yaml
 #     - data-quality-action-config.yaml
 
-version: '3.9'
-
 networks:
   default:
     name: datahub_network
@@ -32,18 +30,32 @@ networks:
 services:
   # ===== DATAHUB CORE SERVICES =====
 
+  nginx:
+    hostname: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "9002:9002"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      datahub-frontend-react:
+        condition: service_started
+      datahub-actions:
+        condition: service_started
+
   datahub-frontend-react:
     hostname: datahub-frontend-react
     # Use GHCR image by default, fallback to local if not available
     # To use local image: export DATAHUB_FRONTEND_IMAGE=custom-datahub-frontend-react:hcltech
     image: ${DATAHUB_FRONTEND_IMAGE:-ghcr.io/starschema/custom-datahub-frontend-react:latest}
     restart: unless-stopped
-    ports:
-      - ${DATAHUB_MAPPED_FRONTEND_PORT:-9002}:9002
+    # PRODUCTION: Port 9002 is NOT exposed externally - only accessible via nginx proxy
+    # For local development with direct access, use a separate docker-compose override file
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
-      - DATAHUB_SECRET=YouKnowNothing
+      - DATAHUB_SECRET=${DATAHUB_SECRET:-YouKnowNothing}
       - DATAHUB_APP_VERSION=1.0
       - DATAHUB_PLAY_MEM_BUFFER_SIZE=10MB
       - JAVA_OPTS=-Xms512m -Xmx512m -Dhttp.port=9002 -Dconfig.file=datahub-frontend/conf/application.conf -Djava.security.auth.login.config=datahub-frontend/conf/jaas.conf -Dlogback.configurationFile=datahub-frontend/conf/logback.xml -Dlogback.debug=false -Dpidfile.path=/dev/null -Dauth.baseUrl=http://datahub-gms:8080
@@ -71,15 +83,18 @@ services:
     hostname: datahub-gms
     image: ${DATAHUB_GMS_IMAGE:-acryldata/datahub-gms}:${DATAHUB_VERSION:-v1.3.0.1}
     restart: unless-stopped
-    ports:
-      - ${DATAHUB_MAPPED_GMS_PORT:-8888}:8080
+    # PRODUCTION SECURITY: GMS port is NOT exposed externally
+    # All API access must go through datahub-frontend-react (port 9002) which handles authentication
+    # For direct GMS access in development, use a docker-compose override file
+    # ports:
+    #   - ${DATAHUB_MAPPED_GMS_PORT:-8888}:8080
     environment:
       - DATAHUB_SERVER_TYPE=${DATAHUB_SERVER_TYPE:-quickstart}
       - DATAHUB_TELEMETRY_ENABLED=${DATAHUB_TELEMETRY_ENABLED:-true}
       - DATAHUB_UPGRADE_HISTORY_KAFKA_CONSUMER_GROUP_ID=generic-duhe-consumer-job-client-gms
       - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
       - EBEAN_DATASOURCE_HOST=mysql:3306
-      - EBEAN_DATASOURCE_PASSWORD=datahub
+      - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-datahub}
       - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8&enabledTLSProtocols=TLSv1.2
       - EBEAN_DATASOURCE_USERNAME=datahub
       - ELASTICSEARCH_HOST=elasticsearch
@@ -101,7 +116,7 @@ services:
       - METADATA_SERVICE_AUTH_ENABLED=${METADATA_SERVICE_AUTH_ENABLED:-true}
       # Neo4j configuration - points to external Neo4j or container
       - NEO4J_USERNAME=neo4j
-      - NEO4J_PASSWORD=P@ssword1
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-P@ssword1}
       - NEO4J_URI=bolt://host.docker.internal:7687
       - NEO4J_HOST=http://host.docker.internal:7474
       - NEO4J_DATABASE=neo4j
@@ -135,8 +150,9 @@ services:
     # # For production: export DATAHUB_ACTIONS_IMAGE=ghcr.io/starschema/datahub-actions-with-governance:latest
     # image: ${DATAHUB_ACTIONS_IMAGE:-datahub-actions-local:latest}
     restart: unless-stopped
-    # NOTE: Port 8082 not exposed in production - access via nginx proxy: /api/ai-assistant -> http://actions:8082
-    # For local dev with port access, use datahub_deployment_local.yml instead
+    # PRODUCTION: AI Assistant API (port 8082) is NOT exposed externally
+    # Access via nginx proxy at /api/ai-assistant/ endpoint
+    # For local development/testing, use a docker-compose override file to expose this port
 
     # NEW (Working image from GHCR - includes governance, data quality, executor, AI assistant):
     # This image is built by ./docker/build-push-images.sh and pushed to GHCR
@@ -151,23 +167,24 @@ services:
         # Start Actions framework (runs in foreground)
         datahub actions run \
           --config /etc/datahub/actions/conf/executor-action.yaml \
-          --config /etc/datahub/actions/conf/data-quality-action.yaml
+          --config /etc/datahub/actions/conf/data-quality-action.yaml \
+          --config /etc/datahub/actions/conf/governance-action.yaml
     environment:
       - DATAHUB_GMS_HOST=datahub-gms
       - DATAHUB_GMS_PORT=8080
       - DATAHUB_GMS_PROTOCOL=http
       - DATAHUB_GMS_URL=http://datahub-gms:8080
       - DATAHUB_SYSTEM_CLIENT_ID=__datahub_system
-      - DATAHUB_SYSTEM_CLIENT_SECRET=JohnSnowKnowsNothing
+      - DATAHUB_SYSTEM_CLIENT_SECRET=${DATAHUB_SYSTEM_CLIENT_SECRET:-JohnSnowKnowsNothing}
       - KAFKA_BOOTSTRAP_SERVER=broker:29092
       - KAFKA_PROPERTIES_SECURITY_PROTOCOL=PLAINTEXT
       - METADATA_AUDIT_EVENT_NAME=MetadataAuditEvent_v4
       - METADATA_CHANGE_LOG_VERSIONED_TOPIC_NAME=MetadataChangeLog_Versioned_v1
       - SCHEMA_REGISTRY_URL=http://schema-registry:8081
       # AI Assistant configuration
-      - LLM_PROVIDER=gemini
-      - GEMINI_API_KEY=AIzaSyA26MaS06JMDpOliZO334jirYd13QKNV0w
-      - GEMINI_MODEL=gemini-2.0-flash-exp
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.0-flash-exp}
     depends_on:
       datahub-gms:
         condition: service_healthy
@@ -194,7 +211,7 @@ services:
       - DATAHUB_GMS_PORT=8080
       - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
       - EBEAN_DATASOURCE_HOST=mysql:3306
-      - EBEAN_DATASOURCE_PASSWORD=datahub
+      - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-datahub}
       - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8
       - EBEAN_DATASOURCE_USERNAME=datahub
       - ELASTICSEARCH_BUILD_INDICES_CLONE_INDICES=false
@@ -230,7 +247,7 @@ services:
       - METADATA_CHANGE_PROPOSAL_TOPIC_NAME=MetadataChangeProposal_v1
       - EBEAN_DATASOURCE_DRIVER=com.mysql.jdbc.Driver
       - EBEAN_DATASOURCE_HOST=mysql:3306
-      - EBEAN_DATASOURCE_PASSWORD=datahub
+      - EBEAN_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-datahub}
       - EBEAN_DATASOURCE_URL=jdbc:mysql://mysql:3306/datahub?verifyServerCertificate=false&useSSL=true&useUnicode=yes&characterEncoding=UTF-8&enabledTLSProtocols=TLSv1.2
       - EBEAN_DATASOURCE_USERNAME=datahub
       - DATAHUB_GMS_HOST=datahub-gms
@@ -271,6 +288,7 @@ services:
   elasticsearch:
     hostname: elasticsearch
     image: ${DATAHUB_SEARCH_IMAGE:-elasticsearch}:${DATAHUB_SEARCH_TAG:-7.10.1}
+    restart: unless-stopped
     # SECURITY: Only expose internally to Docker network, not to host/external IPs
     # Use 'expose' instead of 'ports' to prevent external access
     expose:
@@ -313,6 +331,7 @@ services:
   mysql:
     hostname: mysql
     image: mysql:${DATAHUB_MYSQL_VERSION:-8.2}
+    restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --default-authentication-plugin=mysql_native_password
     # SECURITY: Only expose internally to Docker network, not to host/external IPs
     expose:
@@ -322,10 +341,9 @@ services:
     environment:
       - MYSQL_DATABASE=datahub
       - MYSQL_USER=datahub
-      - MYSQL_PASSWORD=datahub
-      - MYSQL_ROOT_PASSWORD=datahub
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-datahub}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-datahub}
       - MYSQL_ROOT_HOST=%
-    restart: on-failure
     healthcheck:
       interval: 10s
       retries: 30
@@ -342,7 +360,7 @@ services:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
       - MYSQL_USERNAME=datahub
-      - MYSQL_PASSWORD=datahub
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-datahub}
       - DATAHUB_DB_NAME=datahub
     depends_on:
       mysql:
@@ -353,6 +371,7 @@ services:
   broker:
     hostname: broker
     image: ${DATAHUB_CONFLUENT_KAFKA_IMAGE:-confluentinc/cp-kafka}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    restart: unless-stopped
     # SECURITY: Only expose internally to Docker network, not to host/external IPs
     expose:
       - 9092
@@ -385,6 +404,7 @@ services:
   zookeeper:
     hostname: zookeeper
     image: ${DATAHUB_CONFLUENT_ZOOKEEPER_IMAGE:-confluentinc/cp-zookeeper}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    restart: unless-stopped
     # SECURITY: Only expose internally to Docker network, not to host/external IPs
     expose:
       - 2181
@@ -406,6 +426,7 @@ services:
   schema-registry:
     hostname: schema-registry
     image: ${DATAHUB_CONFLUENT_SCHEMA_REGISTRY_IMAGE:-confluentinc/cp-schema-registry}:${DATAHUB_CONFLUENT_VERSION:-7.9.2}
+    restart: unless-stopped
     # SECURITY: Only expose internally to Docker network, not to host/external IPs
     expose:
       - 8081
