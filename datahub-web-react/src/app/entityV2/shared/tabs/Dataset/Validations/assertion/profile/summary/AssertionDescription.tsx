@@ -16,6 +16,10 @@ type Props = {
 
 // Component useful for rendering descriptions of assertions.
 export const AssertionDescription = ({ assertion, options }: Props) => {
+    if (!assertion || !assertion.info) {
+        return <Typography.Text>Assertion information unavailable</Typography.Text>;
+    }
+
     const assertionInfo = assertion.info;
     const monitorSchedule = null;
     const { primaryLabel, secondaryLabel } = useBuildAssertionDescriptionLabels(assertionInfo, monitorSchedule, {

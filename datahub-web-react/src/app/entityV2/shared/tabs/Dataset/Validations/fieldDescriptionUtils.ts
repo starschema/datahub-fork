@@ -104,12 +104,14 @@ const getAssertionStdParameters = (parameters: AssertionStdParameters) => {
 };
 
 export const getFieldDescription = (assertionInfo: FieldAssertionInfo) => {
+    if (!assertionInfo) return '';
+
     const { type, fieldValuesAssertion, fieldMetricAssertion } = assertionInfo;
     switch (type) {
         case FieldAssertionType.FieldValues:
-            return fieldValuesAssertion?.field?.path;
+            return fieldValuesAssertion?.field?.path || 'unknown field';
         case FieldAssertionType.FieldMetric:
-            return fieldMetricAssertion?.field?.path;
+            return fieldMetricAssertion?.field?.path || 'unknown field';
         default:
             throw new Error(`Unknown field assertion type ${type}`);
     }
@@ -122,13 +124,15 @@ export const getFieldOperatorDescription = ({
     assertionInfo: FieldAssertionInfo;
     isPlural?: boolean;
 }) => {
+    if (!assertionInfo) return '';
+
     const { type, fieldValuesAssertion, fieldMetricAssertion } = assertionInfo;
     switch (type) {
         case FieldAssertionType.FieldValues:
-            if (!fieldValuesAssertion?.operator) return '';
+            if (!fieldValuesAssertion?.operator) return 'has unknown condition';
             return getAssertionStdOperator({ operator: fieldValuesAssertion.operator, isPlural });
         case FieldAssertionType.FieldMetric:
-            if (!fieldMetricAssertion?.operator) return '';
+            if (!fieldMetricAssertion?.operator) return 'has unknown condition';
             return getAssertionStdOperator({ operator: fieldMetricAssertion.operator, isPlural });
         default:
             throw new Error(`Unknown field assertion type ${type}`);
@@ -136,13 +140,15 @@ export const getFieldOperatorDescription = ({
 };
 
 export const getFieldTransformDescription = (assertionInfo: FieldAssertionInfo) => {
+    if (!assertionInfo) return '';
+
     const { type, fieldValuesAssertion, fieldMetricAssertion } = assertionInfo;
     switch (type) {
         case FieldAssertionType.FieldValues:
             if (!fieldValuesAssertion?.transform?.type) return '';
             return getFieldTransformType(fieldValuesAssertion.transform.type);
         case FieldAssertionType.FieldMetric:
-            if (!fieldMetricAssertion?.metric) return '';
+            if (!fieldMetricAssertion?.metric) return 'unknown metric';
             return getFieldMetricTypeReadableLabel(fieldMetricAssertion.metric);
         default:
             throw new Error(`Unknown field assertion type ${type}`);
@@ -150,6 +156,8 @@ export const getFieldTransformDescription = (assertionInfo: FieldAssertionInfo) 
 };
 
 export const getFieldParametersDescription = (assertionInfo: FieldAssertionInfo) => {
+    if (!assertionInfo) return '';
+
     const { type, fieldValuesAssertion, fieldMetricAssertion } = assertionInfo;
     switch (type) {
         case FieldAssertionType.FieldValues:

@@ -20,6 +20,14 @@ type Props = {
  * A human-readable description of a Volume Assertion.
  */
 export const VolumeAssertionDescription = ({ assertionInfo }: Props) => {
+    if (!assertionInfo) {
+        return (
+            <div>
+                <Typography.Text>Volume assertion information unavailable</Typography.Text>
+            </div>
+        );
+    }
+
     const volumeType = assertionInfo.type;
     const volumeTypeInfo = getVolumeTypeInfo(assertionInfo);
     const volumeTypeDescription = getVolumeTypeDescription(volumeType);
